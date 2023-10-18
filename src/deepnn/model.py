@@ -65,9 +65,8 @@ class NeuralNetwork:
         # Dynamically add layers from the configuration
         for layer_conf in self.structure_config["layers"]:
             layer_type = layer_conf["type"]
-
-            # For each type of layer, we handle the parameters appropriately
-            # Note: Error handling and data consistency checks are recommended
+ 
+            # For each type of layer, we handle the parameters appropriately.
             if layer_type == "Conv2D":
                 prev_layer = tf.keras.layers.Conv2D(
                     filters=layer_conf["filters"],
@@ -78,11 +77,18 @@ class NeuralNetwork:
                 prev_layer = tf.keras.layers.MaxPooling2D(
                     pool_size=tuple(layer_conf["pool_size"])
                 )(prev_layer)
+            elif layer_type == "BatchNormalization":  # Handling BatchNormalization
+                prev_layer = tf.keras.layers.BatchNormalization()(prev_layer)
             elif layer_type == "Flatten":
                 prev_layer = tf.keras.layers.Flatten()(prev_layer)
             elif layer_type == "Dense":
                 prev_layer = tf.keras.layers.Dense(
-                    units=layer_conf["units"], activation=layer_conf["activation"]
+                    units=layer_conf["units"],
+                    activation=layer_conf["activation"]
+                )(prev_layer)
+            elif layer_type == "Dropout":  # Handling Dropout
+                prev_layer = tf.keras.layers.Dropout(
+                    rate=layer_conf["rate"]
                 )(prev_layer)
             else:
                 raise ValueError(f"Layer type '{layer_type}' not recognized.")
