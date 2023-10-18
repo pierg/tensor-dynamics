@@ -24,15 +24,18 @@ lint:
 	poetry run mypy .
 
 clean_results:
-	# Remove content of results directory
-	rm -rf results/*
+	# Remove content of results directory besides "saved" directory
+	@echo "Cleaning results directory..."
+	@find results/ -mindepth 1 -maxdepth 1 ! -name 'saved' -exec rm -rf {} +
+	@echo "Done cleaning results directory."
+
 
 install:
 	# Install dependencies with pip from the requirements.txt file
 	pip install -r requirements.txt
 
 # The run command requires one mandatory argument (data directory) and an optional list of configurations.
-# For example: make run DATA_DIR=~/Documents/data CONFIGS="config_A config_B"
+# For example: make run DATA_DIR=~/Documents/data CONFIGS='config_Alex config_P'
 run:
 ifdef DATA_DIR
 	. .venv/bin/activate && python src/main.py --data_dir=$(DATA_DIR) $(CONFIGS)

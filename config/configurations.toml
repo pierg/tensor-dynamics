@@ -22,7 +22,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_Alex.training]
-epochs = 2
+epochs = 50
 
 
 
@@ -49,7 +49,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_P.training]
-epochs = 2
+epochs = 50
 
 
 # Configuration Complex_P
@@ -81,7 +81,8 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
 [config_Complex_P.training]
-epochs = 5  # Increased epochs due to the added complexity, but this can be adjusted based on training performance.
+epochs = 50
+
 
 
 # Configuration BN_P
@@ -113,7 +114,8 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
 [config_BN_P.training]
-epochs = 3  # Adjust based on the training convergence and time you're willing to spend on training.
+epochs = 50
+
 
 
 # Configuration A: Basic configuration with minimal layers and settings
@@ -135,8 +137,8 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_A.training]
-epochs = 2
-validation_split = 0.2
+epochs = 50
+
 
 
 
@@ -164,7 +166,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_B.training]
-epochs = 15
+epochs = 50
 
 
 
@@ -188,4 +190,4 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_C.training]
-epochs = 20
+epochs = 50
