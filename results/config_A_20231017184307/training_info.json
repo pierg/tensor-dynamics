@@ -1,0 +1,108 @@
+{
+    "timestamp": "2023-10-17 18:43:07",
+    "config_name": "config_A",
+    "model_config": {
+        "structure_config": {
+            "layers": [
+                {
+                    "type": "Conv2D",
+                    "filters": 32,
+                    "kernel_size": [
+                        3,
+                        3
+                    ],
+                    "activation": "relu"
+                },
+                {
+                    "type": "MaxPooling2D",
+                    "pool_size": [
+                        2,
+                        1
+                    ]
+                },
+                {
+                    "type": "Flatten"
+                },
+                {
+                    "type": "Dense",
+                    "units": 64,
+                    "activation": "relu"
+                },
+                {
+                    "type": "Dense",
+                    "units": 12,
+                    "activation": "linear"
+                }
+            ]
+        },
+        "compile_config": {
+            "optimizer": "adam",
+            "loss": "mean_squared_error",
+            "metrics": [
+                "MeanSquaredError",
+                "MeanAbsoluteError",
+                "MeanAbsolutePercentageError",
+                "RootMeanSquaredError"
+            ]
+        },
+        "training_config": {
+            "epochs": 2,
+            "validation_split": 0.2
+        }
+    },
+    "training_history": {
+        "epochs": [
+            0,
+            1
+        ],
+        "history": {
+            "loss": [
+                158.49188232421875,
+                131.55467224121094
+            ],
+            "mean_squared_error": [
+                158.49188232421875,
+                131.55467224121094
+            ],
+            "mean_absolute_error": [
+                5.6209540367126465,
+                5.572075366973877
+            ],
+            "mean_absolute_percentage_error": [
+                4585.8896484375,
+                4782.39990234375
+            ],
+            "root_mean_squared_error": [
+                12.589357376098633,
+                11.469728469848633
+            ],
+            "val_loss": [
+                138.78990173339844,
+                127.59337615966797
+            ],
+            "val_mean_squared_error": [
+                138.78990173339844,
+                127.59337615966797
+            ],
+            "val_mean_absolute_error": [
+                5.815738201141357,
+                5.807527542114258
+            ],
+            "val_mean_absolute_percentage_error": [
+                6035.75732421875,
+                9079.9453125
+            ],
+            "val_root_mean_squared_error": [
+                11.780912399291992,
+                11.295723915100098
+            ]
+        }
+    },
+    "evaluation_results": {
+        "loss": 126.08427429199219,
+        "mean_squared_error": 126.08427429199219,
+        "mean_absolute_error": 5.767329692840576,
+        "mean_absolute_percentage_error": 13697.23828125,
+        "root_mean_squared_error": 11.228726387023926
+    }
+}

@@ -1,0 +1,29 @@
+Training Summary:
+-----------------
+Best Performing Configuration: 'config_Alex_20231017184305'
+Config Name: config_Alex
+Timestamp: 2023-10-17 18:43:05
+Lowest Loss: 117.1724624633789
+
+Configuration: config_Alex_20231017184305
+Config Name: config_Alex
+Timestamp: 2023-10-17 18:43:05
+
+Evaluation Results:
+  - loss: 117.1724624633789
+  - mean_squared_error: 117.1724624633789
+  - mean_absolute_error: 5.463324546813965
+  - mean_absolute_percentage_error: 46916.20703125
+  - root_mean_squared_error: 10.82462215423584
+
+Configuration: config_A_20231017184307
+Config Name: config_A
+Timestamp: 2023-10-17 18:43:07
+
+Evaluation Results:
+  - loss: 126.08427429199219
+  - mean_squared_error: 126.08427429199219
+  - mean_absolute_error: 5.767329692840576
+  - mean_absolute_percentage_error: 13697.23828125
+  - root_mean_squared_error: 11.228726387023926
+
