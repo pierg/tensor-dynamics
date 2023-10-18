@@ -12,6 +12,8 @@ results
 
 .secrets
 
+logs/
+
 # Distribution / packaging
 .Python
 build/
