@@ -1,4 +1,8 @@
-.PHONY: clean_all format lint clean_results install run
+# Docker variables
+IMAGE_NAME=neural_networks
+VERSION=latest
+
+.PHONY: clean_all format lint clean_results install run tb stoptb docker-push
 
 clean_all:
 	# Remove Python compiled files and cache directories
@@ -34,11 +38,48 @@ install:
 	# Install dependencies with pip from the requirements.txt file
 	pip install -r requirements.txt
 
+.PHONY: run tb
+
+# Launch TensorBoard if not already running
+tb:
+	@if ! pgrep -x "tensorboard" > /dev/null; then \
+		echo "Starting TensorBoard..."; \
+		tensorboard --logdir ./logs & \
+	else \
+		echo "TensorBoard is already running."; \
+	fi
+
 # The run command requires one mandatory argument (data directory) and an optional list of configurations.
 # For example: make run DATA_DIR=~/Documents/data CONFIGS='config_Alex config_P'
-run:
+run: tb
 ifdef DATA_DIR
 	. .venv/bin/activate && python src/main.py --data_dir=$(DATA_DIR) $(CONFIGS)
 else
 	@echo "Error: DATA_DIR is undefined. Usage: make run DATA_DIR=<data-directory> [CONFIGS='<config1> <config2> ...']"
 endif
+
+
+# Terminate the TensorBoard process
+stoptb:
+	@echo "Attempting to stop TensorBoard..."
+	@pkill -f "tensorboard" || echo "Could not find a running TensorBoard process."
+
+
+# Load secrets
+include .secrets
+export $(shell sed 's/=.*//' .secrets)
+
+# Build and push to Docker Hub
+docker-push:
+	# Build the image
+	docker build -t $(DOCKER_USER)/$(IMAGE_NAME):$(VERSION) .
+
+	# Log in to Docker Hub
+	@echo "$(DOCKER_PASS)" | docker login --username $(DOCKER_USER) --password-stdin
+
+	# Push the image
+	docker push $(DOCKER_USER)/$(IMAGE_NAME):$(VERSION)
+
+	# Optional: Log out from Docker Hub
+	docker logout
+

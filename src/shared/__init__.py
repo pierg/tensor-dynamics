@@ -14,3 +14,6 @@ config_file: Path = config_folder / "configurations.toml"
 
 # Path to results folder
 results_folder: Path = main_repo_folder / "results"
+
+# Tensorboard log directory
+tb_log_dir: Path = main_repo_folder / "logs"

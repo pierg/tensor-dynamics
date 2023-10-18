@@ -94,6 +94,7 @@ def process_configuration(
             validation_dataset=val_dataset,
             test_dataset=test_dataset,
             configuration=config,
+            name=config_name,
         )
         history = neural_network.train_model()
 

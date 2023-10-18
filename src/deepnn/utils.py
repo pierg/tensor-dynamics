@@ -155,7 +155,7 @@ def save_training_info(
     }
 
     # Create the save directory
-    dir_name = save_folder / f"{config_name}_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    dir_name = save_folder / f"{config_name}_{datetime.now().strftime('%m.%d-%H.%M.%S')}"
     os.makedirs(dir_name, exist_ok=True)
 
     # Save all training information to a JSON file

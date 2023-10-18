@@ -1,7 +1,9 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Model
-
+from tensorflow.keras.callbacks import TensorBoard
+from src.shared import tb_log_dir
+from datetime import datetime
 
 class NeuralNetwork:
     def __init__(
@@ -10,6 +12,7 @@ class NeuralNetwork:
         validation_dataset: tf.data.Dataset,
         test_dataset: tf.data.Dataset,
         configuration: dict,
+        name: str
     ):
         """
         Initialize the NeuralNetwork class with training, validation, and test datasets,
@@ -20,8 +23,10 @@ class NeuralNetwork:
             validation_dataset (tf.data.Dataset): Validation dataset.
             test_dataset (tf.data.Dataset): Testing dataset.
             configuration (dict): Configuration to use.
+            name (str): Name of the confirguration
         """
         self.config = configuration
+        self.name = name
 
         # Dataset attributes
         self.train_dataset = train_dataset
@@ -129,6 +134,10 @@ class NeuralNetwork:
         """
         Train the neural network model with provided datasets.
         """
+        log_dir = tb_log_dir / f"{self.name}_{datetime.now().strftime('%m.%d-%H.%M.%S')}"
+        tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+
         self.model.summary()  # Display model architecture
 
         # Extract training parameters from configuration
@@ -138,7 +147,8 @@ class NeuralNetwork:
         history = self.model.fit(
             self.train_dataset,
             epochs=epochs,
-            validation_data=self.validation_dataset,  # using validation dataset
+            validation_data=self.validation_dataset,
+            callbacks=[tensorboard_callback]
         )
 
         return history
