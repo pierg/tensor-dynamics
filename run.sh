@@ -27,8 +27,8 @@ done
 # Run the make command depending on whether CONFIGS is provided
 if [ -n "$CONFIGS" ]; then
     # If CONFIGS is provided, include it in the make command
-    make run DATA_DIR="$DATA_DIR" CONFIGS="$CONFIGS"
+    . .venv/bin/activate && python src/main.py --data_dir=$DATA_DIR $CONFIGS
 else
     # If CONFIGS is not provided, run the make command without it
-    make run DATA_DIR="$DATA_DIR"
+    . .venv/bin/activate && python src/main.py --data_dir=$DATA_DIR $CONFIGS
 fi
