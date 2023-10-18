@@ -1,37 +1,28 @@
 #!/bin/bash
 
 # Initialize variables with default values
-DATA_DIR=""
+DATA_DIR="/data"  # Set default value
 CONFIGS=""
 
-# Check if we have the mandatory argument
-if [ "$#" -lt 1 ]; then
-    echo "Error: DATA_DIR argument is mandatory."
-    echo "Usage: docker run <image> DATA_DIR=<data-dir> [CONFIGS='<config1> <config2> ...']"
-    exit 1
-fi
+# Note: No need to check for mandatory arguments now, since we have a default value
 
 # Parse arguments
 for arg in "$@"
 do
     case $arg in
         DATA_DIR=*)
-        DATA_DIR="${arg#*=}"
+        DATA_DIR="${arg#*=}"  # Override if provided
         ;;
         CONFIGS=*)
-        CONFIGS="${arg#*=}"
+        CONFIGS="${arg#*=}"  # Override if provided
         ;;
         *)
-        # You can decide to do something with unexpected arguments or ignore them
+        # Ignore unexpected arguments
         ;;
     esac
 done
 
-# Check if DATA_DIR was provided and is not empty
-if [ -z "$DATA_DIR" ]; then
-    echo "Error: DATA_DIR not provided."
-    exit 1
-fi
+# No need to check if DATA_DIR is empty, as we're ensuring it's either the default or provided value.
 
 # Run the make command depending on whether CONFIGS is provided
 if [ -n "$CONFIGS" ]; then
