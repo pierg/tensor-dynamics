@@ -9,10 +9,14 @@ ENV PYTHONUNBUFFERED 1
 # Install system dependencies
 RUN apt-get update \
     && apt-get install -y git \
-    && apt-get clean
+    && apt-get clean \
+    make
 
 # Create and set the working directory
 WORKDIR /app
+
+# Expose port for tensorboard
+EXPOSE 6006
 
 # Clone the repository
 RUN git clone https://github.com/pierg/neural_networks .

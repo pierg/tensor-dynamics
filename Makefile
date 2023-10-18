@@ -2,7 +2,7 @@
 IMAGE_NAME=neural_networks
 VERSION=latest
 
-.PHONY: clean_all format lint clean_results install run tb stoptb docker-push
+.PHONY: clean_all format lint clean_results install run tb stoptb docker-build docker-push
 
 clean_all:
 	# Remove Python compiled files and cache directories
@@ -70,10 +70,11 @@ include .secrets
 export $(shell sed 's/=.*//' .secrets)
 
 # Build and push to Docker Hub
-docker-push:
+docker-build:
 	# Build the image
 	docker build -t $(DOCKER_USER)/$(IMAGE_NAME):$(VERSION) .
 
+docker-push:
 	# Log in to Docker Hub
 	@echo "$(DOCKER_PASS)" | docker login --username $(DOCKER_USER) --password-stdin
 
