@@ -38,15 +38,15 @@ Before you begin, ensure you have met the following requirements:
 by default it will run all configurations in configurations.toml
 
 ```
-docker run -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pierg/neural_networks:latest
+docker run -it -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pmallozzi/neural_networks:latest
 ```
 
 passing one configuration
 ```
-docker run -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pierg/neural_networks:latest CONFIGS='config_A'
+docker run -it -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pmallozzi/neural_networks:latest CONFIGS='config_A'
 ```
 
 passing list of configurations
 ```
-docker run -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pierg/neural_networks:latest CONFIGS='config_A config_P'
+docker run -it -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pmallozzi/neural_networks:latest CONFIGS='config_A config_P'
 ```

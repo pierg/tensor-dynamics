@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import TensorBoard
-from src.shared import tb_log_dir
+from shared import tb_log_dir
 from datetime import datetime
 
 class NeuralNetwork:
