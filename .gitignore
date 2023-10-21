@@ -13,6 +13,7 @@ results
 .secrets
 
 logs/
+legacy/
 
 # Distribution / packaging
 .Python

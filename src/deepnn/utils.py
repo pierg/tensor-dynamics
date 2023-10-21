@@ -6,7 +6,7 @@ import json
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
-
+import random
 
 def print_data_info(data: np.ndarray, label: str):
     """
@@ -49,14 +49,14 @@ def load_data_from_file(filepath: Path) -> Tuple[List, List]:
 
 
 def load_data_from_files(
-    data_folder: Path, file_indices: List[int] = None
+    data_folder: Path, n_files: int = None
 ) -> Tuple[List, List]:
     """
-    Load data from multiple files. If specific file indices are not provided, all valid files in the data folder are loaded.
+    Load data from multiple files. If the number of files is not specified, all valid files in the data folder are loaded.
 
     Args:
         data_folder (Path): Path to the folder containing the data files.
-        file_indices (List[int], optional): List of indices corresponding to the data files. If None, all files are processed.
+        n_files (int, optional): Number of files to randomly select and process. If None, all files are processed.
 
     Returns:
         Tuple[List, List]: Aggregated list of features and corresponding targets from all files.
@@ -65,30 +65,19 @@ def load_data_from_files(
     nn_data = []
     predictions = []
 
-    # If no specific files are requested, load all suitable files in the directory
-    if file_indices is None:
-        # List all files in the data folder
-        all_files = sorted(Path(data_folder).iterdir(), key=lambda f: f.name)
-        # Filter files based on your criteria (e.g., extension, format, etc.)
-        data_files = [
-            file
-            for file in all_files
-            if file.suffix == ".p"
-        ]
+    # List all ".p" files in the data folder
+    all_files = sorted([file for file in Path(data_folder).iterdir() if file.suffix == ".p"], key=lambda f: f.name)
 
-        # Load data from each file
-        for file in data_files:
-            nn_data_chunk, predictions_chunk = load_data_from_file(file)
-            nn_data.extend(nn_data_chunk)
-            predictions.extend(predictions_chunk)
-    else:
-        # If specific file indices are provided, only load these files
-        for index in file_indices:
-            file_pattern = f"*_{index}.p"
-            matching_files = list(data_folder.glob(file_pattern))
-            nn_data_chunk, predictions_chunk = load_data_from_file(matching_files[0])
-            nn_data.extend(nn_data_chunk)
-            predictions.extend(predictions_chunk)
+    # Randomly select files if n_files is specified
+    if n_files is not None:
+        all_files = random.sample(all_files, min(n_files, len(all_files)))  # select n_files or all available files
+
+    # Load data from each file
+    for file in all_files:
+        # load_data_from_file is a hypothetical function you should replace with your actual data loading logic
+        nn_data_chunk, predictions_chunk = load_data_from_file(file)  
+        nn_data.extend(nn_data_chunk)
+        predictions.extend(predictions_chunk)
 
     return nn_data, predictions
 
