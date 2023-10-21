@@ -7,7 +7,7 @@
 apptainer run \
   --fakeroot \
   --writable-tmpfs \
-  --bind /global/scratch/users/edkinigstein/Dataset_2/F1:/data \
+  --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
   --bind /global/home/groups-sw/pc_nnkinetics/results:/app/results \
   --bind /global/home/groups-sw/pc_nnkinetics/logs:/app/logs \
   ../neural_networks_latest_v2.sif
