@@ -22,7 +22,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_Alex.training]
-epochs = 5
+epochs = 300
 
 
 
@@ -49,7 +49,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [config_P.training]
-epochs = 5
+epochs = 300
 
 
 # Configuration Complex_P
@@ -81,7 +81,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
 [config_Complex_P.training]
-epochs = 5
+epochs = 300
 
 
 
@@ -114,4 +114,4 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
 [config_BN_P.training]
-epochs = 5
+epochs = 300

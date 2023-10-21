@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -A pc_nnkinetics -p lr6 -q lr_normal -t 0-0:30:0 -N1
+#SBATCH -A pc_nnkinetics -p lr6 -q lr_normal -t 0-42:0:0 -N1
 
 
 #CONFIGS='config_A config_P'
