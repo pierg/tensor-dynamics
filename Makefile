@@ -69,18 +69,26 @@ stoptb:
 include .secrets
 export $(shell sed 's/=.*//' .secrets)
 
+
 # Build and push to Docker Hub
-docker-build:
-	# Build the image
-	docker build -t $(DOCKER_USER)/$(IMAGE_NAME):$(VERSION) .
+docker-buildx:
+	# Create a new buildx builder instance (if not already available)
+	BUILDER_NAME  := multi-arch-builder
+	BUILDER_EXISTS := $(shell docker buildx inspect $(BUILDER_NAME) >/dev/null && docker buildx inspect $(BUILDER_NAME) --bootstrap)
+	ifeq ($(BUILDER_EXISTS),)
+		# Creating a new builder instance
+		docker buildx create --name $(BUILDER_NAME) --use
+	endif
 
 docker-push:
 	# Log in to Docker Hub
 	@echo "$(DOCKER_PASS)" | docker login --username $(DOCKER_USER) --password-stdin
 
-	# Push the image
-	docker push $(DOCKER_USER)/$(IMAGE_NAME):$(VERSION)
+	# Start up the builder instance (ensure it's utilizing the correct configuration)
+	docker buildx inspect --bootstrap
+
+	# Build the multi-arch images
+	docker buildx build --platform linux/amd64,linux/arm64 -t $(DOCKER_USER)/$(IMAGE_NAME):$(VERSION) --push .
 
 	# Optional: Log out from Docker Hub
 	docker logout
-

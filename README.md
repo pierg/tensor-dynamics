@@ -37,16 +37,57 @@ Before you begin, ensure you have met the following requirements:
 
 by default it will run all configurations in configurations.toml
 
+We recomand to mound the data, results and logs folder externally for easier access, if you have a configurations.toml that you want to try, you can mount also the config folder and put the file there
+
+
 ```
-docker run -it -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pmallozzi/neural_networks:latest
+docker run -it \
+    -v ~/Documents/neural_networks/data:/data \
+    -v ~/Documents/neural_networks/results:/app/results \
+    -v ~/Documents/neural_networks/logs:/app/logs \
+    -v ~/Documents/neural_networks/config:/app/config \
+    -p 6006:6006 \
+    pmallozzi/neural_networks:latest
 ```
 
-passing one configuration
+you can access tensorboard at localhost:6000
+
+passing one specific configuration
+
 ```
-docker run -it -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pmallozzi/neural_networks:latest CONFIGS='config_A'
+docker run -it \
+    -v ~/Documents/neural_networks/data:/data \
+    -v ~/Documents/neural_networks/results:/app/results \
+    -v ~/Documents/neural_networks/logs:/app/logs \
+    -v ~/Documents/neural_networks/config:/app/config \
+    -p 6006:6006 \
+    pmallozzi/neural_networks:latest CONFIGS='config_A'
 ```
 
 passing list of configurations
 ```
-docker run -it -v ~/Documents/data:/data -v ~/Documents/results:/app/results -p 6006:6006 pmallozzi/neural_networks:latest CONFIGS='config_A config_P'
+docker run -it \
+    -v ~/Documents/neural_networks/data:/data \
+    -v ~/Documents/neural_networks/results:/app/results \
+    -v ~/Documents/neural_networks/logs:/app/logs \
+    -v ~/Documents/neural_networks/config:/app/config \
+    -p 6006:6006 \
+    pmallozzi/neural_networks:latest CONFIGS='config_A config_P'
 ```
+
+running in the background
+
+```
+docker run -d \
+    -- my_running_container
+    -v ~/Documents/neural_networks/data:/data \
+    -v ~/Documents/neural_networks/results:/app/results \
+    -v ~/Documents/neural_networks/logs:/app/logs \
+    -v ~/Documents/neural_networks/config:/app/config \
+    -p 6006:6006 \
+    pmallozzi/neural_networks:latest
+```
+
+you can see the live logs of the container:
+
+docker logs -f my_running_container

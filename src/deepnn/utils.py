@@ -74,7 +74,6 @@ def load_data_from_files(
             file
             for file in all_files
             if file.suffix == ".p"
-            and file.stem.startswith("MM_Demixing_Training_Data2_")
         ]
 
         # Load data from each file
@@ -85,8 +84,9 @@ def load_data_from_files(
     else:
         # If specific file indices are provided, only load these files
         for index in file_indices:
-            file = data_folder / f"MM_Demixing_Training_Data2_{index}.p"
-            nn_data_chunk, predictions_chunk = load_data_from_file(file)
+            file_pattern = f"*_{index}.p"
+            matching_files = list(data_folder.glob(file_pattern))
+            nn_data_chunk, predictions_chunk = load_data_from_file(matching_files[0])
             nn_data.extend(nn_data_chunk)
             predictions.extend(predictions_chunk)
 

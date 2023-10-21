@@ -115,3 +115,79 @@ batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
 [config_BN_P.training]
 epochs = 5
+
+
+
+# Configuration A: Basic configuration with minimal layers and settings
+[config_A]
+[config_A.structure]
+layers = [
+  { type = "Conv2D", filters = 32, kernel_size = [3, 3], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 64, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[config_A.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[config_A.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+[config_A.training]
+epochs = 5
+
+
+
+
+
+
+
+# Configuration B: More complex configuration, with additional layers
+[config_B]
+[config_B.structure]
+layers = [
+  { type = "Conv2D", filters = 64, kernel_size = [3, 3], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 128, kernel_size = [3, 3], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 128, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[config_B.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[config_B.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+[config_B.training]
+epochs = 5
+
+
+
+
+
+
+# Configuration C: Configuration tailored for regression with different optimizer and loss function
+[config_C]
+[config_C.structure]
+layers = [
+  { type = "Dense", units = 64, activation = "relu" },
+  { type = "Dense", units = 64, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[config_C.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[config_C.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+[config_C.training]
+epochs = 5
