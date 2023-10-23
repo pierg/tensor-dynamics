@@ -15,7 +15,6 @@ apptainer run \
   --fakeroot \
   --writable-tmpfs \
   --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
-  --bind /global/home/groups-sw/pc_nnkinetics/results:/app/results \
   --env GITHUB_RESULTS_REPO=$GITHUB_RESULTS_REPO \
   --env GITHUB_TOKEN=$GITHUB_TOKEN \
   ../neural_networks_latest_v2.sif
