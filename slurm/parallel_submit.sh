@@ -22,7 +22,8 @@ fi
 # Loop through each configuration identifier and execute the submit command
 while IFS= read -r id; do
     echo "Submitting configuration $id"
-    ./submit CONFIGS="$id"
+    # Call the submit script with the configuration ID as a parameter
+    ./submit.sh "$id"  # adjusted here
     # Check the exit status of the submit command and handle any errors
     if [[ $? -ne 0 ]]; then
         echo "An error occurred while submitting configuration $id"
