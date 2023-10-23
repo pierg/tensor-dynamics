@@ -1,0 +1,6 @@
+Bootstrap: docker
+From: pmallozzi/neural_networks:latest
+
+%runscript
+  cd /app
+  /bin/bash entrypoint.sh "$@"

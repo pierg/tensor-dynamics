@@ -17,5 +17,5 @@ apptainer run \
   --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
   --env GITHUB_RESULTS_REPO=$GITHUB_RESULTS_REPO \
   --env GITHUB_TOKEN=$GITHUB_TOKEN \
-  ../../neural_networks_latest_v2.sif
+  neural_networks_latest.sif
 
