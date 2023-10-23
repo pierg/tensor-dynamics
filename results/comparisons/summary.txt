@@ -1,0 +1,15 @@
+Training Summary:
+-----------------
+Best Performing Configuration: 'S1'
+Config Name: S1
+Timestamp: 2023-10-23 10:11:10
+Lowest Loss: 13.351966857910156
+
+Configuration: S1
+Config Name: S1
+Timestamp: 2023-10-23 10:11:10
+
+Evaluation Results:
+  - loss: 13.351966857910156
+  - mean_squared_error: 13.351966857910156
+
