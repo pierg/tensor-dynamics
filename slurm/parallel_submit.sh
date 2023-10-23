@@ -11,7 +11,7 @@ fi
 
 # Extract configuration identifiers from the TOML file. We're looking for lines that match '[*]'
 # where * is the identifier, then stripping away the square brackets.
-config_ids=$(grep '^\[.*\]$' "$CONFIG_FILE" | tr -d '[]')
+config_ids=$(grep '^\[[^.]*\]$' "$CONFIG_FILE" | tr -d '[]')
 
 # Check if we found any configurations
 if [[ -z "$config_ids" ]]; then
