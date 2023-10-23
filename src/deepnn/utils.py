@@ -161,15 +161,16 @@ def load_data_from_file(filepath: Path) -> Tuple[List, List]:
     return nn_data, predictions
 
 
-def load_data_from_files(
-    data_folder: Path, n_files: int = None
-) -> Tuple[List, List]:
+from pathlib import Path
+from typing import List, Tuple
+
+def load_data_from_files(data_folder: Path, n_files: int = None) -> Tuple[List, List]:
     """
     Load data from multiple files. If the number of files is not specified, all valid files in the data folder are loaded.
 
     Args:
         data_folder (Path): Path to the folder containing the data files.
-        n_files (int, optional): Number of files to randomly select and process. If None, all files are processed.
+        n_files (int, optional): Number of files to select and process from the beginning. If None, all files are processed.
 
     Returns:
         Tuple[List, List]: Aggregated list of features and corresponding targets from all files.
@@ -178,12 +179,12 @@ def load_data_from_files(
     nn_data = []
     predictions = []
 
-    # List all ".p" files in the data folder
+    # List all ".p" files in the data folder and sort them by name
     all_files = sorted([file for file in Path(data_folder).iterdir() if file.suffix == ".p"], key=lambda f: f.name)
 
-    # Randomly select files if n_files is specified
+    # If n_files is specified, select the first n_files from the sorted list
     if n_files is not None:
-        all_files = random.sample(all_files, min(n_files, len(all_files)))  # select n_files or all available files
+        all_files = all_files[:min(n_files, len(all_files))]  # select first n_files or all available files, whichever is less
 
     # Load data from each file
     for file in all_files:
