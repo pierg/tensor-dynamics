@@ -7,11 +7,13 @@ get_job_id_by_index() {
     echo $JOBID
 }
 
-# Check if the argument is provided
+# If no argument is provided, we'll stop all jobs.
 if [ -z "$1" ]; then
-    echo "Error: No index provided."
-    echo "Usage: $0 <index>"
-    exit 1
+    echo "No index provided, stopping all jobs."
+    # Cancel all jobs. This command may vary depending on your job scheduler.
+    # For SLURM, you might do something like this:
+    scancel -u $(whoami)  # This cancels all jobs belonging to the current user
+    exit 0  # Exit after stopping all jobs
 fi
 
 # Check if the argument is a number
