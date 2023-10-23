@@ -7,23 +7,28 @@ from shared import results_folder
 
 def load_training_info(directory):
     """
-    Load training information from JSON files in the provided directory.
+    Load training information from JSON files in all subdirectories of the provided directory.
     """
     training_data = {}
 
-    # Check every item in the directory
-    for item in os.listdir(directory):
-        item_path = os.path.join(directory, item)
+    # Recursively walk through all subdirectories
+    for subdir, _, files in os.walk(directory):
+        for file in files:
+            if file == "training_info.json":
+                json_file = os.path.join(subdir, file)
 
-        # Check if the current item is a directory
-        if os.path.isdir(item_path):
-            json_file = os.path.join(item_path, "training_info.json")
+                try:
+                    # If the training_info.json file exists, read it
+                    with open(json_file, "r") as file:
+                        data = json.load(file)
+                        # Use the directory name as a key
+                        # This assumes each subdirectory has a unique name
+                        dir_name = os.path.basename(subdir)
+                        training_data[dir_name] = data
 
-            # If the training_info.json file exists, read it
-            if os.path.isfile(json_file):
-                with open(json_file, "r") as file:
-                    data = json.load(file)
-                    training_data[item] = data  # Use the directory name as a key
+                except Exception as e:
+                    # You might want to log exceptions here or handle them some other way
+                    print(f"An error occurred: {e}")
 
     return training_data
 
@@ -31,15 +36,30 @@ def load_training_info(directory):
 def plot_training_info(training_data, metric, results_dir):
     """
     Plot comparison charts for the specified metric from the training information.
+    This function now plots only the top 10 configurations based on the last recorded value of the specified metric.
     """
     plt.figure(figsize=(10, 6))
 
+    # New: Collect the final metric values and corresponding configuration names
+    final_metric_values = []
     for config, data in training_data.items():
         history = data.get("training_history", {}).get("history", {})
         if metric in history:
-            plt.plot(history[metric], label=f"{config} - {metric}")
+            final_value = history[metric][-1] if history[metric] else None  # Assumes the metric is a list
+            final_metric_values.append((final_value, config))
 
-    plt.title(f"Comparison of {metric}")
+    # New: Sort configurations by the final metric value (assumes lower is better; reverse if higher is better)
+    final_metric_values.sort(key=lambda x: x[0])  # Add 'reverse=True' if higher values are better
+
+    # New: Get only the top 10 configurations
+    top_10_configs = final_metric_values[:10]
+
+    # New: Plot only the top 10 configurations
+    for final_value, config in top_10_configs:
+        history = training_data[config].get("training_history", {}).get("history", {})
+        plt.plot(history[metric], label=f"{config} - {metric} (final: {final_value:.5f})")  # Adjust formatting as needed
+
+    plt.title(f"Top 10 Configurations for {metric}")
     plt.ylabel(metric)
     plt.xlabel("Epoch")
     plt.legend()
@@ -47,7 +67,7 @@ def plot_training_info(training_data, metric, results_dir):
     plt.tight_layout()
 
     # Save the figure in the results directory
-    plot_filename = f"comparison_{metric}.png"
+    plot_filename = f"top_10_comparison_{metric}.png"
     plot_path = os.path.join(results_dir, plot_filename)
     plt.savefig(plot_path)
     plt.close()  # Close the plot
@@ -133,16 +153,16 @@ def compare_results():
     directory: Path = results_folder
 
     # Create a results directory if it doesn't exist
-    results_dir = directory / "comparisons"
+    comparison_dir = directory / "comparisons"
 
-    if not os.path.exists(results_dir):
-        os.makedirs(results_dir)
+    if not os.path.exists(comparison_dir):
+        os.makedirs(comparison_dir)
 
     # Load training information from JSON files in each sub-directory
     training_data = load_training_info(directory)
 
-    compare_plots(training_data, results_dir)
-    create_summary_file(training_data, results_dir)
+    compare_plots(training_data, comparison_dir)
+    create_summary_file(training_data, comparison_dir)
 
 
 if __name__ == "__main__":

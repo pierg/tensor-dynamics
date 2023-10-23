@@ -2,8 +2,6 @@
 
 #SBATCH -A pc_nnkinetics -p lr6 -q lr_normal -t 0-42:0:0 -N1
 
-
-#CONFIGS='config_A config_P'
 apptainer run \
   --fakeroot \
   --writable-tmpfs \
@@ -11,3 +9,4 @@ apptainer run \
   --bind /global/home/groups-sw/pc_nnkinetics/results:/app/results \
   --bind /global/home/groups-sw/pc_nnkinetics/logs:/app/logs \
   ../neural_networks_latest_v2.sif
+

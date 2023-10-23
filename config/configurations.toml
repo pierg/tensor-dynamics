@@ -1,117 +1,41 @@
-# Configuration Alex: Original CNN configuration from Alex
-[config_Alex]
-[config_Alex.structure]
+# Simplified Configuration S1
+[S1]
+[S1.structure]
 layers = [
-  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },
+  { type = "Conv2D", filters = 8, kernel_size = [3, 1], activation = "relu" },  # Reduced filters
   { type = "MaxPooling2D", pool_size = [2, 1] },
   { type = "Flatten" },
-  { type = "Dense", units = 64, activation = "relu" },
-  { type = "Dense", units = 128, activation = "relu" },
-  { type = "Dense", units = 12, activation = "linear" },
+  { type = "Dense", units = 12, activation = "linear" },  # Output layer simplified
 ]
-[config_Alex.compile]
+[S1.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[config_Alex.dataset]
+metrics = ["MeanSquaredError"]
+[S1.dataset]
 shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
-[config_Alex.training]
-epochs = 300
+batch_size = 32  # Reduced batch size
+splits = [0.7, 0.15, 0.15]
+[S1.training]
+epochs = 3  # Keeping the same to ensure some level of training adequacy
 
-
-
-# Configuration P
-[config_P]
-[config_P.structure]
+# Simplified Configuration S2
+[S2]
+[S2.structure]
 layers = [
-  { type = "Conv2D", filters = 16, kernel_size = [3, 1], activation = "relu" },  # Reduced number of filters
+  { type = "Conv2D", filters = 16, kernel_size = [3, 1], activation = "relu" },  # A bit more filters than S1
   { type = "MaxPooling2D", pool_size = [2, 1] },
-  # Removed one Conv2D and MaxPooling2D layer each to simplify the model
-  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },  # Reduced number of filters
+  { type = "Conv2D", filters = 8, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D, fewer filters
   { type = "MaxPooling2D", pool_size = [2, 1] },
   { type = "Flatten" },
-  { type = "Dense", units = 32, activation = "relu" },  # Reduced number of units
-  # Removed one Dense layer to simplify the model
-  { type = "Dense", units = 12, activation = "linear" },  # This is typically the output layer, kept as-is if it aligns with the number of desired outputs
+  { type = "Dense", units = 12, activation = "linear" },  # Simple output layer
 ]
-[config_P.compile]
+[S2.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[config_P.dataset]
+metrics = ["MeanSquaredError"]
+[S2.dataset]
 shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
-[config_P.training]
-epochs = 300
-
-
-# Configuration Complex_P
-[config_Complex_P]
-[config_Complex_P.structure]
-layers = [
-  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },
-  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D layer
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },
-  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D layer
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Conv2D", filters = 256, kernel_size = [3, 1], activation = "relu" },
-  { type = "Conv2D", filters = 256, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D layer
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Flatten" },
-  { type = "Dense", units = 128, activation = "relu" },
-  { type = "Dropout", rate = 0.5 },  # Dropout layer added to help prevent overfitting
-  { type = "Dense", units = 256, activation = "relu" },
-  { type = "Dropout", rate = 0.5 },  # Dropout layer added to help prevent overfitting
-  { type = "Dense", units = 12, activation = "linear" },
-]
-[config_Complex_P.compile]
-optimizer = "adam"
-loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[config_Complex_P.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
-[config_Complex_P.training]
-epochs = 300
-
-
-
-# Configuration BN_P
-[config_BN_P]
-[config_BN_P.structure]
-layers = [
-  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
-  { type = "BatchNormalization" },  # Added BatchNormalization
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },
-  { type = "BatchNormalization" },  # Added BatchNormalization
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },
-  { type = "BatchNormalization" },  # Added BatchNormalization
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Flatten" },
-  { type = "Dense", units = 64, activation = "relu" },
-  { type = "BatchNormalization" },  # Added BatchNormalization before activation
-  { type = "Dense", units = 128, activation = "relu" },
-  { type = "BatchNormalization" },  # Added BatchNormalization before activation
-  { type = "Dense", units = 12, activation = "linear" },
-]
-[config_BN_P.compile]
-optimizer = "adam"
-loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[config_BN_P.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
-[config_BN_P.training]
-epochs = 300
+batch_size = 32  # Reduced batch size
+splits = [0.7, 0.15, 0.15]
+[S2.training]
+epochs = 3

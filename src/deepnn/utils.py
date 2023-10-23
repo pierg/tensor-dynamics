@@ -7,6 +7,8 @@ import os
 from datetime import datetime
 import matplotlib.pyplot as plt
 import random
+import os
+import subprocess
 
 def print_data_info(data: np.ndarray, label: str):
     """
@@ -21,6 +23,72 @@ def print_data_info(data: np.ndarray, label: str):
     print(f"{label} size: {data.size}")
     print(f"{label} dtype: {data.dtype}")
     print("-" * 50)
+
+
+# Function to load secrets from a file into environment variables
+def load_secrets(file_path):
+    print(f"Loading secrets: {file_path}")
+    with open(file_path, 'r') as file:
+        for line in file:
+            # Clean up the line
+            cleaned_line = line.strip()
+
+            # Ignore empty lines and comments
+            if cleaned_line == "" or cleaned_line.startswith('#'):
+                continue
+
+            # Check if line contains 'export ' from shell script format and remove it
+            if cleaned_line.startswith('export '):
+                cleaned_line = cleaned_line.replace('export ', '', 1)  # remove the first occurrence of 'export '
+
+            # Split the line into key and value
+            if '=' in cleaned_line:
+                key, value = cleaned_line.split('=', 1)
+                print(f"Loading {key}")
+                os.environ[key] = value
+            else:
+                print(f"Warning: Ignoring line, missing '=': {cleaned_line}")
+
+
+def git_push(commit_message="Update files", folder=None):
+    """
+    Pushes changes to a GitHub repository using the token-based authentication.
+
+    Args:
+    commit_message (str, optional): The commit message. Defaults to "Update files".
+    folder (Path, optional): Path object representing the folder to push. If not specified, the current directory is used.
+    """
+    if folder is None:
+        folder = Path.cwd()  # Use the current working directory if no folder is provided
+    elif not folder.is_dir():
+        raise ValueError(f"{folder} does not exist or is not a directory.")
+
+    github_token = os.getenv('GITHUB_TOKEN')
+    if github_token is None:
+        raise ValueError("GITHUB_TOKEN is not set in the environment variables.")
+
+    repo_url = os.getenv('GITHUB_RESULTS_REPO')
+    if repo_url is None:
+        raise ValueError("GITHUB_RESULTS_REPO is not set in the environment variables.")
+    
+    if not repo_url.startswith("https://"):
+        raise ValueError("The repository URL must start with 'https://'")
+
+    repo_url_with_token = repo_url.replace("https://", f"https://{github_token}:x-oauth-basic@")
+
+    original_cwd = Path.cwd()  # Save the original working directory
+    try:
+        os.chdir(folder)  # Change to the target directory
+
+        # Perform git operations
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        subprocess.run(["git", "push", repo_url_with_token, "main"], check=True)  # replace "main" with your target branch if different
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while pushing to GitHub: {str(e)}")
+        raise  # Rethrow the exception to handle it at a higher level of your application
+    finally:
+        os.chdir(original_cwd)  # Ensure that you always return to the original directory
 
 
 def load_data_from_file(filepath: Path) -> Tuple[List, List]:
@@ -144,7 +212,7 @@ def save_training_info(
     }
 
     # Create the save directory
-    dir_name = save_folder / f"{config_name}_{datetime.now().strftime('%m.%d-%H.%M.%S')}"
+    dir_name = save_folder / config_name
     os.makedirs(dir_name, exist_ok=True)
 
     # Save all training information to a JSON file

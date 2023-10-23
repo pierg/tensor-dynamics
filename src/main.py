@@ -4,13 +4,14 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import load_data_from_files, preprocess_data, save_training_info
-from shared import config_file, results_folder
+from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info
+from shared import config_file, results_folder, secrets_path
 from analysis import compare_results
 import argparse
 import os
 import traceback
 import json
+from datetime import datetime
 
 
 def parse_arguments():
@@ -32,7 +33,7 @@ def load_and_preprocess_data(data_folder):
 
 
 def process_configuration(
-    config_name: str, config: dict, data: np.ndarray, predictions: np.ndarray
+    config_name: str, config: dict, data: np.ndarray, predictions: np.ndarray, instance_folder
 ):
     """
     Set up and process a single neural network configuration.
@@ -95,13 +96,14 @@ def process_configuration(
             test_dataset=test_dataset,
             configuration=config,
             name=config_name,
+            instance_folder=instance_folder
         )
         history = neural_network.train_model()
 
         # Evaluation and saving results
         evaluation_results = neural_network.evaluate_model()
         save_training_info(
-            config_name, neural_network, history, evaluation_results, results_folder
+            config_name, neural_network, history, evaluation_results, instance_folder
         )
 
     except Exception as e:
@@ -126,6 +128,9 @@ def main():
     # Load the configurations from the TOML file
     configs = toml.load(config_file)
 
+    # Results folder
+    instance_folder = results_folder / f"{datetime.now().strftime('%m.%d-%H.%M.%S')}"
+
     print(args)
 
     config_names = args.configs
@@ -146,17 +151,23 @@ def main():
     for config_name in config_names:
         if config_name in configs:
             config = configs[config_name]
+            print("Processing configuration...")
             process_configuration(
-                config_name, config, data, predictions
+                config_name, config, data, predictions, instance_folder
             )  # This function is the refactored part of your main function
+            print("Comparing results...")
+            compare_results()
+            # Push to github
+            print("Pushing to github...")
+            git_push(folder=results_folder)
+
         else:
             print(f"Configuration {config_name} not found.")
-
-    # Compare results after all configurations have been processed
-    compare_results()
 
     print("All configurations have been processed and results have been saved.")
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    load_secrets(secrets_path)
+    git_push(results_folder)

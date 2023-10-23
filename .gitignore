@@ -8,11 +8,11 @@ __pycache__/
 
 
 data 
-results
+# results
 
 .secrets
 
-logs/
+# logs/
 legacy/
 
 # Distribution / packaging

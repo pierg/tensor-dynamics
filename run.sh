@@ -39,10 +39,13 @@ else
         echo "TensorBoard is already running."
     fi
 
+    source .secrets
+    
     # Proceed if not launching bash (the rest of your script remains the same)
     # Run the python command depending on whether CONFIGS is provided
     if [ -n "$CONFIGS" ]; then
         # If CONFIGS is provided, include it in the python command
+        
         python src/main.py --data_dir=$DATA_DIR $CONFIGS
     else
         # If CONFIGS is not provided, run the python command without it

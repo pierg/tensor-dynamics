@@ -45,7 +45,6 @@ docker run -it \
     -v ~/Documents/neural_networks/data:/data \
     -v ~/Documents/neural_networks/results:/app/results \
     -v ~/Documents/neural_networks/logs:/app/logs \
-    -v ~/Documents/neural_networks/config:/app/config \
     -p 6006:6006 \
     pmallozzi/neural_networks:latest
 ```

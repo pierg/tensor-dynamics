@@ -12,7 +12,8 @@ class NeuralNetwork:
         validation_dataset: tf.data.Dataset,
         test_dataset: tf.data.Dataset,
         configuration: dict,
-        name: str
+        name: str,
+        instance_folder
     ):
         """
         Initialize the NeuralNetwork class with training, validation, and test datasets,
@@ -41,6 +42,8 @@ class NeuralNetwork:
         # Building and compiling the neural network model
         self.model = self._build_model()
         self._compile_model()
+
+        self.instance_folder = instance_folder
 
     def _build_model(self) -> tf.keras.Model:
         """
@@ -134,7 +137,8 @@ class NeuralNetwork:
         """
         Train the neural network model with provided datasets.
         """
-        log_dir = tb_log_dir / f"{self.name}_{datetime.now().strftime('%m.%d-%H.%M.%S')}"
+        log_dir = self.instance_folder / f"{self.name}"
+        
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
 
