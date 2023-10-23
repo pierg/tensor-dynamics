@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info
+from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo
 from shared import config_file, results_folder, secrets_path
 from analysis import compare_results
 import argparse
@@ -123,6 +123,17 @@ def process_configuration(
 
 
 def main():
+
+     # Load secrets from file
+    if secrets_path.exists():
+        load_secrets(secrets_path)
+
+    # Check if the results_folder is empty or doesn't exist
+    if is_directory_empty(results_folder):
+        # Clone the private repo
+        print("Directory is empty. Cloning the private repository...")
+        clone_private_repo(os.getenv('GITHUB_RESULTS_REPO'), results_folder)
+
     args = parse_arguments()
 
     # Load the configurations from the TOML file
@@ -168,6 +179,17 @@ def main():
 
 
 if __name__ == "__main__":
+
+    main()
+
+    # load_secrets(secrets_path)
+
+    # # Check if the results_folder is empty or doesn't exist
+    # if is_directory_empty(results_folder):
+    #     # Clone the private repo
+    #     print("Directory is empty. Cloning the private repository...")
+    #     clone_private_repo(os.getenv('GITHUB_RESULTS_REPO'), results_folder)
+
     # main()
-    load_secrets(secrets_path)
-    git_push(results_folder)
+
+    # git_push(folder=results_folder)

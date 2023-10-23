@@ -25,6 +25,25 @@ def print_data_info(data: np.ndarray, label: str):
     print("-" * 50)
 
 
+def clone_private_repo(repo_url, local_path):
+    """
+    Clone the private GitHub repository to a local path.
+
+    Args:
+    - repo_url (str): HTTPS URL of the private GitHub repository.
+    - local_path (str): Local path where the repository should be cloned.
+    """
+    if not os.path.isdir(local_path):
+        os.makedirs(local_path)  # Ensure the directory exists
+
+    try:
+        # Clone the repository
+        subprocess.run(['git', 'clone', repo_url, local_path], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while cloning the repo: {e}")
+        raise e
+
+
 # Function to load secrets from a file into environment variables
 def load_secrets(file_path):
     print(f"Loading secrets: {file_path}")
@@ -50,7 +69,22 @@ def load_secrets(file_path):
                 print(f"Warning: Ignoring line, missing '=': {cleaned_line}")
 
 
-def git_push(commit_message="Update files", folder=None):
+def is_directory_empty(path):
+    """
+    Check if a directory is empty or does not exist.
+
+    Args:
+    - path (str): The path of the directory to check.
+
+    Returns:
+    - bool: True if the directory is empty or does not exist, False otherwise.
+    """
+    if not os.path.exists(path):
+        return True
+    return len(os.listdir(path)) == 0
+
+
+def git_push(folder=None, commit_message="Update files", ):
     """
     Pushes changes to a GitHub repository using the token-based authentication.
 
@@ -81,6 +115,7 @@ def git_push(commit_message="Update files", folder=None):
         os.chdir(folder)  # Change to the target directory
 
         # Perform git operations
+        subprocess.run(['git', 'pull'], check=True)  # Ensure we're up-to-date with the remote
         subprocess.run(["git", "add", "."], check=True)
         subprocess.run(["git", "commit", "-m", commit_message], check=True)
         subprocess.run(["git", "push", repo_url_with_token, "main"], check=True)  # replace "main" with your target branch if different

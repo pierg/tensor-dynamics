@@ -38,8 +38,6 @@ else
     else
         echo "TensorBoard is already running."
     fi
-
-    source .secrets
     
     # Proceed if not launching bash (the rest of your script remains the same)
     # Run the python command depending on whether CONFIGS is provided
