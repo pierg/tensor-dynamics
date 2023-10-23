@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import random
 import os
 import subprocess
+from urllib.parse import urlparse
 
 def print_data_info(data: np.ndarray, label: str):
     """
@@ -26,19 +27,20 @@ def print_data_info(data: np.ndarray, label: str):
 
 
 def clone_private_repo(repo_url, local_path):
-    """
-    Clone the private GitHub repository to a local path.
-
-    Args:
-    - repo_url (str): HTTPS URL of the private GitHub repository.
-    - local_path (str): Local path where the repository should be cloned.
-    """
-    if not os.path.isdir(local_path):
-        os.makedirs(local_path)  # Ensure the directory exists
-
     try:
-        # Clone the repository
-        subprocess.run(['git', 'clone', repo_url, local_path], check=True)
+        # Parse the provided URL
+        url = urlparse(repo_url)
+
+        # Insert the token as the username in the URL
+        token = os.getenv('GITHUB_TOKEN')  # Or another secure method to retrieve your token
+        if not token:
+            raise ValueError("GitHub token is not provided")
+
+        # Construct the new URL with the token included
+        url_with_token = url._replace(netloc=f'{token}:{url.netloc}').geturl()
+
+        # Perform the clone operation
+        subprocess.run(['git', 'clone', url_with_token, str(local_path)], check=True)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while cloning the repo: {e}")
         raise e
