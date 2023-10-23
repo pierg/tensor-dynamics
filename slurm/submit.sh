@@ -2,8 +2,8 @@
 
 #SBATCH -A pc_nnkinetics -p lr6 -q lr_normal -t 0-42:0:0 -N 1
 #SBATCH --job-name=my_neural_network_job
-#SBATCH --output=result-%j.out  # %j inserts the job number
-#SBATCH --error=result-%j.err
+#SBATCH --output=slurm-%j.out  # %j inserts the job number
+#SBATCH --error=slurm-%j.err
 
 # Ensure any error stops the script execution
 set -e 
