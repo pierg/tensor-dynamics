@@ -32,12 +32,12 @@ if [ $LAUNCH_BASH -eq 1 ]; then
     # If the "-c" argument was passed, launch an interactive bash shell
     exec /bin/bash  # 'exec' replaces the current process (the script) with the new command (bash)
 else
-    if ! pgrep -x "tensorboard" > /dev/null; then
-        echo "Starting TensorBoard..."
-        tensorboard --logdir ./logs &  # This starts tensorboard in the background
-    else
-        echo "TensorBoard is already running."
-    fi
+    # if ! pgrep -x "tensorboard" > /dev/null; then
+    #     echo "Starting TensorBoard..."
+    #     tensorboard --logdir ./logs &  # This starts tensorboard in the background
+    # else
+    #     echo "TensorBoard is already running."
+    # fi
     
     # Proceed if not launching bash (the rest of your script remains the same)
     # Run the python command depending on whether CONFIGS is provided
