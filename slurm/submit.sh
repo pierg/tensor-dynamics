@@ -35,5 +35,4 @@ apptainer run \
   --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
   --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
   --env GITHUB_TOKEN="$GITHUB_TOKEN" \
-  --env CONFIG_ID="$CONFIG_ID" \  # Pass the CONFIG_ID to the container
-  neural_networks_latest.sif
+  neural_networks_latest.sif CONFIG_ID="$CONFIG_ID"
