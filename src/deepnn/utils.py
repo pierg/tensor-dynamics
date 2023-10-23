@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import random
 import os
 import subprocess
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 def print_data_info(data: np.ndarray, label: str):
     """
@@ -26,25 +26,33 @@ def print_data_info(data: np.ndarray, label: str):
     print("-" * 50)
 
 
+
 def clone_private_repo(repo_url, local_path):
     try:
-        # Parse the provided URL
-        url = urlparse(repo_url)
-
-        # Insert the token as the username in the URL
-        token = os.getenv('GITHUB_TOKEN')  # Or another secure method to retrieve your token
+        # Ensure the GitHub token is available
+        token = os.getenv('GITHUB_TOKEN')
         if not token:
             raise ValueError("GitHub token is not provided")
 
-        # Construct the new URL with the token included
-        url_with_token = url._replace(netloc=f'{token}:{url.netloc}').geturl()
+        # Parse the provided URL
+        parsed_url = urlparse(repo_url)
+
+        # Prepare the new netloc with the token
+        # The format is: TOKEN@hostname (The '@' is used to separate the token from the hostname)
+        new_netloc = f"{token}@{parsed_url.netloc}"
+
+        # Construct the new URL components with the modified netloc
+        new_url_components = (parsed_url.scheme, new_netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment)
+
+        # Reconstruct the full URL with the token included
+        url_with_token = urlunparse(new_url_components)
 
         # Perform the clone operation
         subprocess.run(['git', 'clone', url_with_token, str(local_path)], check=True)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while cloning the repo: {e}")
         raise e
-
+    
 
 # Function to load secrets from a file into environment variables
 def load_secrets(file_path):
