@@ -1,0 +1,37 @@
+# Use the official lightweight Python image.
+# https://hub.docker.com/_/python
+FROM python:3.11-slim
+
+# Set environment varibles
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y git \
+    && apt-get clean \
+    make
+
+# Create and set the working directory
+WORKDIR /app
+
+# Expose port for tensorboard
+EXPOSE 6006
+
+# Clone the repository
+RUN git clone https://github.com/pierg/neural_networks .
+
+# Install project dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy and set permissions for the entrypoint script
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Set the entrypoint script as the entrypoint for the Docker container
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+# The CMD should be an array of strings, which form the arguments you would 
+# pass to the script. Here it is left empty by default, which you can override
+# with `docker run`.
+CMD []

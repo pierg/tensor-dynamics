@@ -1,37 +1,41 @@
-# Use the official lightweight Python image.
-# https://hub.docker.com/_/python
-FROM python:3.11-slim
+# Use an official NVIDIA image with TensorFlow, Python, and CUDA pre-installed
+FROM nvcr.io/nvidia/tensorflow:23.09-tf2-py3
 
-# Set environment varibles
+# Set environment variables to make Python output unbuffered, 
+# which is useful when running Python within Docker containers
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Install system dependencies
-RUN apt-get update \
-    && apt-get install -y git \
-    && apt-get clean \
-    make
+# Install system dependencies if needed
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git \
+    make && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create and set the working directory
+# Set the working directory within the container
 WORKDIR /app
 
-# Expose port for tensorboard
-EXPOSE 6006
-
-# Clone the repository
+# Clone the repository inside the Docker container
 RUN git clone https://github.com/pierg/neural_networks .
 
-# Install project dependencies
+# Copy requirements file and install Python dependencies
+# Note: This assumes that the requirements.txt file exists in the repository. 
+# If it exists outside, you need to COPY it from your local context.
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy and set permissions for the entrypoint script
+# Expose port for TensorBoard
+EXPOSE 6006
+
+# Copy entrypoint script and grant execution permissions
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
-# Set the entrypoint script as the entrypoint for the Docker container
+# Use the entrypoint script to configure how the container will run
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
-# The CMD should be an array of strings, which form the arguments you would 
-# pass to the script. Here it is left empty by default, which you can override
-# with `docker run`.
+
+# The CMD defines default execution behavior for the container.
+# It can be overridden by command-line parameters passed to `docker run`.
 CMD []
