@@ -4,7 +4,7 @@
 
 
 # Source the secrets file to export GITHUB_TOKEN
-source .secrets
+source ../.secrets
 
 # The 'set +x' command is used to prevent the script from logging the following commands, 
 # protecting the confidentiality of the token.
@@ -17,5 +17,5 @@ apptainer run \
   --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
   --env GITHUB_RESULTS_REPO=$GITHUB_RESULTS_REPO \
   --env GITHUB_TOKEN=$GITHUB_TOKEN \
-  ../neural_networks_latest_v2.sif
+  ../../neural_networks_latest_v2.sif
 

@@ -11,6 +11,7 @@ python = ">=3.11,<3.12"
 numpy = "*"
 matplotlib = "*"
 toml = "^0.10.2"
+scipy = "^1.11.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "*"
