@@ -34,4 +34,4 @@ apptainer run \
   --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
   --env GITHUB_TOKEN="$GITHUB_TOKEN" \
   ../../neural_networks_latest.sif \
-  CONFIGS="'$CONFIG_ID'"
+  CONFIGS="$CONFIG_ID"
