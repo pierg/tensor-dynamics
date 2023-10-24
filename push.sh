@@ -25,5 +25,9 @@ git add .
 # Committing the changes
 git commit -m "update"
 
+
+git remote set-url origin https://$GITHUB_TOKEN@github.com/pierg/neural_networks.git
+
+
 # Pushing the changes
 git push origin main
