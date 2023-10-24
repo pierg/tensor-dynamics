@@ -165,10 +165,11 @@ def main():
         if config_name in configs:
             config = configs[config_name]
             print("Processing configuration...")
+            git_pull(folder=results_folder, prefer_local=False)
             process_configuration(
                 config_name, config, data, predictions, instance_folder
             )  # This function is the refactored part of your main function
-            git_pull(folder=results_folder)
+            git_pull(folder=results_folder, prefer_local=True)
             git_push(folder=results_folder)
             print("Comparing results...")
             compare_results()
