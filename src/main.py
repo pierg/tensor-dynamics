@@ -28,7 +28,7 @@ def validate_directory(path):
 
 
 def load_and_preprocess_data(data_folder):
-    data, predictions = load_data_from_files(data_folder, 7)
+    data, predictions = load_data_from_files(data_folder, 15)
     return preprocess_data(data, predictions)
 
 
