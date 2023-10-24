@@ -141,23 +141,45 @@ def git_push(folder=None, commit_message="Update files", ):
     original_cwd = Path.cwd()  # Save the original working directory
     try:
         os.chdir(folder)  # Change to the target directory
+        print(f"Changed directory to: {folder}")
 
-        # Stash local changes temporarily
-        subprocess.run(['git', 'stash'], check=True)
+        # Check for uncommitted changes
+        result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True, check=True)
+        changes_to_stash = result.stdout.strip() != ""
+
+        if changes_to_stash:
+            # Stash local changes temporarily if there are any
+            subprocess.run(['git', 'stash'], check=True)
+            print("Local changes were stashed.")
+        else:
+            print("No local changes to stash.")
 
         # Fetch the latest history from the remote and reset your local branch
+        print("Fetching latest changes from remote...")
         subprocess.run(['git', 'fetch', 'origin', 'main'], check=True)
+
+        print("Resetting local branch to match the remote main...")
         subprocess.run(['git', 'reset', '--hard', 'origin/main'], check=True)
 
-        # Apply stashed changes; this does not affect the git history
-        subprocess.run(['git', 'stash', 'pop'], check=True)
+        if changes_to_stash:
+            # Apply stashed changes; this does not affect the git history
+            print("Applying stashed changes...")
+            subprocess.run(['git', 'stash', 'pop'], check=True)
 
         # The local files are now modified with your changes. We'll commit them as a new snapshot.
-        subprocess.run(['git', 'add', '.'], check=True)
-        subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+        # If there were no local changes, this commit would be unnecessary, but it doesn't harm to check.
+        if changes_to_stash:
+            print("Adding and committing local changes...")
+            subprocess.run(['git', 'add', '.'], check=True)
+            subprocess.run(['git', 'commit', '-m', commit_message], check=True)
 
         # Force push to the remote repository; this overwrites history!
+        print("Force pushing to the remote repository...")
         subprocess.run(['git', 'push', repo_url_with_token, 'main', '--force'], check=True)
+
+        print("Operation completed successfully.")
+
+
 
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while pushing to GitHub: {str(e)}")
