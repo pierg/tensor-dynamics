@@ -27,6 +27,8 @@ def print_data_info(data: np.ndarray, label: str):
     print("-" * 50)
 
 def check_tf():
+    print("Checking Tensorflow...")
+
     # Check TensorFlow version
     print("TensorFlow version: ", tf.__version__)
 
@@ -41,16 +43,6 @@ def check_tf():
         # If GPU list is empty, no GPU is accessible to TensorFlow
         print("No GPU available for TensorFlow")
 
-    # List physical devices available
-    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-
-    # To specifically check for a GPU (useful if you have both CPU and GPU available)
-    physical_devices = tf.config.list_physical_devices('GPU')
-    if len(physical_devices) > 0:
-        # TensorFlow will automatically use the GPU if available
-        print("GPUs: ", physical_devices)
-    else:
-        print("Not running on GPU")
 
 
 def clone_private_repo(repo_url, local_path):
