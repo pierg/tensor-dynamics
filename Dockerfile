@@ -18,7 +18,7 @@ RUN apt-get update && \
 WORKDIR /app
 
 # Clone the repository inside the Docker container
-RUN git clone https://github.com/pierg/neural_networks .
+RUN git clone --depth 1 https://github.com/pierg/neural_networks .
 
 # Copy requirements file and install Python dependencies
 # Note: This assumes that the requirements.txt file exists in the repository. 
