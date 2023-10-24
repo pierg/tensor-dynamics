@@ -14,6 +14,7 @@ config_file: Path = config_folder / "configurations.toml"
 
 # Path to results folder
 results_folder: Path = main_repo_folder / "results"
+comparisons_folder: Path = results_folder / "comparisons"
 
 # Seretes path
 secrets_path: Path = main_repo_folder / ".secrets"

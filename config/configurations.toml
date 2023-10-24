@@ -17,7 +17,7 @@ shuffle_buffer_size = 512  # Reduced buffer size
 batch_size = 32  # Smaller batch size
 splits = [0.7, 0.15, 0.15]
 [Simple1.training]
-epochs = 1
+epochs = 2
 
 
 
@@ -37,5 +37,144 @@ shuffle_buffer_size = 512
 batch_size = 32
 splits = [0.7, 0.15, 0.15]
 [Simple2.training]
-epochs = 1
+epochs = 2
 
+
+[Simple3]
+[Simple3.structure]
+layers = [
+  { type = "Flatten" },
+  { type = "Dense", units = 32, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[Simple3.compile]
+optimizer = "sgd"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError"]
+[Simple3.dataset]
+shuffle_buffer_size = 512
+batch_size = 32
+splits = [0.7, 0.15, 0.15]
+[Simple3.training]
+epochs = 2
+
+
+
+
+# Configuration A: Original CNN configuration
+[A]
+[A.structure]
+layers = [
+  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 64, activation = "relu" },
+  { type = "Dense", units = 128, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" },
+]
+[A.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[A.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+[A.training]
+epochs = 2
+
+
+
+# Configuration P
+[P]
+[P.structure]
+layers = [
+  { type = "Conv2D", filters = 16, kernel_size = [3, 1], activation = "relu" },  # Reduced number of filters
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  # Removed one Conv2D and MaxPooling2D layer each to simplify the model
+  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },  # Reduced number of filters
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 32, activation = "relu" },  # Reduced number of units
+  # Removed one Dense layer to simplify the model
+  { type = "Dense", units = 12, activation = "linear" },  # This is typically the output layer, kept as-is if it aligns with the number of desired outputs
+]
+[P.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[P.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+[P.training]
+epochs = 2
+
+
+# Configuration P2
+[P2]
+[P2.structure]
+layers = [
+  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },
+  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D layer
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },
+  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D layer
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 256, kernel_size = [3, 1], activation = "relu" },
+  { type = "Conv2D", filters = 256, kernel_size = [3, 1], activation = "relu" },  # Additional Conv2D layer
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 128, activation = "relu" },
+  { type = "Dropout", rate = 0.5 },  # Dropout layer added to help prevent overfitting
+  { type = "Dense", units = 256, activation = "relu" },
+  { type = "Dropout", rate = 0.5 },  # Dropout layer added to help prevent overfitting
+  { type = "Dense", units = 12, activation = "linear" },
+]
+[P2.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[P2.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
+[P2.training]
+epochs = 2
+
+
+
+# Configuration PBN
+[PBN]
+[PBN.structure]
+layers = [
+  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
+  { type = "BatchNormalization" },  # Added BatchNormalization
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 64, kernel_size = [3, 1], activation = "relu" },
+  { type = "BatchNormalization" },  # Added BatchNormalization
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Conv2D", filters = 128, kernel_size = [3, 1], activation = "relu" },
+  { type = "BatchNormalization" },  # Added BatchNormalization
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 64, activation = "relu" },
+  { type = "BatchNormalization" },  # Added BatchNormalization before activation
+  { type = "Dense", units = 128, activation = "relu" },
+  { type = "BatchNormalization" },  # Added BatchNormalization before activation
+  { type = "Dense", units = 12, activation = "linear" },
+]
+[PBN.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[PBN.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
+[PBN.training]
+epochs = 2

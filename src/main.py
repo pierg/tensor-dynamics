@@ -170,11 +170,11 @@ def main():
             )  # This function is the refactored part of your main function
             git_pull(folder=results_folder)
             git_push(folder=results_folder)
-            # print("Comparing results...")
-            # compare_results()
-            # # Push to github
-            # print("Pushing to github overwriting remote comparisons...")
-            # git_push(folder=results_folder)
+            print("Comparing results...")
+            compare_results()
+            # Push to github
+            print("Pushing to github overwriting remote comparisons...")
+            git_push(folder=results_folder)
 
         else:
             print(f"Configuration {config_name} not found.")
