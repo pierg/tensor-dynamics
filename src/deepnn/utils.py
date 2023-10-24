@@ -30,11 +30,16 @@ def check_tf():
     # Check TensorFlow version
     print("TensorFlow version: ", tf.__version__)
 
-    # Check if GPU is available
-    if tf.test.is_gpu_available():  # This might show a deprecation warning, as it's deprecated in newer versions of TensorFlow.
-        print("GPU is available")
+    # List all available GPUs
+    gpus = tf.config.list_physical_devices('GPU')
+
+    if gpus:
+        # If GPU list is not empty, TensorFlow has access to GPU
+        print(f"Num GPUs Available: {len(gpus)}")
+        print("GPU(s) available for TensorFlow:", gpus)
     else:
-        print("GPU is not available")
+        # If GPU list is empty, no GPU is accessible to TensorFlow
+        print("No GPU available for TensorFlow")
 
     # List physical devices available
     print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
