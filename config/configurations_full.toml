@@ -1,4 +1,67 @@
-# Configuration A: Original CNN configuration from A
+
+[Simple1]
+[Simple1.structure]
+layers = [
+  { type = "Conv2D", filters = 8, kernel_size = [3, 1], activation = "relu" },
+  { type = "MaxPooling2D", pool_size = [2, 1] },
+  { type = "Flatten" },
+  { type = "Dense", units = 8, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[Simple1.compile]
+optimizer = "sgd"  # Simpler optimizer
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError"]
+[Simple1.dataset]
+shuffle_buffer_size = 512  # Reduced buffer size
+batch_size = 32  # Smaller batch size
+splits = [0.7, 0.15, 0.15]
+[Simple1.training]
+epochs = 2
+
+
+
+[Simple2]
+[Simple2.structure]
+layers = [
+  { type = "Conv2D", filters = 16, kernel_size = [3, 1], activation = "relu" },
+  { type = "Flatten" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[Simple2.compile]
+optimizer = "sgd"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError"]
+[Simple2.dataset]
+shuffle_buffer_size = 512
+batch_size = 32
+splits = [0.7, 0.15, 0.15]
+[Simple2.training]
+epochs = 2
+
+
+[Simple3]
+[Simple3.structure]
+layers = [
+  { type = "Flatten" },
+  { type = "Dense", units = 32, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[Simple3.compile]
+optimizer = "sgd"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError"]
+[Simple3.dataset]
+shuffle_buffer_size = 512
+batch_size = 32
+splits = [0.7, 0.15, 0.15]
+[Simple3.training]
+epochs = 2
+
+
+
+
+# Configuration A: Original CNN configuration
 [A]
 [A.structure]
 layers = [
@@ -22,7 +85,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [A.training]
-epochs = 3
+epochs = 2
 
 
 
@@ -49,7 +112,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [P.training]
-epochs = 3
+epochs = 2
 
 
 # Configuration P2
@@ -81,7 +144,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
 [P2.training]
-epochs = 3
+epochs = 2
 
 
 
@@ -114,4 +177,4 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
 [PBN.training]
-epochs = 3
+epochs = 2

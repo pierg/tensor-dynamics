@@ -10,7 +10,7 @@ layers = [
 [Simple1.compile]
 optimizer = "sgd"  # Simpler optimizer
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError"]
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [Simple1.dataset]
 shuffle_buffer_size = 512  # Reduced buffer size
 batch_size = 32  # Smaller batch size
@@ -30,7 +30,7 @@ layers = [
 [Simple2.compile]
 optimizer = "sgd"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError"]
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [Simple2.dataset]
 shuffle_buffer_size = 512
 batch_size = 32
@@ -49,7 +49,7 @@ layers = [
 [Simple3.compile]
 optimizer = "sgd"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError"]
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [Simple3.dataset]
 shuffle_buffer_size = 512
 batch_size = 32
