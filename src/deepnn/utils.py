@@ -6,10 +6,11 @@ import json
 import os
 from datetime import datetime
 import matplotlib.pyplot as plt
-import random
 import os
 import subprocess
 from urllib.parse import urlparse, urlunparse
+import tensorflow as tf
+
 
 def print_data_info(data: np.ndarray, label: str):
     """
@@ -25,6 +26,26 @@ def print_data_info(data: np.ndarray, label: str):
     print(f"{label} dtype: {data.dtype}")
     print("-" * 50)
 
+def check_tf():
+    # Check TensorFlow version
+    print("TensorFlow version: ", tf.__version__)
+
+    # Check if GPU is available
+    if tf.test.is_gpu_available():  # This might show a deprecation warning, as it's deprecated in newer versions of TensorFlow.
+        print("GPU is available")
+    else:
+        print("GPU is not available")
+
+    # List physical devices available
+    print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+
+    # To specifically check for a GPU (useful if you have both CPU and GPU available)
+    physical_devices = tf.config.list_physical_devices('GPU')
+    if len(physical_devices) > 0:
+        # TensorFlow will automatically use the GPU if available
+        print("GPUs: ", physical_devices)
+    else:
+        print("Not running on GPU")
 
 
 def clone_private_repo(repo_url, local_path):

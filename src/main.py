@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo
+from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf
 from shared import config_file, results_folder, secrets_path
 from analysis import compare_results
 import argparse
@@ -123,6 +123,8 @@ def process_configuration(
 
 
 def main():
+
+    check_tf()
 
      # Load secrets from file
     if secrets_path.exists():
