@@ -66,7 +66,7 @@ def clone_private_repo(repo_url, local_path):
         url_with_token = urlunparse(new_url_components)
 
         # Perform the clone operation
-        subprocess.run(['git', 'clone', url_with_token, str(local_path)], check=True)
+        subprocess.run(['git', 'clone', '--depth', '1', url_with_token, str(local_path)], check=True, capture_output=True)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while cloning the repo: {e}")
         raise e

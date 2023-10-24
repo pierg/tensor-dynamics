@@ -16,7 +16,7 @@ Before you begin, ensure you have met the following requirements:
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/pierg/neural_networks.git
+   git clone --depth 1 https://github.com/pierg/neural_networks.git
    cd neural_networks
    ```
 
