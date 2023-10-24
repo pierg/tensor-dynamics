@@ -60,6 +60,30 @@ epochs = 5
 
 
 
+# Configuration Eli
+[E]
+[A.structure]
+layers = [
+  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
+  { type = "Flatten" },
+  { type = "Dense", units = 128, activation = "relu" },
+  { type = "Dense", units = 128, activation = "relu" },
+  { type = "Dense", units = 64, activation = "relu" },
+  { type = "Dense", units = 32, activation = "linear" },
+  { type = "Dense", units = 12, activation = "linear" },
+]
+[A.compile]
+optimizer = "adam"
+loss = "mean_squared_error"
+metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[A.dataset]
+shuffle_buffer_size = 1024
+batch_size = 64
+splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+[A.training]
+epochs = 5
+
+
 
 # Configuration A: Original CNN configuration
 [A]
