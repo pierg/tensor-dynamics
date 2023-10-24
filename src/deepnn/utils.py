@@ -124,11 +124,23 @@ def git_push(folder=None, commit_message="Update files", ):
     try:
         os.chdir(folder)  # Change to the target directory
 
-        # Perform git operations
-        subprocess.run(['git', 'pull'], check=True)  # Ensure we're up-to-date with the remote
-        subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
-        subprocess.run(["git", "push", repo_url_with_token, "main"], check=True)  # replace "main" with your target branch if different
+        # Stash local changes temporarily
+        subprocess.run(['git', 'stash'], check=True)
+
+        # Fetch the latest history from the remote and reset your local branch
+        subprocess.run(['git', 'fetch', 'origin', 'main'], check=True)
+        subprocess.run(['git', 'reset', '--hard', 'origin/main'], check=True)
+
+        # Apply stashed changes; this does not affect the git history
+        subprocess.run(['git', 'stash', 'pop'], check=True)
+
+        # The local files are now modified with your changes. We'll commit them as a new snapshot.
+        subprocess.run(['git', 'add', '.'], check=True)
+        subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+
+        # Force push to the remote repository; this overwrites history!
+        subprocess.run(['git', 'push', repo_url_with_token, 'main', '--force'], check=True)
+
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while pushing to GitHub: {str(e)}")
         raise  # Rethrow the exception to handle it at a higher level of your application
