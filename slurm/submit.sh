@@ -1,17 +1,12 @@
 #!/bin/bash
 
 #SBATCH -A pc_nnkinetics -p lr6 -q lr_normal -t 0-42:0:0 -N 1
-#SBATCH --job-name=my_neural_network_job
 
 # Ensure any error stops the script execution
 set -e 
 
-# Check if configuration id was passed to the script, if not, exit with error.
-if [ -z "$1" ]; then
-    echo "Error: No configuration ID provided."
-    exit 1
-fi
 
+# Optional: Accept input argument for CONFIG_ID
 CONFIG_ID=$1
 
 # Source the secrets file to export GITHUB_TOKEN and other variables
@@ -26,12 +21,28 @@ if [ -z "$GITHUB_RESULTS_REPO" ] || [ -z "$GITHUB_TOKEN" ]; then
     exit 1
 fi
 
-# Run the container with the neural network application, passing in the CONFIG_ID
-apptainer run \
-  --fakeroot \
-  --writable-tmpfs \
-  --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
-  --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
-  --env GITHUB_TOKEN="$GITHUB_TOKEN" \
-  ../../neural_networks_latest.sif \
-  CONFIGS="$CONFIG_ID"
+# Check if CONFIG_ID was provided as an argument
+if [ -n "$CONFIG_ID" ]; then
+    echo "Running Config ID: $CONFIG_ID"
+    
+    # Run the container, passing in the CONFIG_ID
+    apptainer run \
+      --fakeroot \
+      --writable-tmpfs \
+      --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
+      --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
+      --env GITHUB_TOKEN="$GITHUB_TOKEN" \
+      ../../neural_networks_latest.sif \
+      CONFIGS="$CONFIG_ID"
+else
+    echo "No config ID. Running all configurations."
+
+    # Run the container, running all configurations
+    apptainer run \
+      --fakeroot \
+      --writable-tmpfs \
+      --bind /global/scratch/users/edkinigstein/Dataset2/F1:/data \
+      --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
+      --env GITHUB_TOKEN="$GITHUB_TOKEN" \
+      ../../neural_networks_latest.sif
+fi
