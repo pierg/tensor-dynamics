@@ -24,29 +24,23 @@ do
     esac
 done
 
-#!/bin/bash
-
-# Assuming LAUNCH_BASH and other variables are set earlier in the script or are passed as environment variables
+# No need for a second shebang (#!/bin/bash) here.
 
 if [ $LAUNCH_BASH -eq 1 ]; then
     # If the "-c" argument was passed, launch an interactive bash shell
     exec /bin/bash  # 'exec' replaces the current process (the script) with the new command (bash)
 else
-    # if ! pgrep -x "tensorboard" > /dev/null; then
-    #     echo "Starting TensorBoard..."
-    #     tensorboard --logdir ./logs &  # This starts tensorboard in the background
-    # else
-    #     echo "TensorBoard is already running."
-    # fi
-    
-    # Proceed if not launching bash (the rest of your script remains the same)
+    # Custom operations like checking or starting services can be placed here.
+
+    # Proceed if not launching bash
     # Run the python command depending on whether CONFIGS is provided
     if [ -n "$CONFIGS" ]; then
         # If CONFIGS is provided, include it in the python command
         
-        python src/main.py --data_dir=$DATA_DIR $CONFIGS
+        # Double-quote variables to prevent globbing and word splitting, in case of spaces or special characters in variables.
+        python src/main.py --data_dir="$DATA_DIR" $CONFIGS
     else
         # If CONFIGS is not provided, run the python command without it
-        python src/main.py --data_dir=$DATA_DIR
+        python src/main.py --data_dir="$DATA_DIR"
     fi
 fi

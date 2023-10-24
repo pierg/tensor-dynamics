@@ -9,6 +9,12 @@ set -e
 # Optional: Accept input argument for CONFIG_ID
 CONFIG_ID=$1
 
+# Check if the secrets file exists before sourcing
+if [ ! -f "../.secrets" ]; then
+    echo "Error: Missing secrets file."
+    exit 1
+fi
+
 # Source the secrets file to export GITHUB_TOKEN and other variables
 source ../.secrets
 
