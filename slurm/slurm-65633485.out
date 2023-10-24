@@ -1,0 +1,38 @@
+Running Config ID: PBN
+INFO:    User not listed in /etc/subuid, trying root-mapped namespace
+INFO:    Using fakeroot command combined with root-mapped namespace
+13:4: not a valid test operator: (
+13:4: not a valid test operator: 525.105.17
+From https://github.com/pierg/neural_networks
+ * branch            main       -> FETCH_HEAD
+   ca88cfa..15ae99c  main       -> origin/main
+HEAD is now at 15ae99c Change Epochs to 5
+2023-10-24 14:20:27.480746: I tensorflow/core/platform/cpu_feature_guard.cc:183] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: SSE3 SSE4.1 SSE4.2 AVX, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+Checking Tensorflow...
+TensorFlow version:  2.13.0
+Num GPUs Available: 1
+GPU(s) available for TensorFlow: [PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
+Directory is empty. Cloning the private repository...
+Namespace(data_dir='/data', configs=['PBN'])
+Loading data from file: /data/MM_Data_set_1_10_18_23_0.p
+Loading data from file: /data/MM_Data_set_1_10_18_23_1.p
+Loading data from file: /data/MM_Data_set_1_10_18_23_10.p
+Loading data from file: /data/MM_Data_set_1_10_18_23_100.p
+Loading data from file: /data/MM_Data_set_1_10_18_23_101.p
+Loading data from file: /data/MM_Data_set_1_10_18_23_102.p
+Loading data from file: /data/MM_Data_set_1_10_18_23_103.p
+data type: <class 'numpy.ndarray'>
+data shape: (700000, 501, 2, 1)
+data size: 701400000
+data dtype: float64
+--------------------------------------------------
+predictions type: <class 'numpy.ndarray'>
+predictions shape: (700000, 12)
+predictions size: 8400000
+predictions dtype: float64
+--------------------------------------------------
+Processing configuration...
+2023-10-24 14:21:37.018864: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1636] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 9762 MB memory:  -> device: 0, name: NVIDIA GeForce RTX 2080 Ti, pci bus id: 0000:3b:00.0, compute capability: 7.5
+./run.sh: line 46: 268546 Killed                  python src/main.py --data_dir="$DATA_DIR" $CONFIGS
+slurmstepd: error: Detected 1 oom-kill event(s) in StepId=65633485.batch. Some of your processes may have been killed by the cgroup out-of-memory handler.
