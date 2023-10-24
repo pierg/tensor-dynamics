@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf
+from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf, git_pull
 from shared import config_file, results_folder, secrets_path
 from analysis import compare_results
 import argparse
@@ -168,10 +168,12 @@ def main():
             process_configuration(
                 config_name, config, data, predictions, instance_folder
             )  # This function is the refactored part of your main function
+            git_pull(folder=results_folder)
+            git_push(folder=results_folder)
             print("Comparing results...")
             compare_results()
             # Push to github
-            print("Pushing to github...")
+            print("Pushing to github overwriting remote comparisons...")
             git_push(folder=results_folder)
 
         else:
