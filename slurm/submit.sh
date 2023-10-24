@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #SBATCH -A pc_nnkinetics -p lr6 -q lr_normal -t 0-42:0:0 -N 1
+#SBATCH --job-name=nn_cpu_lr6
 
 # Ensure any error stops the script execution
 set -e 
