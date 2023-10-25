@@ -56,9 +56,9 @@ class NeuralNetwork:
         print(f"Mean of target values in training dataset: {self.mean_train}")
         print(f"Variance of target values in training dataset: {self.variance_train}")
 
-        self.val_range = compute_dataset_range(self.val_dataset)
+        self.val_range = compute_dataset_range(self.validation_dataset)
         print(f"Range of target values in validation dataset: {self.val_range}")
-        self.mean_val, self.variance_val = compute_mean_and_variance(self.val_dataset)
+        self.mean_val, self.variance_val = compute_mean_and_variance(self.validation_dataset)
         print(f"Mean of target values in validation dataset: {self.mean_val}")
         print(f"Variance of target values in validation dataset: {self.variance_val}")
 
