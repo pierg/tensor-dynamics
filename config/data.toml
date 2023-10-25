@@ -1,0 +1,38 @@
+[d1]
+[d1.parameters]
+k1_min = 0.01
+k1_max = 0.05
+k2_min = 0.01
+k2_max = 0.05
+k3_min = 0.01
+k3_max = 0.05
+E0_min = 0.1
+E0_max = 0.3
+S0_min = 0.1
+S0_max = 0.3
+spectra_min = -1
+spectra_max = 1
+amplitude_min = 0.2
+amplitude_max = 0.8
+[d1.seed]
+value = 42
+
+[d2]
+[d2.parameters]
+k1_min = 0.01
+k1_max = 0.05
+k2_min = 0.01
+k2_max = 0.05
+k3_min = 0.01
+k3_max = 0.05
+E0_min = 0.1
+E0_max = 0.3
+S0_min = 0.1
+S0_max = 0.3
+spectra_min = -1
+spectra_max = 1
+amplitude_min = 0.2
+amplitude_max = 0.8
+[d2.seed]
+value = 55
+

@@ -11,6 +11,7 @@ config_folder: Path = main_repo_folder / "config"
 
 # Path to configuration file
 config_file: Path = config_folder / "configurations.toml"
+data_config_file: Path = config_folder / "data.toml"
 
 # Path to results folder
 results_folder: Path = main_repo_folder / "results"
