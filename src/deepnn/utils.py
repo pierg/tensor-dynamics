@@ -329,7 +329,7 @@ def preprocess_data(data: list, predictions: list) -> tuple:
 
 
 def save_training_info(
-    config_name, neural_network, history, evaluation_results, save_folder: Path
+    config_name, neural_network, history, evaluation_results, save_folder: Path, formatted_time
 ):
     """
     Save training information and generate plots for the training history.
@@ -344,6 +344,7 @@ def save_training_info(
     # Create a dictionary to store all training information
     training_info = {
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "time_elapsed": formatted_time,
         "config_name": config_name,
         "model_config": {
             "structure_config": neural_network.structure_config,

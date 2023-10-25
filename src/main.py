@@ -12,6 +12,7 @@ import os
 import traceback
 import json
 from datetime import datetime
+import time
 
 
 def parse_arguments():
@@ -98,12 +99,31 @@ def process_configuration(
             name=config_name,
             instance_folder=instance_folder
         )
+
+        # Capture the current time just before starting training
+        start_time = time.time()
+
+        # Train the model
         history = neural_network.train_model()
+
+        # Capture the time immediately after training is complete
+        end_time = time.time()
+
+
+        time_elapsed = end_time - start_time
+
+        # Convert the time to hours, minutes, and seconds
+        hours, rem = divmod(time_elapsed, 3600)
+        minutes, seconds = divmod(rem, 60)
+
+        # Format the time in a human-readable format
+        formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
+
 
         # Evaluation and saving results
         evaluation_results = neural_network.evaluate_model()
         save_training_info(
-            config_name, neural_network, history, evaluation_results, instance_folder
+            config_name, neural_network, history, evaluation_results, instance_folder, formatted_time
         )
 
     except Exception as e:
