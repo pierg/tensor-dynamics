@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf, git_pull, compute_dataset_range, compute_mean_and_variance
+from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf, git_pull
 from shared import config_file, results_folder, secrets_path, data_config_file
 from analysis import compare_results
 import argparse
@@ -125,7 +125,7 @@ def process_configuration(
         evaluation_results = neural_network.evaluate_model()
         
         save_training_info(
-            config_name, neural_network, history, evaluation_results, instance_folder, formatted_time, [train_range, val_range, test_range], [mean_train, mean_val, mean_test], [variance_train, variance_val, variance_test]
+            config_name, neural_network, history, evaluation_results, instance_folder, formatted_time
         )
 
     except Exception as e:
