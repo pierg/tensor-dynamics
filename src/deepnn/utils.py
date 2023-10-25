@@ -295,9 +295,10 @@ def compute_mean_and_variance(dataset):
 
     # Calculate the mean and variance
     mean = np.mean(all_targets_np)
+    mean_abs = np.mean(np.absolute(all_targets_np))
     variance = np.var(all_targets_np)
 
-    return mean, variance
+    return mean_abs, variance
 
 def compute_dataset_range(dataset):
     """

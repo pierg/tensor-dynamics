@@ -1,52 +1,80 @@
-from pathlib import Path
-import toml
-import tensorflow as tf
 import numpy as np
-import os
-from src.datagen.michaelis import *
+import tensorflow as tf
+from pathlib import Path
 from src.datagen.dataset import *
 
-def main():
-    # Configuration
-    num_samples = 100
-    dataset_config = {
-        'seed': {'value': None},  # We will set this later
-        'parameters': {'param_size': 10}  # Just an example parameter
-    }
-    output_dir = Path("./dataset_dir")
+import numpy as np
+import tensorflow as tf
 
-    # Step 1: Generate with a random seed
-    random_seed = np.random.randint(0, 10000)  # for example between 0 and 10000
-    print(f"Random seed for dataset generation: {random_seed}")
-    dataset_config['seed']['value'] = random_seed
+def are_datasets_equal(dataset1: tf.data.Dataset, dataset2: tf.data.Dataset) -> bool:
+    """
+    Compares two TensorFlow datasets to check if they are practically identical,
+    allowing for small differences in floating-point calculations.
 
-    # Store the seed for later comparison
-    seed_storage_path = output_dir / "seed_value.txt"
-    with open(seed_storage_path, 'w') as seed_file:
-        seed_file.write(str(random_seed))
+    :param dataset1: First dataset.
+    :param dataset2: Second dataset.
+    :return: True if practically identical, False otherwise.
+    """
+    for (original_elements, original_labels), (regenerated_elements, regenerated_labels) in zip(dataset1, dataset2):
+        # Ensure data points are numpy arrays for comparison
+        original_data_elements = original_elements.numpy() if isinstance(original_elements, tf.Tensor) else original_elements
+        regenerated_data_elements = regenerated_elements.numpy() if isinstance(regenerated_elements, tf.Tensor) else regenerated_elements
 
-    # Generate and store the dataset
-    create_dataset(num_samples, dataset_config, output_dir)
+        original_data_labels = original_labels.numpy() if isinstance(original_labels, tf.Tensor) else original_labels
+        regenerated_data_labels = regenerated_labels.numpy() if isinstance(regenerated_labels, tf.Tensor) else regenerated_labels
 
-    # Step 2: Load the stored dataset
-    loaded_dataset = load_dataset(str(output_dir / 'dataset.tfrecord'), buffer_size=10000)
+        # Compare the data points using a tolerance-based comparison for the elements and the labels
+        if not (np.allclose(original_data_elements, regenerated_data_elements, rtol=1e-05, atol=1e-08) and 
+                np.allclose(original_data_labels, regenerated_data_labels, rtol=1e-05, atol=1e-08)):
+            return False
+    return True
 
-    # Step 3: Regenerate with the same seed
-    with open(seed_storage_path, 'r') as seed_file:
-        stored_seed = int(seed_file.read().strip())
-    
-    print(f"Using stored seed for regeneration: {stored_seed}")
-    dataset_config['seed']['value'] = stored_seed
 
-    regenerated_dataset = create_dataset(num_samples, dataset_config, output_dir / "regenerated")
 
-    # Step 4: Compare the datasets
-    # This can be complex, depending on what "comparison" means in context.
-    # For tensors or complex structures, you might need more sophisticated metric-based comparison.
-    for (original_features, original_labels), (regenerated_features, regenerated_labels) in zip(loaded_dataset, regenerated_dataset):
-        comparison_result = tf.reduce_all(tf.equal(original_features, regenerated_features)).numpy()
-        print(f"Are the datasets identical? {'Yes' if comparison_result else 'No'}")
+def main() -> None:
 
-        # If they are not identical, we should stop the comparison to investigate.
-        if not comparison_result:
-            break
+    # Set paths and load configurations
+    current_dir = Path(__file__).resolve().parent
+    data_config_file = current_dir / "data.toml"
+    data_config = toml.load(data_config_file)
+    dataset_config = data_config["d1"]  # Assuming "d1" is a placeholder for your actual config key
+
+
+    seed_value = dataset_config.get('dataset', {}).get('seed', None)
+    n_samples = dataset_config.get('dataset', {}).get('n_samples', None)
+    batch_size = dataset_config.get('dataset', {}).get('batch_size', None)
+
+
+    output_dir = Path(__file__).parent.resolve() / "output"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+
+    # Step 1: Using seed
+    print(f"Random seed for dataset generation: {seed_value}")
+
+    # Generate and store the dataset.
+    dataset_path = output_dir / 'dataset.tfrecord'
+    create_dataset(n_samples, dataset_config, dataset_path)
+
+    pretty_print_dataset_elements(dataset_path)
+
+    # Step 2: Load the stored dataset.
+    loaded_dataset = load_dataset(dataset_path, batch_size)
+
+    # Step 3: Regenerate with the same seed.
+    print(f"Using stored seed for regeneration: {seed_value}")
+
+    regenerated_dataset_path = output_dir / "regenerated_dataset.tfrecord"
+    create_dataset(n_samples, dataset_config, regenerated_dataset_path)
+
+    # pretty_print_dataset_elements(regenerated_dataset_path)
+
+    # Reload the regenerated dataset for comparison
+    regenerated_dataset = load_dataset(regenerated_dataset_path, batch_size)
+
+    # Step 4: Compare the datasets.
+    are_identical = are_datasets_equal(loaded_dataset, regenerated_dataset)
+    print(f"Are the datasets identical? {'Yes' if are_identical else 'No'}")
+
+if __name__ == "__main__":
+    main()

@@ -113,7 +113,7 @@ def generate_parameters(param_config):
 
 
 
-def generate_datapoint(parameters):
+def generate_datapoint_dictionary(parameters):
     """
     Generate a datapoint by running the simulation with the provided parameters.
     """
@@ -145,3 +145,35 @@ def generate_datapoint(parameters):
     }
 
     return datapoint
+
+
+
+def generate_datapoint(parameters) -> tuple[np.ndarray, np.ndarray]:
+
+    datapoint = generate_datapoint_dictionary(parameters)
+
+    features = datapoint["NN_eValue_Input"] * datapoint["NN_eVector_Input"]
+    label = datapoint["NN_Prediction"].flatten()
+
+    return features, label
+
+
+
+
+def collect_data_points(num_samples, param_config):
+    results_features = []
+    results_labels = []
+
+
+    for _ in range(num_samples):
+        # Generate random parameters based on your configuration
+        parameters = generate_parameters(param_config)
+
+        # Generate data points
+        features, labels = generate_datapoint(parameters)
+
+        # Store the results
+        results_features.append(features.flatten())  # flatten if the data is multi-dimensional
+        results_labels.append(labels)
+
+    return np.array(results_features), np.array(results_labels)
