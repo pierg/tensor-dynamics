@@ -261,8 +261,57 @@ def load_data_from_file(filepath: Path) -> Tuple[List, List]:
     return nn_data, predictions
 
 
-from pathlib import Path
-from typing import List, Tuple
+def compute_mean_and_variance(dataset):
+    """
+    Compute the mean and variance of target values in a TensorFlow dataset.
+
+    Args:
+    dataset (tf.data.Dataset): The dataset containing data points and target values.
+
+    Returns:
+    tuple: The mean and variance of target values.
+    """
+    # List to store all targets
+    all_targets = []
+
+    # Iterate over the batches in the dataset
+    for features, targets in dataset:
+        all_targets.append(targets.numpy())  # Convert targets to numpy array and store
+
+    # Concatenate all targets into a single numpy array
+    all_targets_np = np.concatenate(all_targets, axis=0)
+
+    # Calculate the mean and variance
+    mean = np.mean(all_targets_np)
+    variance = np.var(all_targets_np)
+
+    return mean, variance
+
+def compute_dataset_range(dataset):
+    """
+    Compute the range of target values in a TensorFlow dataset.
+
+    Args:
+    dataset (tf.data.Dataset): The dataset containing data points and target values.
+
+    Returns:
+    float: The range of target values.
+    """
+    # Initialize variables to store the max and min with opposite extreme values
+    max_value = float('-inf')
+    min_value = float('inf')
+
+    # Iterate over the batches in the dataset
+    for features, targets in dataset:
+        # Convert targets to numpy array
+        targets_numpy = targets.numpy()
+
+        # Update max and min
+        max_value = max(max_value, np.max(targets_numpy))
+        min_value = min(min_value, np.min(targets_numpy))
+
+    # Calculate the range
+    return max_value - min_value
 
 def load_data_from_files(data_folder: Path, n_files: int = None) -> Tuple[List, List]:
     """
@@ -329,7 +378,8 @@ def preprocess_data(data: list, predictions: list) -> tuple:
 
 
 def save_training_info(
-    config_name, neural_network, history, evaluation_results, save_folder: Path, formatted_time
+    config_name, neural_network, history, evaluation_results, save_folder: Path, formatted_time,
+    datasets_ranges, datasets_means, datasets_variances
 ):
     """
     Save training information and generate plots for the training history.
@@ -356,6 +406,9 @@ def save_training_info(
             "history": history.history,
         },
         "evaluation_results": evaluation_results,
+        "datasets_ranges": datasets_ranges,
+        "datasets_means": datasets_means,
+        "datasets_variances": datasets_variances
     }
 
     # Create the save directory
