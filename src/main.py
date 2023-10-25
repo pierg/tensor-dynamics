@@ -4,7 +4,7 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf, git_pull
+from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf, git_pull, compute_dataset_range, compute_mean_and_variance
 from shared import config_file, results_folder, secrets_path, data_config_file
 from analysis import compare_results
 import argparse
@@ -12,6 +12,7 @@ import os
 import traceback
 import json
 from datetime import datetime
+import time
 
 
 def parse_arguments():
@@ -88,6 +89,7 @@ def process_configuration(
         (test_data, test_predictions)
     ).batch(dataset_config["batch_size"])
 
+
     try:
         # Initialize and train the neural network
         neural_network = NeuralNetwork(
@@ -98,12 +100,32 @@ def process_configuration(
             name=config_name,
             instance_folder=instance_folder
         )
+
+        # Capture the current time just before starting training
+        start_time = time.time()
+
+        # Train the model
         history = neural_network.train_model()
+
+        # Capture the time immediately after training is complete
+        end_time = time.time()
+
+
+        time_elapsed = end_time - start_time
+
+        # Convert the time to hours, minutes, and seconds
+        hours, rem = divmod(time_elapsed, 3600)
+        minutes, seconds = divmod(rem, 60)
+
+        # Format the time in a human-readable format
+        formatted_time = "{:0>2}:{:0>2}:{:05.2f}".format(int(hours), int(minutes), seconds)
+
 
         # Evaluation and saving results
         evaluation_results = neural_network.evaluate_model()
+        
         save_training_info(
-            config_name, neural_network, history, evaluation_results, instance_folder
+            config_name, neural_network, history, evaluation_results, instance_folder, formatted_time, [train_range, val_range, test_range], [mean_train, mean_val, mean_test], [variance_train, variance_val, variance_test]
         )
 
     except Exception as e:
