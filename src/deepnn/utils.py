@@ -254,7 +254,7 @@ def load_data_from_file(filepath: Path) -> Tuple[List, List]:
 
     # Extract features and targets
     nn_data = [
-        item["NN_eValue_Input"][1:] * item["NN_eVector_Input"][:, 1:] for item in data
+        item["NN_eValue_Input"] * item["NN_eVector_Input"] for item in data
     ]
     predictions = [item["NN_Prediction"].flatten() for item in data]
 
