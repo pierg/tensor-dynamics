@@ -9,14 +9,14 @@ def create_summary_file(training_data, results_dir):
     summary_lines = ["Training Summary:\n", "-----------------\n"]
 
     best_performance_index = None
-    best_loss = float("inf")
+    best_mape = float("inf")
 
     # Search for the best performing configuration
     for i, data in enumerate(training_data):
-        current_loss = data.get("evaluation_results", {}).get("loss", float("inf"))
+        current_mape = data.get("evaluation_results", {}).get("mean_absolute_percentage_error", float("inf"))
 
-        if current_loss < best_loss:
-            best_loss = current_loss
+        if current_mape < best_mape:
+            best_mape = current_mape
             best_performance_index = i
 
     # Adding the best configuration info at the beginning of the summary
@@ -28,7 +28,7 @@ def create_summary_file(training_data, results_dir):
         summary_lines.append(f"Best Performing Configuration:\n")
         summary_lines.append(f"Config Name: {config_name}\n")
         summary_lines.append(f"Timestamp: {timestamp}\n")
-        summary_lines.append(f"Lowest Loss: {best_loss}\n\n")
+        summary_lines.append(f"Lowest MAPE: {best_mape}\n\n")
 
     # Add information for each configuration
     for data in training_data:
