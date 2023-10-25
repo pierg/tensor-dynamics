@@ -34,6 +34,7 @@ class NeuralNetwork:
         self.train_dataset = train_dataset
         self.validation_dataset = validation_dataset
         self.test_dataset = test_dataset
+        self._analyze_datasets()
 
         # Extracting configuration components for easier access
         self.structure_config = self.config["structure"]
