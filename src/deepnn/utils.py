@@ -252,11 +252,23 @@ def load_data_from_file(filepath: Path) -> Tuple[List, List]:
     with filepath.open("rb") as f:
         data = pickle.load(f)
 
+    print("~~~~~~~")
+    print(f"NN_eValue_Input shape: {data[0]['NN_eValue_Input'].shape}")
+    print(f"NN_eVector_Input shape: {data[0]['NN_eVector_Input'].shape}")
+    print(f"NN_Prediction shape: {data[0]['NN_Prediction'].shape}")
+
     # Extract features and targets
     nn_data = [
-        item["NN_eValue_Input"][1:] * item["NN_eVector_Input"][:, 1:] for item in data
+        item["NN_eValue_Input"] * item["NN_eVector_Input"] for item in data
     ]
     predictions = [item["NN_Prediction"].flatten() for item in data]
+
+
+    print(f"nn_data shape: {nn_data[0].shape}")
+    print(f"predictions shape: {predictions[0].shape}")
+    print("~~~~~~~")
+
+
 
     return nn_data, predictions
 
@@ -307,6 +319,11 @@ def preprocess_data(data: list, predictions: list) -> tuple:
     Returns:
         tuple: Processed data and predictions.
     """
+    print(f"BEFORE data shape: {data[0].shape}")  
+    print(f"BEFORE predictions shape: {predictions[0].shape}")  
+
+
+
     # Convert list of data into a numpy array for efficient manipulation.
     data = np.array(data)
 
