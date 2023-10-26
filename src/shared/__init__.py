@@ -20,5 +20,5 @@ comparisons_folder: Path = results_folder / "comparisons"
 # Seretes path
 secrets_path: Path = main_repo_folder / ".secrets"
 
-# Tensorboard log directory
-tb_log_dir: Path = main_repo_folder / "logs"
+# Datasets folder path
+datasets_folder: Path = main_repo_folder / "data"

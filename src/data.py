@@ -1,215 +1,65 @@
-import sys
-import toml
+
+
+
 from pathlib import Path
-import tensorflow as tf
-import numpy as np
-from deepnn.model import NeuralNetwork
-from deepnn.utils import (
-    git_push,
-    load_data_from_files,
-    load_secrets,
-    preprocess_data,
-    save_training_info,
-    is_directory_empty,
-    clone_private_repo,
-    check_tf,
-    git_pull,
-)
-from shared import config_file, results_folder, secrets_path, data_config_file
-from analysis import compare_results
-import argparse
-import os
-import traceback
-import json
-from datetime import datetime
+from src.datagen.dataset_utils import pretty_print_sharded_dataset_elements
+from src.datagen.runningstats import RunningStatsDatapoints
+from src.datagen.tf_dataset import create_sharded_tfrecord, transform_and_save_sharded_dataset
+from typing import Any, Dict
 
+def create_dataset(base_file_path: Path, data_config: Dict[str, Any]) -> Path:
+    # Ensure the base directory exists.
+    base_file_path.mkdir(parents=True, exist_ok=True)
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="Process data and configurations.")
-    parser.add_argument("--data_dir", required=True, help="Path to the data directory")
-    parser.add_argument("configs", nargs="*", help="Optional configurations")
-    return parser.parse_args()
+    # Prepare directories for the original and normalized datasets.
+    base_origin_path = base_file_path / "origin"
+    base_norm_path = base_file_path / "normalized"
+    base_origin_path.mkdir(exist_ok=True)
+    base_norm_path.mkdir(exist_ok=True)
 
+    # Constants for the sharding process.
+    shard_prefix = "shard"
+    num_shards = data_config.get('dataset', {}).get('n_shards')
+    if num_shards is None:
+        raise ValueError("Number of shards not defined in configuration")
 
-def validate_directory(path):
-    if not path.is_dir():
-        print(f"Provided path is not a directory: {path}")
-        sys.exit(1)
+    # Initialize running statistics for the datapoints.
+    running_stats = RunningStatsDatapoints()
 
+    # Create the original dataset in shards and collect statistics.
+    create_sharded_tfrecord(base_origin_path, data_config, running_stats)
 
-def load_and_preprocess_data(data_folder):
-    data, predictions = load_data_from_files(data_folder, 15)
-    return preprocess_data(data, predictions)
-
-
-def process_configuration(
-    config_name: str,
-    config: dict,
-    data: np.ndarray,
-    predictions: np.ndarray,
-    instance_folder,
-):
-    """
-    Set up and process a single neural network configuration.
-
-    Args:
-    config_name (str): Name of the configuration
-    config (dict): The configuration settings for the neural network.
-    data (ndarray): The dataset to be used.
-    predictions (ndarray): The actual values or labels.
-
-    Returns:
-    dict: The results from evaluating the neural network.
-    """
-    dataset_config = config["dataset"]
-
-    # Validate split ratios
-    splits = dataset_config["splits"]
-    if sum(splits) != 1.0:
-        raise ValueError(f"Split ratios for the configuration don't add up to 1.0")
-
-    train_ratio, val_ratio, test_ratio = splits
-
-    # Calculate split indices
-    total_count = len(data)
-    train_split = int(train_ratio * total_count)
-    val_split = int(val_ratio * total_count)  # Count of validation samples
-
-    # Data partitioning
-    train_data, remaining_data = data[:train_split], data[train_split:]
-    train_predictions, remaining_predictions = (
-        predictions[:train_split],
-        predictions[train_split:],
-    )
-    val_data, test_data = remaining_data[:val_split], remaining_data[val_split:]
-    val_predictions, test_predictions = (
-        remaining_predictions[:val_split],
-        remaining_predictions[val_split:],
+    # Display examples from the original dataset.
+    print("\nOriginal Dataset:")
+    pretty_print_sharded_dataset_elements(
+        shards_directory=base_origin_path,
+        shard_prefix=shard_prefix,
+        num_shards=num_shards,
+        running_stats=running_stats,
+        n=5
     )
 
-    # Convert the datasets to TensorFlow datasets for better performance
-    # For the training phase, we often shuffle and batch the data. This can be done using tf.data for efficiency.
-    train_dataset = (
-        tf.data.Dataset.from_tensor_slices((train_data, train_predictions))
-        .shuffle(buffer_size=dataset_config["shuffle_buffer_size"])
-        .batch(dataset_config["batch_size"])
+    # Normalize the dataset based on collected statistics and save in shards.
+    feature_stats = running_stats.get_feature_stats()
+    label_stats = running_stats.get_label_stats()
+    transform_and_save_sharded_dataset(
+        input_shards_directory=base_origin_path,
+        feature_stats=feature_stats,
+        label_stats=label_stats,
+        output_shards_directory=base_norm_path,
+        shard_prefix=shard_prefix,
+        num_shards=num_shards,
     )
-    # Usually, the validation and test dataset isn't shuffled; only batched.
-    val_dataset = tf.data.Dataset.from_tensor_slices((val_data, val_predictions)).batch(
-        dataset_config["batch_size"]
+
+    # Display examples from the normalized dataset.
+    print("\nNormalized Dataset:")
+    pretty_print_sharded_dataset_elements(
+        shards_directory=base_norm_path,
+        shard_prefix=shard_prefix,
+        num_shards=num_shards,
+        running_stats=running_stats,
+        n=5
     )
-    test_dataset = tf.data.Dataset.from_tensor_slices(
-        (test_data, test_predictions)
-    ).batch(dataset_config["batch_size"])
 
-    try:
-        # Initialize and train the neural network
-        neural_network = NeuralNetwork(
-            train_dataset=train_dataset,
-            validation_dataset=val_dataset,
-            test_dataset=test_dataset,
-            configuration=config,
-            name=config_name,
-            instance_folder=instance_folder,
-        )
-        history = neural_network.train_model()
-
-        # Evaluation and saving results
-        evaluation_results = neural_network.evaluate_model()
-        save_training_info(
-            config_name, neural_network, history, evaluation_results, instance_folder
-        )
-
-    except Exception as e:
-        error_message = str(e)
-        traceback_info = traceback.format_exc()  # Capture the traceback
-
-        # Print the error message and traceback
-        print(f"Configuration {config_name} can not be compiled and trained")
-
-        # Save the error message and traceback to a file
-        error_log = {"error_message": error_message, "traceback": traceback_info}
-        error_file_path = Path(results_folder) / f"{config_name}_error_log.json"
-        with open(error_file_path, "w", encoding="utf-8") as error_file:
-            json.dump(error_log, error_file, ensure_ascii=False, indent=4)
-
-    return
-
-
-def main():
-    check_tf()
-
-    # Load secrets from file
-    if secrets_path.exists():
-        load_secrets(secrets_path)
-
-    # Check if the results_folder is empty or doesn't exist
-    if is_directory_empty(results_folder):
-        # Clone the private repo
-        print("Directory is empty. Cloning the private repository...")
-        clone_private_repo(os.getenv("GITHUB_RESULTS_REPO"), results_folder)
-
-    args = parse_arguments()
-
-    # Load the configurations from the TOML file
-    configs = toml.load(config_file)
-
-    # Load the configurations from the TOML file
-    data_config = toml.load(data_config_file)
-
-    # Results folder
-    instance_folder = results_folder / f"{datetime.now().strftime('%m.%d-%H.%M.%S')}"
-
-    print(args)
-
-    config_names = args.configs
-    # If no specific configurations are provided, process all configurations
-    if not config_names:
-        print(
-            "No specific configuration names provided. Processing all configurations."
-        )
-        config_names = list(configs.keys())
-        print(config_names)
-
-    data_folder = Path(os.path.expanduser(args.data_dir))
-    validate_directory(data_folder)
-
-    data, predictions = load_and_preprocess_data(data_folder)
-
-    # Process each configuration
-    for config_name in config_names:
-        if config_name in configs:
-            config = configs[config_name]
-            print("Processing configuration...")
-            git_pull(folder=results_folder, prefer_local=False)
-            process_configuration(
-                config_name, config, data, predictions, instance_folder
-            )  # This function is the refactored part of your main function
-            git_pull(folder=results_folder, prefer_local=True)
-            git_push(folder=results_folder)
-            print("Comparing results...")
-            compare_results()
-            # Push to github
-            print("Pushing to github overwriting remote comparisons...")
-            git_push(folder=results_folder)
-
-        else:
-            print(f"Configuration {config_name} not found.")
-
-    print("All configurations have been processed and results have been saved.")
-
-
-if __name__ == "__main__":
-    main()
-
-    # load_secrets(secrets_path)
-
-    # # Check if the results_folder is empty or doesn't exist
-    # if is_directory_empty(results_folder):
-    #     # Clone the private repo
-    #     print("Directory is empty. Cloning the private repository...")
-    #     clone_private_repo(os.getenv('GITHUB_RESULTS_REPO'), results_folder)
-
-    # main()
-
-    # git_push(folder=results_folder)
+    # Return the path of the normalized dataset.
+    return base_norm_path
