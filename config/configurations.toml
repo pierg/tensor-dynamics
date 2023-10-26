@@ -16,7 +16,7 @@ shuffle_buffer_size = 512  # Reduced buffer size
 batch_size = 32  # Smaller batch size
 splits = [0.7, 0.15, 0.15]
 [Simple1.training]
-epochs = 40
+epochs = 70
 
 
 
@@ -36,7 +36,7 @@ shuffle_buffer_size = 512
 batch_size = 32
 splits = [0.7, 0.15, 0.15]
 [Simple2.training]
-epochs = 40
+epochs = 70
 
 
 [Simple3]
@@ -55,7 +55,7 @@ shuffle_buffer_size = 512
 batch_size = 32
 splits = [0.7, 0.15, 0.15]
 [Simple3.training]
-epochs = 40
+epochs = 70
 
 
 
@@ -80,7 +80,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [E.training]
-epochs = 40
+epochs = 70
 
 
 
@@ -108,7 +108,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [A.training]
-epochs = 40
+epochs = 70
 
 
 
@@ -135,7 +135,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
 [P.training]
-epochs = 40
+epochs = 70
 
 
 # Configuration P2
@@ -167,7 +167,7 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
 [P2.training]
-epochs = 40
+epochs = 70
 
 
 
@@ -200,4 +200,4 @@ shuffle_buffer_size = 1024
 batch_size = 64
 splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
 [PBN.training]
-epochs = 40
+epochs = 70
