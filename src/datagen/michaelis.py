@@ -148,6 +148,52 @@ def generate_datapoint_dictionary(parameters):
 
 
 
+
+def normalize_data(data, mean, std):
+    """
+    Normalize data using the provided mean and standard deviation, flattening and reshaping as needed.
+
+    Args:
+    data (list/np.array): The data to be normalized, expected in the form of a list or a NumPy array.
+    mean (float/list/np.array): The mean value(s) used for normalization. Could be a list, a single float, or a NumPy array.
+    std (float/list/np.array): The standard deviation value(s) used for normalization. Could be a list, a single float, or a NumPy array.
+
+    Returns:
+    np.array: The normalized data, reshaped to its original dimensions.
+    """
+
+    # Ensure the inputs are NumPy arrays
+    data_np = np.array(data) if not isinstance(data, np.ndarray) else data
+    mean_np = np.array(mean) if not isinstance(mean, np.ndarray) else mean
+    std_np = np.array(std) if not isinstance(std, np.ndarray) else std
+
+    # Record the original shape of the data
+    original_shape = data_np.shape
+
+    # Flatten the data if it's not already a 1D array
+    data_flattened = data_np.flatten() if len(original_shape) > 1 else data_np
+
+    # Normalize the flattened data. If mean and std are single values, they'll broadcast.
+    # If they're arrays, their length should match the number of elements in the flattened data.
+    normalized_data_flattened = (data_flattened - mean_np) / std_np
+
+    # Reshape the data back to its original shape
+    normalized_data = normalized_data_flattened.reshape(original_shape)
+
+    return normalized_data
+
+
+
+def quantize_data(data, q_min=-128, q_max=127):
+    """Quantize the normalized data."""
+    # Assuming data is already normalized.
+    # You might want to adjust the range depending on your exact needs.
+    quantized = np.round(data * q_max)  # or use other factors for quantization
+    # Ensure values are within the desired range
+    quantized = np.clip(quantized, q_min, q_max)
+    return quantized.astype(np.int32)  # or np.uint8 or other as needed
+
+
 def generate_datapoint(parameters) -> tuple[np.ndarray, np.ndarray]:
 
     datapoint = generate_datapoint_dictionary(parameters)
@@ -156,7 +202,6 @@ def generate_datapoint(parameters) -> tuple[np.ndarray, np.ndarray]:
     label = datapoint["NN_Prediction"].flatten()
 
     return features, label
-
 
 
 

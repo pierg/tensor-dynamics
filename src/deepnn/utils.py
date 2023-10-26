@@ -288,7 +288,7 @@ def compute_mean_and_variance(dataset):
 
     # Iterate over the batches in the dataset
     for features, targets in dataset:
-        all_targets.append(targets.numpy())  # Convert targets to numpy array and store
+        all_targets.append(targets.numpy()) 
 
     # Concatenate all targets into a single numpy array
     all_targets_np = np.concatenate(all_targets, axis=0)
