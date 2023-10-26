@@ -4,7 +4,17 @@ from pathlib import Path
 import tensorflow as tf
 import numpy as np
 from deepnn.model import NeuralNetwork
-from deepnn.utils import git_push, load_data_from_files, load_secrets, preprocess_data, save_training_info, is_directory_empty, clone_private_repo, check_tf, git_pull
+from deepnn.utils import (
+    git_push,
+    load_data_from_files,
+    load_secrets,
+    preprocess_data,
+    save_training_info,
+    is_directory_empty,
+    clone_private_repo,
+    check_tf,
+    git_pull,
+)
 from shared import config_file, results_folder, secrets_path, data_config_file
 from analysis import compare_results
 import argparse
@@ -35,11 +45,11 @@ def load_and_preprocess_data(data_folder):
 
 
 def process_configuration(
-    config_name: str, 
-    config: dict, 
-    data: np.ndarray, 
-    predictions: np.ndarray, 
-    instance_folder
+    config_name: str,
+    config: dict,
+    data: np.ndarray,
+    predictions: np.ndarray,
+    instance_folder,
 ):
     """
     Set up and process a single neural network configuration.
@@ -102,7 +112,7 @@ def process_configuration(
             test_dataset=test_dataset,
             configuration=config,
             name=config_name,
-            instance_folder=instance_folder
+            instance_folder=instance_folder,
         )
         history = neural_network.train_model()
 
@@ -129,10 +139,9 @@ def process_configuration(
 
 
 def main():
-
     check_tf()
 
-     # Load secrets from file
+    # Load secrets from file
     if secrets_path.exists():
         load_secrets(secrets_path)
 
@@ -140,7 +149,7 @@ def main():
     if is_directory_empty(results_folder):
         # Clone the private repo
         print("Directory is empty. Cloning the private repository...")
-        clone_private_repo(os.getenv('GITHUB_RESULTS_REPO'), results_folder)
+        clone_private_repo(os.getenv("GITHUB_RESULTS_REPO"), results_folder)
 
     args = parse_arguments()
 
@@ -196,7 +205,6 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()
 
     # load_secrets(secrets_path)

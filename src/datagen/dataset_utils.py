@@ -4,6 +4,7 @@ from pathlib import Path
 from src.datagen.runningstats import RunningStatsDatapoints
 from src.datagen.tf_dataset import load_tfrecord_dataset
 
+
 def print_data_info(data: np.ndarray, label: str) -> None:
     """Display formatted information about the numpy data.
 
@@ -17,9 +18,10 @@ def print_data_info(data: np.ndarray, label: str) -> None:
         f"Shape: {data.shape}",
         f"Size : {data.size}",
         f"Dtype: {data.dtype}",
-        "-" * 50
+        "-" * 50,
     ]
-    print('\n'.join(info_strings))
+    print("\n".join(info_strings))
+
 
 def compute_statistics(dataset: tf.data.Dataset) -> tuple:
     """
@@ -41,13 +43,14 @@ def compute_statistics(dataset: tf.data.Dataset) -> tuple:
     return mean_abs, variance, range_value
 
 
-
-def pretty_print_dataset_elements(dataset_location: Path, 
-                                  running_stats: RunningStatsDatapoints = None, 
-                                  compute_stats: bool = True,
-                                  n: int = None) -> None:
+def pretty_print_dataset_elements(
+    dataset_location: Path,
+    running_stats: RunningStatsDatapoints = None,
+    compute_stats: bool = True,
+    n: int = None,
+) -> None:
     """
-    Pretty prints 'n' elements from the dataset located at the provided path. 
+    Pretty prints 'n' elements from the dataset located at the provided path.
     It utilizes running statistics if provided.
 
     Args:
@@ -77,16 +80,20 @@ def pretty_print_dataset_elements(dataset_location: Path,
     if compute_stats:
         # If running_stats is not provided, calculate and print statistics from the dataset
         mean, variance, range_value = compute_statistics(dataset)
-        print(f"\nComputing Dataset Statistics:\nRange: {range_value}\nMean : {mean}\nVar  : {variance}\n" + "-" * 30)
+        print(
+            f"\nComputing Dataset Statistics:\nRange: {range_value}\nMean : {mean}\nVar  : {variance}\n"
+            + "-" * 30
+        )
 
     # Use the cardinality of the dataset if 'n' is not specified
     num_elements = n if n is not None else dataset.cardinality().numpy()
 
     for count, (features, labels) in enumerate(dataset.take(num_elements), start=1):
         print(f"\nElement: {count}")
-        print("Feature:", features.numpy(), sep='\n')
-        print("Label:", labels.numpy(), sep='\n')
+        print("Feature:", features.numpy(), sep="\n")
+        print("Label:", labels.numpy(), sep="\n")
         print("-" * 30)
+
 
 def count_elements_and_batches(dataset: tf.data.Dataset) -> tuple:
     """Counts the number of elements and batches in a TensorFlow dataset.
@@ -97,10 +104,14 @@ def count_elements_and_batches(dataset: tf.data.Dataset) -> tuple:
     Returns:
         tuple: Total number of elements and total number of batches.
     """
-    num_elements = dataset.reduce(0, lambda x, _: x + 1).numpy()  # More efficient counting
+    num_elements = dataset.reduce(
+        0, lambda x, _: x + 1
+    ).numpy()  # More efficient counting
 
     # Assumes the dataset might already be batched
     num_batches = tf.data.experimental.cardinality(dataset).numpy()
-    num_batches = num_batches if num_batches != -1 else sum(1 for _ in dataset)  # Handle unknown cardinality
+    num_batches = (
+        num_batches if num_batches != -1 else sum(1 for _ in dataset)
+    )  # Handle unknown cardinality
 
     return num_elements, num_batches

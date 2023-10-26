@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 from src.datagen.michaelis import generate_datapoint, generate_parameters
 
 
-
-
-
 def plot_and_save_statistics(cumulative_means, title, file_name):
     """
     Plots the cumulative means and saves the plot to a file.
@@ -17,16 +14,17 @@ def plot_and_save_statistics(cumulative_means, title, file_name):
     :param file_name: The name of the file to save the plot.
     """
     plt.figure(figsize=(10, 6))
-    plt.plot(cumulative_means, label='Average Cumulative Mean')
-    plt.xlabel('Number of Samples')
-    plt.ylabel('Value')
+    plt.plot(cumulative_means, label="Average Cumulative Mean")
+    plt.xlabel("Number of Samples")
+    plt.ylabel("Value")
     plt.title(title)
-    plt.legend(loc='upper right')
+    plt.legend(loc="upper right")
     plt.savefig(file_name)
     plt.close()
 
-
     ...
+
+
 class RunningStats:
     """
     Maintains running statistics including mean and standard deviation without storing all data points.
@@ -64,6 +62,7 @@ class RunningStats:
     def standard_deviation(self):
         return np.sqrt(self.variance())
 
+
 class RunningStats:
     """
     Maintains running statistics including mean and variance without storing all data points.
@@ -94,7 +93,11 @@ class RunningStats:
     def get_variance(self):
         # For sample variance, use M2 / (n - 1)
         # For population variance, use M2 / n
-        return self.M2 / (self.n - 1) if self.n > 1 else (self.M2 if self.M2 is not None else 0)
+        return (
+            self.M2 / (self.n - 1)
+            if self.n > 1
+            else (self.M2 if self.M2 is not None else 0)
+        )
 
     def get_standard_deviation(self):
         return np.sqrt(self.get_variance())
@@ -131,7 +134,6 @@ class RunningStatsDataset:
         }
 
 
-
 def compute_mean_std(data_config_file: Path, data_config_id: str = "d1"):
     # Load the dataset configuration from the TOML file
     data_config = toml.load(data_config_file)
@@ -145,10 +147,8 @@ def compute_mean_std(data_config_file: Path, data_config_id: str = "d1"):
     stats_features = RunningStats(shape=(0,))
     stats_labels = RunningStats(shape=(0,))
 
-
     cumulative_means_features = []
     cumulative_means_labels = []
-
 
     for _ in range(num_samples):
         parameters = generate_parameters(param_config)
@@ -174,7 +174,6 @@ def compute_mean_std(data_config_file: Path, data_config_id: str = "d1"):
     most_accurate_mean_labels = stats_labels.mean()
     most_accurate_std_labels = stats_labels.standard_deviation()
 
-
     statistics_configs = {data_config_id: {}}
     # Update the dataset configuration with the new statistics
     statistics_configs[data_config_id]["statistics"] = {
@@ -186,37 +185,39 @@ def compute_mean_std(data_config_file: Path, data_config_id: str = "d1"):
 
     # Save the updated configuration back to the TOML file
     statistic_file = data_config_file.parent / "statistics.toml"
-    with open(statistic_file, 'w') as toml_file:
+    with open(statistic_file, "w") as toml_file:
         toml.dump(statistics_configs, toml_file)
-
 
     print(f"Most accurate mean (features): {most_accurate_mean_features}")
     print(f"Most accurate standard deviation (features): {most_accurate_std_features}")
     print(f"Most accurate mean (labels): {most_accurate_mean_labels}")
     print(f"Most accurate standard deviation (labels): {most_accurate_std_labels}")
 
-
     # Plot statistics for features
     plot_and_save_statistics(
         cumulative_means_features,
-        title='Cumulative Statistics for Features',
-        file_name=current_dir / 'cumulative_statistics_features.png'
+        title="Cumulative Statistics for Features",
+        file_name=current_dir / "cumulative_statistics_features.png",
     )
 
-        # Plot statistics for labels
+    # Plot statistics for labels
     plot_and_save_statistics(
         cumulative_means_labels,
-        title='Cumulative Statistics for Labels',
-        file_name=current_dir / 'cumulative_statistics_labels.png'
+        title="Cumulative Statistics for Labels",
+        file_name=current_dir / "cumulative_statistics_labels.png",
     )
 
-
-    return most_accurate_mean_features, most_accurate_std_features, most_accurate_mean_labels, most_accurate_std_labels
+    return (
+        most_accurate_mean_features,
+        most_accurate_std_features,
+        most_accurate_mean_labels,
+        most_accurate_std_labels,
+    )
 
 
 if __name__ == "__main__":
     current_dir = Path(__file__).resolve().parent
     data_config_file = current_dir / "data.toml"
     data_config = toml.load(data_config_file)
-    
+
     compute_mean_std(data_config_file, "d1")

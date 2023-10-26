@@ -6,6 +6,7 @@ from .utils import compute_dataset_range, compute_mean_and_variance
 from shared import tb_log_dir
 from datetime import datetime
 
+
 class NeuralNetwork:
     def __init__(
         self,
@@ -14,7 +15,7 @@ class NeuralNetwork:
         test_dataset: tf.data.Dataset,
         configuration: dict,
         name: str,
-        instance_folder
+        instance_folder,
     ):
         """
         Initialize the NeuralNetwork class with training, validation, and test datasets,
@@ -52,23 +53,27 @@ class NeuralNetwork:
         # Compute and print the range for each dataset
         self.train_range = compute_dataset_range(self.train_dataset)
         print(f"Range of target values in training dataset: {self.train_range}")
-        self.mean_train, self.variance_train = compute_mean_and_variance(self.train_dataset)
+        self.mean_train, self.variance_train = compute_mean_and_variance(
+            self.train_dataset
+        )
         print(f"Mean of target values in training dataset: {self.mean_train}")
         print(f"Variance of target values in training dataset: {self.variance_train}")
 
         self.val_range = compute_dataset_range(self.validation_dataset)
         print(f"Range of target values in validation dataset: {self.val_range}")
-        self.mean_val, self.variance_val = compute_mean_and_variance(self.validation_dataset)
+        self.mean_val, self.variance_val = compute_mean_and_variance(
+            self.validation_dataset
+        )
         print(f"Mean of target values in validation dataset: {self.mean_val}")
         print(f"Variance of target values in validation dataset: {self.variance_val}")
 
         self.test_range = compute_dataset_range(self.test_dataset)
         print(f"Range of target values in test dataset: {self.test_range}")
-        self.mean_test, self.variance_test = compute_mean_and_variance(self.test_dataset)
+        self.mean_test, self.variance_test = compute_mean_and_variance(
+            self.test_dataset
+        )
         print(f"Mean of target values in test dataset: {self.mean_test}")
         print(f"Variance of target values in test dataset: {self.variance_test}")
-
-
 
     def _build_model(self) -> tf.keras.Model:
         """
@@ -98,7 +103,7 @@ class NeuralNetwork:
         # Dynamically add layers from the configuration
         for layer_conf in self.structure_config["layers"]:
             layer_type = layer_conf["type"]
- 
+
             # For each type of layer, we handle the parameters appropriately.
             if layer_type == "Conv2D":
                 prev_layer = tf.keras.layers.Conv2D(
@@ -116,13 +121,12 @@ class NeuralNetwork:
                 prev_layer = tf.keras.layers.Flatten()(prev_layer)
             elif layer_type == "Dense":
                 prev_layer = tf.keras.layers.Dense(
-                    units=layer_conf["units"],
-                    activation=layer_conf["activation"]
+                    units=layer_conf["units"], activation=layer_conf["activation"]
                 )(prev_layer)
             elif layer_type == "Dropout":  # Handling Dropout
-                prev_layer = tf.keras.layers.Dropout(
-                    rate=layer_conf["rate"]
-                )(prev_layer)
+                prev_layer = tf.keras.layers.Dropout(rate=layer_conf["rate"])(
+                    prev_layer
+                )
             else:
                 raise ValueError(f"Layer type '{layer_type}' not recognized.")
 
@@ -163,9 +167,8 @@ class NeuralNetwork:
         Train the neural network model with provided datasets.
         """
         log_dir = self.instance_folder / f"{self.name}"
-        
-        tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
+        tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
         self.model.summary()  # Display model architecture
 
@@ -177,7 +180,7 @@ class NeuralNetwork:
             self.train_dataset,
             epochs=epochs,
             validation_data=self.validation_dataset,
-            callbacks=[tensorboard_callback]
+            callbacks=[tensorboard_callback],
         )
 
         return history
@@ -203,47 +206,52 @@ class NeuralNetwork:
         # Evaluating the model on different datasets helps in understanding the performance and robustness of the model.
 
         # The training data evaluation helps understand how well the model learned the patterns in the data it was trained on.
-        train_results = self.model.evaluate(x=self.train_dataset, verbose=verbose, return_dict=return_dict)
-        
+        train_results = self.model.evaluate(
+            x=self.train_dataset, verbose=verbose, return_dict=return_dict
+        )
+
         # Evaluating on validation data provides insights on how the model performs on unseen data, which is crucial for understanding its generalization.
-        val_results = self.model.evaluate(x=self.val_dataset, verbose=verbose, return_dict=return_dict)
+        val_results = self.model.evaluate(
+            x=self.val_dataset, verbose=verbose, return_dict=return_dict
+        )
 
         # Finally, the test data evaluation gives the most unbiased estimate of the model's real-world performance on entirely new data.
-        test_results = self.model.evaluate(x=self.test_dataset, verbose=verbose, return_dict=return_dict)
+        test_results = self.model.evaluate(
+            x=self.test_dataset, verbose=verbose, return_dict=return_dict
+        )
 
         # Calculate additional statistics, such as R-squared, which is a statistical measure that represents the proportion of the variance for the dependent variable that's explained by the independent variables in a regression model.
 
         # The closer R-squared is to 1, the more the model explains the variation in the target variable. Conversely, a value closer to 0 indicates the model does not explain much of the variation, highlighting potential issues with the model's fit.
-        R_squared_train = 1 - (train_results['loss'] / self.variance_train)
-        R_squared_val = 1 - (val_results['loss'] / self.variance_val)
-        R_squared_test = 1 - (test_results['loss'] / self.variance_test)
+        R_squared_train = 1 - (train_results["loss"] / self.variance_train)
+        R_squared_val = 1 - (val_results["loss"] / self.variance_val)
+        R_squared_test = 1 - (test_results["loss"] / self.variance_test)
 
         # Organize everything in a dictionary to return. This includes both the results from .evaluate()
         # as well as any additional statistics you've calculated.
         # This comprehensive data helps in making informed decisions and evaluations about the model's performance and potential next steps.
         evaluation_results = {
-            'train': {
-                'results': train_results,
-                'range': self.train_range,  # Range gives an idea of the spread of values, which can influence how we interpret the model's error rates.
-                'mean': self.mean_train,  # Knowing the mean helps put the model's prediction errors into context.
-                'variance': self.variance_train,  # Variance helps in understanding the distribution of data.
-                'R_squared': R_squared_train  # Indicates how much of the target's variability is explained by the model.
+            "train": {
+                "results": train_results,
+                "range": self.train_range,  # Range gives an idea of the spread of values, which can influence how we interpret the model's error rates.
+                "mean": self.mean_train,  # Knowing the mean helps put the model's prediction errors into context.
+                "variance": self.variance_train,  # Variance helps in understanding the distribution of data.
+                "R_squared": R_squared_train,  # Indicates how much of the target's variability is explained by the model.
             },
-            'validation': {
-                'results': val_results,
-                'range': self.val_range,
-                'mean': self.mean_val,
-                'variance': self.variance_val,
-                'R_squared': R_squared_val
+            "validation": {
+                "results": val_results,
+                "range": self.val_range,
+                "mean": self.mean_val,
+                "variance": self.variance_val,
+                "R_squared": R_squared_val,
             },
-            'test': {
-                'results': test_results,
-                'range': self.test_range,
-                'mean': self.mean_test,
-                'variance': self.variance_test,
-                'R_squared': R_squared_test
-            }
+            "test": {
+                "results": test_results,
+                "range": self.test_range,
+                "mean": self.mean_test,
+                "variance": self.variance_test,
+                "R_squared": R_squared_test,
+            },
         }
 
         return evaluation_results
-

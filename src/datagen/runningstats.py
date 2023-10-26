@@ -1,8 +1,9 @@
 import numpy as np
 
+
 class RunningStats:
     """
-    Maintains running statistics including mean, variance, min, and max 
+    Maintains running statistics including mean, variance, min, and max
     without storing all data points.
     """
 
@@ -24,8 +25,12 @@ class RunningStats:
         if self.n == 0:
             self.mean = np.zeros_like(x)
             self.M2 = np.zeros_like(x)
-            self.min = np.full_like(x, np.inf)  # Set to infinity to ensure any value will be smaller
-            self.max = np.full_like(x, -np.inf)  # Set to negative infinity to ensure any value will be larger
+            self.min = np.full_like(
+                x, np.inf
+            )  # Set to infinity to ensure any value will be smaller
+            self.max = np.full_like(
+                x, -np.inf
+            )  # Set to negative infinity to ensure any value will be larger
 
         self.n += 1
 
@@ -43,7 +48,11 @@ class RunningStats:
         return self.mean if self.mean is not None else 0
 
     def get_variance(self):
-        return self.M2 / (self.n - 1) if self.n > 1 else (self.M2 if self.M2 is not None else 0)
+        return (
+            self.M2 / (self.n - 1)
+            if self.n > 1
+            else (self.M2 if self.M2 is not None else 0)
+        )
 
     def get_standard_deviation(self):
         return np.sqrt(self.get_variance())
@@ -74,7 +83,7 @@ class RunningStatsDatapoints:
             "variance": self.features.get_variance(),
             "std_dev": self.features.get_standard_deviation(),
             "min": self.features.get_min(),
-            "max": self.features.get_max()
+            "max": self.features.get_max(),
         }
 
     def get_label_stats(self):
@@ -83,5 +92,5 @@ class RunningStatsDatapoints:
             "variance": self.labels.get_variance(),
             "std_dev": self.labels.get_standard_deviation(),
             "min": self.labels.get_min(),
-            "max": self.labels.get_max()
+            "max": self.labels.get_max(),
         }

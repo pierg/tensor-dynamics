@@ -26,6 +26,7 @@ def print_data_info(data: np.ndarray, label: str):
     print(f"{label} dtype: {data.dtype}")
     print("-" * 50)
 
+
 def check_tf():
     print("Checking Tensorflow...")
 
@@ -33,7 +34,7 @@ def check_tf():
     print("TensorFlow version: ", tf.__version__)
 
     # List all available GPUs
-    gpus = tf.config.list_physical_devices('GPU')
+    gpus = tf.config.list_physical_devices("GPU")
 
     if gpus:
         # If GPU list is not empty, TensorFlow has access to GPU
@@ -44,11 +45,10 @@ def check_tf():
         print("No GPU available for TensorFlow")
 
 
-
 def clone_private_repo(repo_url, local_path):
     try:
         # Ensure the GitHub token is available
-        token = os.getenv('GITHUB_TOKEN')
+        token = os.getenv("GITHUB_TOKEN")
         if not token:
             raise ValueError("GitHub token is not provided")
 
@@ -60,37 +60,50 @@ def clone_private_repo(repo_url, local_path):
         new_netloc = f"{token}@{parsed_url.netloc}"
 
         # Construct the new URL components with the modified netloc
-        new_url_components = (parsed_url.scheme, new_netloc, parsed_url.path, parsed_url.params, parsed_url.query, parsed_url.fragment)
+        new_url_components = (
+            parsed_url.scheme,
+            new_netloc,
+            parsed_url.path,
+            parsed_url.params,
+            parsed_url.query,
+            parsed_url.fragment,
+        )
 
         # Reconstruct the full URL with the token included
         url_with_token = urlunparse(new_url_components)
 
         # Perform the clone operation
-        subprocess.run(['git', 'clone', '--depth', '1', url_with_token, str(local_path)], check=True, capture_output=True)
+        subprocess.run(
+            ["git", "clone", "--depth", "1", url_with_token, str(local_path)],
+            check=True,
+            capture_output=True,
+        )
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while cloning the repo: {e}")
         raise e
-    
+
 
 # Function to load secrets from a file into environment variables
 def load_secrets(file_path):
     print(f"Loading secrets: {file_path}")
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
             # Clean up the line
             cleaned_line = line.strip()
 
             # Ignore empty lines and comments
-            if cleaned_line == "" or cleaned_line.startswith('#'):
+            if cleaned_line == "" or cleaned_line.startswith("#"):
                 continue
 
             # Check if line contains 'export ' from shell script format and remove it
-            if cleaned_line.startswith('export '):
-                cleaned_line = cleaned_line.replace('export ', '', 1)  # remove the first occurrence of 'export '
+            if cleaned_line.startswith("export "):
+                cleaned_line = cleaned_line.replace(
+                    "export ", "", 1
+                )  # remove the first occurrence of 'export '
 
             # Split the line into key and value
-            if '=' in cleaned_line:
-                key, value = cleaned_line.split('=', 1)
+            if "=" in cleaned_line:
+                key, value = cleaned_line.split("=", 1)
                 print(f"Loading {key}")
                 os.environ[key] = value
             else:
@@ -112,7 +125,6 @@ def is_directory_empty(path):
     return len(os.listdir(path)) == 0
 
 
-
 def git_pull(folder=None, prefer_local=True):
     """
     Pulls the latest changes from a GitHub repository using token-based authentication.
@@ -123,22 +135,26 @@ def git_pull(folder=None, prefer_local=True):
         prefer_local (bool, optional): If true, resolve merge conflicts by preferring local changes; otherwise, prefer remote changes.
     """
     if folder is None:
-        folder = Path.cwd()  # Use the current working directory if no folder is provided
+        folder = (
+            Path.cwd()
+        )  # Use the current working directory if no folder is provided
     elif not folder.is_dir():
         raise ValueError(f"{folder} does not exist or is not a directory.")
 
-    github_token = os.getenv('GITHUB_TOKEN')
+    github_token = os.getenv("GITHUB_TOKEN")
     if github_token is None:
         raise ValueError("GITHUB_TOKEN is not set in the environment variables.")
 
-    repo_url = os.getenv('GITHUB_RESULTS_REPO')
+    repo_url = os.getenv("GITHUB_RESULTS_REPO")
     if repo_url is None:
         raise ValueError("GITHUB_RESULTS_REPO is not set in the environment variables.")
-    
+
     if not repo_url.startswith("https://"):
         raise ValueError("The repository URL must start with 'https://'")
 
-    repo_url_with_token = repo_url.replace("https://", f"https://{github_token}:x-oauth-basic@")
+    repo_url_with_token = repo_url.replace(
+        "https://", f"https://{github_token}:x-oauth-basic@"
+    )
 
     original_cwd = Path.cwd()  # Save the original working directory
     try:
@@ -147,14 +163,14 @@ def git_pull(folder=None, prefer_local=True):
 
         print("Starting to pull latest changes from remote repository...")
         # Fetch the changes from the remote repository
-        subprocess.run(['git', 'fetch', repo_url_with_token], check=True)
+        subprocess.run(["git", "fetch", repo_url_with_token], check=True)
 
         if prefer_local:
             print("Merging changes with strategy favoring local changes...")
-            subprocess.run(['git', 'merge', '-Xours', 'FETCH_HEAD'], check=True)
+            subprocess.run(["git", "merge", "-Xours", "FETCH_HEAD"], check=True)
         else:
             print("Merging changes with strategy favoring remote changes...")
-            subprocess.run(['git', 'merge', '-Xtheirs', 'FETCH_HEAD'], check=True)
+            subprocess.run(["git", "merge", "-Xtheirs", "FETCH_HEAD"], check=True)
 
         print("Operation completed successfully.")
 
@@ -162,8 +178,9 @@ def git_pull(folder=None, prefer_local=True):
         print(f"An error occurred while pulling from GitHub: {str(e)}")
         raise  # Rethrow the exception to handle it at a higher level of your application
     finally:
-        os.chdir(original_cwd)  # Ensure that you always return to the original directory
-
+        os.chdir(
+            original_cwd
+        )  # Ensure that you always return to the original directory
 
 
 def git_push(folder=None, commit_message="Update files"):
@@ -175,22 +192,26 @@ def git_push(folder=None, commit_message="Update files"):
     commit_message (str, optional): The commit message. Defaults to "Update files".
     """
     if folder is None:
-        folder = Path.cwd()  # Use the current working directory if no folder is provided
+        folder = (
+            Path.cwd()
+        )  # Use the current working directory if no folder is provided
     elif not folder.is_dir():
         raise ValueError(f"{folder} does not exist or is not a directory.")
 
-    github_token = os.getenv('GITHUB_TOKEN')
+    github_token = os.getenv("GITHUB_TOKEN")
     if github_token is None:
         raise ValueError("GITHUB_TOKEN is not set in the environment variables.")
 
-    repo_url = os.getenv('GITHUB_RESULTS_REPO')
+    repo_url = os.getenv("GITHUB_RESULTS_REPO")
     if repo_url is None:
         raise ValueError("GITHUB_RESULTS_REPO is not set in the environment variables.")
 
     if not repo_url.startswith("https://"):
         raise ValueError("The repository URL must start with 'https://'")
 
-    repo_url_with_token = repo_url.replace("https://", f"https://{github_token}:x-oauth-basic@")
+    repo_url_with_token = repo_url.replace(
+        "https://", f"https://{github_token}:x-oauth-basic@"
+    )
 
     original_cwd = Path.cwd()  # Save the original working directory
 
@@ -199,28 +220,30 @@ def git_push(folder=None, commit_message="Update files"):
         print(f"Changed directory to: {folder}")
 
         # Check for uncommitted changes
-        result = subprocess.run(['git', 'status', '--porcelain'], capture_output=True, text=True, check=True)
+        result = subprocess.run(
+            ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
+        )
         local_changes = result.stdout.strip() != ""
 
         if local_changes:
             print("Adding local changes...")
-            subprocess.run(['git', 'add', '.'], check=True)
+            subprocess.run(["git", "add", "."], check=True)
 
             print(f"Committing with message: {commit_message}...")
-            subprocess.run(['git', 'commit', '-m', commit_message], check=True)
+            subprocess.run(["git", "commit", "-m", commit_message], check=True)
         else:
             print("No local changes to commit.")
 
         print("Pushing to the remote repository...")
-        push_command = ['git', 'push', repo_url_with_token, 'main']
+        push_command = ["git", "push", repo_url_with_token, "main"]
         try:
             subprocess.run(push_command, check=True)  # Attempt to push
         except subprocess.CalledProcessError:
             # If push fails, pull with strategy to prefer local changes
             print("Push failed. Pulling latest changes from remote repository...")
-            subprocess.run(['git', 'fetch', repo_url_with_token], check=True)
+            subprocess.run(["git", "fetch", repo_url_with_token], check=True)
             print("Merging changes with strategy favoring local changes...")
-            subprocess.run(['git', 'merge', '-Xours', 'FETCH_HEAD'], check=True)
+            subprocess.run(["git", "merge", "-Xours", "FETCH_HEAD"], check=True)
             print("Pushing merged changes to the remote repository...")
             subprocess.run(push_command, check=True)  # Attempt to push again
 
@@ -232,8 +255,9 @@ def git_push(folder=None, commit_message="Update files"):
         raise  # Rethrow the exception to handle it at a higher level of your application
 
     finally:
-        os.chdir(original_cwd)  # Ensure that you always return to the original directory
-
+        os.chdir(
+            original_cwd
+        )  # Ensure that you always return to the original directory
 
 
 def load_data_from_file(filepath: Path) -> Tuple[List, List]:
@@ -258,17 +282,12 @@ def load_data_from_file(filepath: Path) -> Tuple[List, List]:
     print(f"NN_Prediction shape: {data[0]['NN_Prediction'].shape}")
 
     # Extract features and targets
-    nn_data = [
-        item["NN_eValue_Input"] * item["NN_eVector_Input"] for item in data
-    ]
+    nn_data = [item["NN_eValue_Input"] * item["NN_eVector_Input"] for item in data]
     predictions = [item["NN_Prediction"].flatten() for item in data]
-
 
     print(f"nn_data shape: {nn_data[0].shape}")
     print(f"predictions shape: {predictions[0].shape}")
     print("~~~~~~~")
-
-
 
     return nn_data, predictions
 
@@ -288,7 +307,7 @@ def compute_mean_and_variance(dataset):
 
     # Iterate over the batches in the dataset
     for features, targets in dataset:
-        all_targets.append(targets.numpy()) 
+        all_targets.append(targets.numpy())
 
     # Concatenate all targets into a single numpy array
     all_targets_np = np.concatenate(all_targets, axis=0)
@@ -299,6 +318,7 @@ def compute_mean_and_variance(dataset):
     variance = np.var(all_targets_np)
 
     return mean_abs, variance
+
 
 def compute_dataset_range(dataset):
     """
@@ -311,8 +331,8 @@ def compute_dataset_range(dataset):
     float: The range of target values.
     """
     # Initialize variables to store the max and min with opposite extreme values
-    max_value = float('-inf')
-    min_value = float('inf')
+    max_value = float("-inf")
+    min_value = float("inf")
 
     # Iterate over the batches in the dataset
     for features, targets in dataset:
@@ -325,6 +345,7 @@ def compute_dataset_range(dataset):
 
     # Calculate the range
     return max_value - min_value
+
 
 def load_data_from_files(data_folder: Path, n_files: int = None) -> Tuple[List, List]:
     """
@@ -342,16 +363,21 @@ def load_data_from_files(data_folder: Path, n_files: int = None) -> Tuple[List, 
     predictions = []
 
     # List all ".p" files in the data folder and sort them by name
-    all_files = sorted([file for file in Path(data_folder).iterdir() if file.suffix == ".p"], key=lambda f: f.name)
+    all_files = sorted(
+        [file for file in Path(data_folder).iterdir() if file.suffix == ".p"],
+        key=lambda f: f.name,
+    )
 
     # If n_files is specified, select the first n_files from the sorted list
     if n_files is not None:
-        all_files = all_files[:min(n_files, len(all_files))]  # select first n_files or all available files, whichever is less
+        all_files = all_files[
+            : min(n_files, len(all_files))
+        ]  # select first n_files or all available files, whichever is less
 
     # Load data from each file
     for file in all_files:
         # load_data_from_file is a hypothetical function you should replace with your actual data loading logic
-        nn_data_chunk, predictions_chunk = load_data_from_file(file)  
+        nn_data_chunk, predictions_chunk = load_data_from_file(file)
         nn_data.extend(nn_data_chunk)
         predictions.extend(predictions_chunk)
 
@@ -369,10 +395,8 @@ def preprocess_data(data: list, predictions: list) -> tuple:
     Returns:
         tuple: Processed data and predictions.
     """
-    print(f"BEFORE data shape: {data[0].shape}")  
-    print(f"BEFORE predictions shape: {predictions[0].shape}")  
-
-
+    print(f"BEFORE data shape: {data[0].shape}")
+    print(f"BEFORE predictions shape: {predictions[0].shape}")
 
     # Convert list of data into a numpy array for efficient manipulation.
     data = np.array(data)
@@ -396,8 +420,15 @@ def preprocess_data(data: list, predictions: list) -> tuple:
 
 
 def save_training_info(
-    config_name, neural_network, history, evaluation_results, save_folder: Path, formatted_time,
-    datasets_ranges, datasets_means, datasets_variances
+    config_name,
+    neural_network,
+    history,
+    evaluation_results,
+    save_folder: Path,
+    formatted_time,
+    datasets_ranges,
+    datasets_means,
+    datasets_variances,
 ):
     """
     Save training information and generate plots for the training history.
@@ -426,7 +457,7 @@ def save_training_info(
         "evaluation_results": evaluation_results,
         "datasets_ranges": datasets_ranges,
         "datasets_means": datasets_means,
-        "datasets_variances": datasets_variances
+        "datasets_variances": datasets_variances,
     }
 
     # Create the save directory

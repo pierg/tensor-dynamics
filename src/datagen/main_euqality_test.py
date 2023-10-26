@@ -6,6 +6,7 @@ from src.datagen.dataset import *
 import numpy as np
 import tensorflow as tf
 
+
 def are_datasets_equal(dataset1: tf.data.Dataset, dataset2: tf.data.Dataset) -> bool:
     """
     Compares two TensorFlow datasets to check if they are practically identical,
@@ -15,53 +16,78 @@ def are_datasets_equal(dataset1: tf.data.Dataset, dataset2: tf.data.Dataset) -> 
     :param dataset2: Second dataset.
     :return: True if practically identical, False otherwise.
     """
-    for (original_elements, original_labels), (regenerated_elements, regenerated_labels) in zip(dataset1, dataset2):
+    for (original_elements, original_labels), (
+        regenerated_elements,
+        regenerated_labels,
+    ) in zip(dataset1, dataset2):
         # Ensure data points are numpy arrays for comparison
-        original_data_elements = original_elements.numpy() if isinstance(original_elements, tf.Tensor) else original_elements
-        regenerated_data_elements = regenerated_elements.numpy() if isinstance(regenerated_elements, tf.Tensor) else regenerated_elements
+        original_data_elements = (
+            original_elements.numpy()
+            if isinstance(original_elements, tf.Tensor)
+            else original_elements
+        )
+        regenerated_data_elements = (
+            regenerated_elements.numpy()
+            if isinstance(regenerated_elements, tf.Tensor)
+            else regenerated_elements
+        )
 
-        original_data_labels = original_labels.numpy() if isinstance(original_labels, tf.Tensor) else original_labels
-        regenerated_data_labels = regenerated_labels.numpy() if isinstance(regenerated_labels, tf.Tensor) else regenerated_labels
+        original_data_labels = (
+            original_labels.numpy()
+            if isinstance(original_labels, tf.Tensor)
+            else original_labels
+        )
+        regenerated_data_labels = (
+            regenerated_labels.numpy()
+            if isinstance(regenerated_labels, tf.Tensor)
+            else regenerated_labels
+        )
 
         # Compare the data points using a tolerance-based comparison for the elements and the labels
-        if not (np.allclose(original_data_elements, regenerated_data_elements, rtol=1e-05, atol=1e-08) and 
-                np.allclose(original_data_labels, regenerated_data_labels, rtol=1e-05, atol=1e-08)):
+        if not (
+            np.allclose(
+                original_data_elements,
+                regenerated_data_elements,
+                rtol=1e-05,
+                atol=1e-08,
+            )
+            and np.allclose(
+                original_data_labels, regenerated_data_labels, rtol=1e-05, atol=1e-08
+            )
+        ):
             return False
     return True
 
 
-
 def main() -> None:
-
     # Set paths and load configurations
     current_dir = Path(__file__).resolve().parent
     data_config_file = current_dir / "data.toml"
     statistics_file = current_dir / "statistics.toml"
-    
+
     data_config = toml.load(data_config_file)
     stats_config = toml.load(statistics_file)
 
-    dataset_config = data_config["d1"] 
-    stats_config = stats_config["d1"]["statistics"] 
+    dataset_config = data_config["d1"]
+    stats_config = stats_config["d1"]["statistics"]
 
     dataset_config["statistics"] = stats_config
 
-
-    seed_value = dataset_config.get('dataset', {}).get('seed', None)
-    n_samples = dataset_config.get('dataset', {}).get('n_samples', None)
-    batch_size = dataset_config.get('dataset', {}).get('batch_size', None)
-
+    seed_value = dataset_config.get("dataset", {}).get("seed", None)
+    n_samples = dataset_config.get("dataset", {}).get("n_samples", None)
+    batch_size = dataset_config.get("dataset", {}).get("batch_size", None)
 
     output_dir = Path(__file__).parent.resolve() / "output"
     output_dir.mkdir(parents=True, exist_ok=True)
-
 
     # Step 1: Using seed
     print(f"Random seed for dataset generation: {seed_value}")
 
     # Generate and store the dataset.
-    dataset_path = output_dir / 'orig_dataset.tfrecord'
-    create_dataset(n_samples, dataset_config, dataset_path, normalization=False, quantization=True)
+    dataset_path = output_dir / "orig_dataset.tfrecord"
+    create_dataset(
+        n_samples, dataset_config, dataset_path, normalization=False, quantization=True
+    )
 
     pretty_print_dataset_elements(dataset_path)
 
@@ -72,7 +98,13 @@ def main() -> None:
     print(f"Using stored seed for regeneration: {seed_value}")
 
     regenerated_dataset_path = output_dir / "regenerated_dataset.tfrecord"
-    create_dataset(n_samples, dataset_config, regenerated_dataset_path, normalization=False, quantization=True)
+    create_dataset(
+        n_samples,
+        dataset_config,
+        regenerated_dataset_path,
+        normalization=False,
+        quantization=True,
+    )
 
     # pretty_print_dataset_elements(regenerated_dataset_path)
 
@@ -82,6 +114,7 @@ def main() -> None:
     # Step 4: Compare the datasets.
     are_identical = are_datasets_equal(loaded_dataset, regenerated_dataset)
     print(f"Are the datasets identical? {'Yes' if are_identical else 'No'}")
+
 
 if __name__ == "__main__":
     main()
