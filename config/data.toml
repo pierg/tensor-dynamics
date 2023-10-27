@@ -24,6 +24,33 @@ shuffle_buffer_size = 1000
 splits = [0.7, 0.15, 0.15]  # 70% training, 15% validation, 15% test
 
 
+[dbig]
+[dbig.parameters]
+k1_min = 0.01
+k1_max = 0.05
+k2_min = 0.01
+k2_max = 0.05
+k3_min = 0.01
+k3_max = 0.05
+E0_min = 0.1
+E0_max = 0.3
+S0_min = 0.1
+S0_max = 0.3
+spectra_min = -1
+spectra_max = 1
+amplitude_min = 0.2
+amplitude_max = 0.8
+
+[dbig.dataset]
+seed = 42
+n_samples = 5000000  # e.g., 50,000,000 samples
+n_shards = 1000         # The dataset is divided into 10000 shards, each containing 500,000 samples
+batch_size = 64         # Adjust based on your specific memory constraints
+shuffle_buffer_size = 1000 
+splits = [0.7, 0.15, 0.15]  # 70% training, 15% validation, 15% test
+
+
+
 [dtest]
 [dtest.parameters]
 k1_min = 0.01

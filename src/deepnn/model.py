@@ -32,8 +32,13 @@ class NeuralNetwork:
         self.training_config = self.config["training"]
 
         # Building and compiling the neural network model
-        self.model = self._build_model()
-        self._compile_model()
+        # Instantiate the MirroredStrategy
+        self.strategy = tf.distribute.MirroredStrategy()
+        
+        with self.strategy.scope():
+            # Building and compiling should be inside the strategy scope.
+            self.model = self._build_model()
+            self._compile_model()  
 
         # Results
         self.instance_folder = instance_folder
