@@ -203,10 +203,22 @@ def quantize_data(data, q_min=-128, q_max=127):
 def generate_datapoint(parameters) -> tuple[np.ndarray, np.ndarray]:
     datapoint = generate_datapoint_dictionary(parameters)
 
+    # Assuming that the operations are numpy-based and "features" need an additional dimension
     features = datapoint["NN_eValue_Input"] * datapoint["NN_eVector_Input"]
+    
+    # Check the current shape of your features and decide if you need to add an extra dimension.
+    # This is typically necessary when preparing data for convolutional networks which expect data in a 3D format.
+    if features.ndim == 2:
+        # The data is 2D, and we need to add an additional dimension to it.
+        # np.newaxis is used to increase the dimension of the existing array by one more dimension,
+        # when used once. Thus, 2D becomes 3D.
+        features = features[:, :, np.newaxis]
+
+    # For the label, we're flattening it as it seems to be a single dimensional output per data point
     label = datapoint["NN_Prediction"].flatten()
 
     return features, label
+
 
 
 def collect_data_points(num_samples, param_config):

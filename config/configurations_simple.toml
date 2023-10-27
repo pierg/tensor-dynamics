@@ -1,4 +1,3 @@
-
 [Simple1]
 [Simple1.structure]
 layers = [
@@ -11,13 +10,11 @@ layers = [
 [Simple1.compile]
 optimizer = "sgd"  # Simpler optimizer
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [Simple1.dataset]
-shuffle_buffer_size = 512  # Reduced buffer size
-batch_size = 32  # Smaller batch size
-splits = [0.7, 0.15, 0.15]
+id = "d1"
 [Simple1.training]
-epochs = 1
+epochs = 40
 
 
 
@@ -31,11 +28,27 @@ layers = [
 [Simple2.compile]
 optimizer = "sgd"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [Simple2.dataset]
-shuffle_buffer_size = 512
-batch_size = 32
-splits = [0.7, 0.15, 0.15]
+id = "d1"
 [Simple2.training]
-epochs = 1
+epochs = 40
+
+
+[Simple3]
+[Simple3.structure]
+layers = [
+  { type = "Flatten" },
+  { type = "Dense", units = 32, activation = "relu" },
+  { type = "Dense", units = 12, activation = "linear" }
+]
+[Simple3.compile]
+optimizer = "sgd"
+loss = "mean_squared_error"
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+[Simple3.dataset]
+id = "d1"
+[Simple3.training]
+epochs = 40
+
 

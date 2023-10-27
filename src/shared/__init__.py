@@ -14,11 +14,12 @@ config_file: Path = config_folder / "configurations.toml"
 data_config_file: Path = config_folder / "data.toml"
 
 # Path to results folder
-results_folder: Path = main_repo_folder / "results"
-comparisons_folder: Path = results_folder / "comparisons"
+results_repo_folder: Path = main_repo_folder / "results"
+results_runs_folder: Path = results_repo_folder / "runs"
+comparisons_folder: Path = results_repo_folder / "comparisons"
 
 # Seretes path
 secrets_path: Path = main_repo_folder / ".secrets"
 
-# Tensorboard log directory
-tb_log_dir: Path = main_repo_folder / "logs"
+# Datasets folder path
+datasets_folder: Path = main_repo_folder / "data"
