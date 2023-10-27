@@ -37,6 +37,7 @@ if [ -n "$CONFIG_ID" ]; then
       --fakeroot \
       --writable-tmpfs \
       --bind /global/home/groups/pc_nnkinetics/data:/data \
+      --bind /global/home/groups/pc_nnkinetics/results:/results \
       --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
       --env GITHUB_TOKEN="$GITHUB_TOKEN" \
       ../../neural_networks_latest_gpu.sif \
@@ -49,6 +50,7 @@ else
       --fakeroot \
       --writable-tmpfs \
       --bind /global/home/groups/pc_nnkinetics/data:/data \
+      --bind /global/home/groups/pc_nnkinetics/results:/results \
       --env GITHUB_RESULTS_REPO="$GITHUB_RESULTS_REPO" \
       --env GITHUB_TOKEN="$GITHUB_TOKEN" \
       ../../neural_networks_latest_gpu.sif
