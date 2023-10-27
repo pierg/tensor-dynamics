@@ -13,7 +13,7 @@ class Datasets:
     test_stats: RunningStatsDatapoints
 
     @classmethod
-    def from_dict(cls, datasets: dict, stats: dict) -> 'Datasets':
+    def from_dict(cls, datasets: dict, stats: dict) -> "Datasets":
         """
         Create a Datasets instance from provided dictionaries.
 
@@ -26,10 +26,14 @@ class Datasets:
         """
         # Ensure the input dictionaries have the correct keys
         if not all(key in datasets for key in ["training", "validation", "testing"]):
-            raise ValueError("The 'datasets' dictionary must contain 'training', 'validation', and 'testing' keys.")
+            raise ValueError(
+                "The 'datasets' dictionary must contain 'training', 'validation', and 'testing' keys."
+            )
 
         if not all(key in stats for key in ["training", "validation", "testing"]):
-            raise ValueError("The 'stats' dictionary must contain 'training', 'validation', and 'testing' keys.")
+            raise ValueError(
+                "The 'stats' dictionary must contain 'training', 'validation', and 'testing' keys."
+            )
 
         # Create the Datasets instance using the provided dictionaries
         return cls(
@@ -38,9 +42,8 @@ class Datasets:
             test_dataset=datasets["testing"],
             train_stats=stats["training"],
             validation_stats=stats["validation"],
-            test_stats=stats["testing"]
+            test_stats=stats["testing"],
         )
-
 
     def to_dict(self) -> dict:
         """
@@ -50,15 +53,9 @@ class Datasets:
             dict: A dictionary representation of the Datasets instance.
         """
         datasets_dict = {
-            "train": {
-                "stats": self.train_stats.to_dict(reduced=True)
-            },
-            "validation": {
-                "stats": self.validation_stats.to_dict(reduced=True)
-            },
-            "test": {
-                "stats": self.test_stats.to_dict(reduced=True)
-            }
+            "train": {"stats": self.train_stats.to_dict(reduced=True)},
+            "validation": {"stats": self.validation_stats.to_dict(reduced=True)},
+            "test": {"stats": self.test_stats.to_dict(reduced=True)},
         }
 
         return datasets_dict

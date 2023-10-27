@@ -3,7 +3,12 @@ from datetime import datetime
 from pathlib import Path
 
 # Local module imports
-from shared import results_repo_folder, data_config_file, datasets_folder, results_runs_folder
+from shared import (
+    results_repo_folder,
+    data_config_file,
+    datasets_folder,
+    results_runs_folder,
+)
 from src.data import load_all_datasets, process_datasets
 from src.deepnn.datasets import Datasets
 from src.deepnn.model import NeuralNetwork
@@ -24,19 +29,16 @@ def process_configuration(config_name, config, instance_config_folder):
 
     # Load the dataset configuration
     dataset_config = toml.load(data_config_file).get(config["dataset"]["id"], {})
-    
+
     # If you're testing with a specific dataset, uncomment the line below
     # dataset_config = toml.load(data_config_file)["dtest"]
 
     # Create the dataset and obtain its folder path
-    base_folder_path = process_datasets(dataset_config, 
-                                      datasets_folder, 
-                                      overwrite=True)
-    
+    base_folder_path = process_datasets(dataset_config, datasets_folder, overwrite=True)
 
-    datasets, running_stats = load_all_datasets(dataset_config, 
-                                            base_folder_path, transformed=False)
-    
+    datasets, running_stats = load_all_datasets(
+        dataset_config, base_folder_path, transformed=False
+    )
 
     try:
         # Set up and train the neural network
@@ -46,7 +48,7 @@ def process_configuration(config_name, config, instance_config_folder):
             name=config_name,
             instance_folder=instance_config_folder,
         )
-        
+
         neural_network.train_model()  # Train
         neural_network.evaluate_model()  # Evaluate
         neural_network.save_model(instance_config_folder)  # Save
@@ -71,7 +73,7 @@ def main():
     configurations = main_preamble()
 
     # Create a unique instance folder for this execution's results
-    instance_folder = results_runs_folder / datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    instance_folder = results_runs_folder / datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     instance_folder.mkdir(parents=True, exist_ok=True)
 
     # Process each configuration

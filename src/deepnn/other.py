@@ -45,7 +45,6 @@ def check_tf():
         print("No GPU available for TensorFlow")
 
 
-
 def load_data_from_file(filepath: Path) -> Tuple[List, List]:
     """
     Load data from the given pickle file and extract the required features and targets.

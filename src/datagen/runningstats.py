@@ -5,9 +5,10 @@ import tensorflow as tf
 import numpy as np
 from typing import Union
 
+
 class RunningStats:
     """
-    Maintains running statistics including mean, variance, min, max, 
+    Maintains running statistics including mean, variance, min, max,
     shape, data type, and an example of the data points.
     """
 
@@ -73,7 +74,7 @@ class RunningStats:
 
     def get_max(self):
         return self.max if self.max is not None else 0
-    
+
     def get_averages(self) -> dict:
         """
         Calculate the averages of the statistical properties, treating the data as if it were flat.
@@ -84,15 +85,18 @@ class RunningStats:
             "shape": self.shape,
             "type": self.dtype,
             "average_mean": np.mean(self.mean) if self.mean is not None else None,
-            "average_variance": np.mean(self.M2 / (self.n - 1)) if self.n > 1 and self.M2 is not None else None,  # Using variance formula here
-            "average_std_dev": np.mean(np.sqrt(self.M2 / (self.n - 1))) if self.n > 1 and self.M2 is not None else None,  # Using std dev formula here
+            "average_variance": np.mean(self.M2 / (self.n - 1))
+            if self.n > 1 and self.M2 is not None
+            else None,  # Using variance formula here
+            "average_std_dev": np.mean(np.sqrt(self.M2 / (self.n - 1)))
+            if self.n > 1 and self.M2 is not None
+            else None,  # Using std dev formula here
             "average_min": np.mean(self.min) if self.min is not None else None,
             "average_max": np.mean(self.max) if self.max is not None else None,
         }
 
         return averages
 
-    
     def to_dict(self) -> dict:
         """
         Convert the RunningStats object to a dictionary format that is JSON serializable.
@@ -105,7 +109,9 @@ class RunningStats:
 
         # Construct a dictionary with hierarchical structure: averages followed by complete stats.
         stats_dict = {
-            "averages": {key: serialize_array(value) for key, value in averages.items()},
+            "averages": {
+                key: serialize_array(value) for key, value in averages.items()
+            },
             "full": {
                 "mean": serialize_array(self.get_mean()),
                 "variance": serialize_array(self.get_variance()),
@@ -113,15 +119,15 @@ class RunningStats:
                 "min": serialize_array(self.get_min()),
                 "max": serialize_array(self.get_max()),
                 "shape": self.shape,  # Assuming shape is a tuple, which is JSON serializable.
-                "dtype": str(self.dtype),  # JSON serialization: convert explicitly to string
+                "dtype": str(
+                    self.dtype
+                ),  # JSON serialization: convert explicitly to string
                 "example": serialize_array(self.example),  # Convert example data point
-            }
+            },
         }
 
         return stats_dict
 
-
-    
 
 class RunningStatsDatapoints:
     """
@@ -143,7 +149,7 @@ class RunningStatsDatapoints:
 
     def get_label_stats(self):
         return self.labels.to_dict()
-    
+
     def __str__(self) -> str:
         """
         Create a formatted string of the averages of statistics for features and labels.
@@ -153,10 +159,16 @@ class RunningStatsDatapoints:
         label_averages = self.labels.get_averages()
 
         # Creating a formatted string for features and labels using the averages.
-        features_str = "Features Averages:\n" + '\n'.join(f"{key}: {value}" for key, value in feature_averages.items()) + "\n"
-        labels_str = "Labels Averages:\n" + '\n'.join(f"{key}: {value}" for key, value in label_averages.items())
+        features_str = (
+            "Features Averages:\n"
+            + "\n".join(f"{key}: {value}" for key, value in feature_averages.items())
+            + "\n"
+        )
+        labels_str = "Labels Averages:\n" + "\n".join(
+            f"{key}: {value}" for key, value in label_averages.items()
+        )
 
-        return features_str + '\n' + labels_str
+        return features_str + "\n" + labels_str
 
     def to_dict(self, reduced: bool = False) -> dict:
         """
@@ -168,34 +180,32 @@ class RunningStatsDatapoints:
 
         if reduced:
             return {
-            "samples": self.n,
-            "features": self.features.get_averages(),
-            "labels": self.labels.get_averages()
-        }
+                "samples": self.n,
+                "features": self.features.get_averages(),
+                "labels": self.labels.get_averages(),
+            }
 
         return {
             "samples": self.n,
             "features": self.get_feature_stats(),
-            "labels": self.get_label_stats()
+            "labels": self.get_label_stats(),
         }
 
-    
 
-
-
-
-def calculate_dataset_running_stats(dataset: tf.data.Dataset, 
-                                    feature_dims: Union[int, tuple] = None, 
-                                    label_dims: Union[int, tuple] = None) -> RunningStatsDatapoints:
+def calculate_dataset_running_stats(
+    dataset: tf.data.Dataset,
+    feature_dims: Union[int, tuple] = None,
+    label_dims: Union[int, tuple] = None,
+) -> RunningStatsDatapoints:
     """
     Given a tf.data.Dataset, iterates through the dataset to calculate running statistics
     for both features and labels using the RunningStatsDatapoints class.
 
     Args:
     dataset (tf.data.Dataset): A batched or unbatched dataset of (feature, label) pairs.
-    feature_dims (Union[int, tuple]): The number of dimensions or shape of the individual feature. 
+    feature_dims (Union[int, tuple]): The number of dimensions or shape of the individual feature.
                                       Needed for reshaping the tensor for running stats update.
-    label_dims (Union[int, tuple]): The number of dimensions or shape of the individual label. 
+    label_dims (Union[int, tuple]): The number of dimensions or shape of the individual label.
                                     Needed for reshaping the tensor for running stats update.
 
     Returns:
@@ -215,8 +225,16 @@ def calculate_dataset_running_stats(dataset: tf.data.Dataset,
             batch_size = features_numpy.shape[0]
             for i in range(batch_size):
                 # Reshape if required and update stats for individual datapoint
-                feature = features_numpy[i].reshape(feature_dims) if feature_dims else features_numpy[i]
-                label = labels_numpy[i].reshape(label_dims) if label_dims else labels_numpy[i]
+                feature = (
+                    features_numpy[i].reshape(feature_dims)
+                    if feature_dims
+                    else features_numpy[i]
+                )
+                label = (
+                    labels_numpy[i].reshape(label_dims)
+                    if label_dims
+                    else labels_numpy[i]
+                )
                 running_stats_datapoints.update(feature, label)
         else:
             # If the dataset is unbatched, we directly update stats

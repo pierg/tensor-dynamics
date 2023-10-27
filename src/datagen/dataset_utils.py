@@ -23,7 +23,6 @@ def print_data_info(data: np.ndarray, label: str) -> None:
     print("\n".join(info_strings))
 
 
-
 def compute_and_print_dataset_statistics(dataset: tf.data.Dataset, name: str) -> None:
     """Compute and print statistics for a tf.data.Dataset, and use print_data_info for additional information.
 
@@ -91,7 +90,7 @@ def pretty_print_sharded_dataset_elements(
     running_stats: RunningStatsDatapoints = None,
     compute_stats: bool = True,
     print_elements: bool = False,
-    n: int = None
+    n: int = None,
 ) -> None:
     """
     Pretty prints 'n' elements from a sharded dataset located at the provided directory.
@@ -130,7 +129,9 @@ def pretty_print_sharded_dataset_elements(
 
             # Pretty print 'n' elements from the current shard
             num_elements = n if n is not None else dataset.cardinality().numpy()
-            for count, (features, labels) in enumerate(dataset.take(num_elements), start=1):
+            for count, (features, labels) in enumerate(
+                dataset.take(num_elements), start=1
+            ):
                 print(f"\nShard: {shard_id}, Element: {count}")
                 print("Feature:", features.numpy(), sep="\n")
                 print("Label:", labels.numpy(), sep="\n")
@@ -158,9 +159,9 @@ def pretty_print_sharded_dataset_elements(
         # Calculate statistics here from total_feature_stats and total_label_stats
         # For simplicity, this example does not actually compute the statistics
         # Replace the following print statement with actual statistics computation and printing
-        print("\nComputed statistics for the entire sharded dataset would be displayed here.")
-
-
+        print(
+            "\nComputed statistics for the entire sharded dataset would be displayed here."
+        )
 
 
 def pretty_print_dataset_elements(
@@ -237,7 +238,6 @@ def count_elements_and_batches(dataset: tf.data.Dataset) -> tuple:
     return num_elements, num_batches
 
 
-
 def get_dataset_statistics(dataset, dataset_name):
     """
     Compute and print basic statistics about a TensorFlow dataset.
@@ -262,12 +262,16 @@ def get_dataset_statistics(dataset, dataset_name):
             for feature_name, feature_tensor in data.items():
                 print(f"Feature: {feature_name}")
                 print(f"    Type: {feature_tensor.dtype}")
-                print(f"    Shape: {feature_tensor.shape}")  # The first dimension is the batch size.
+                print(
+                    f"    Shape: {feature_tensor.shape}"
+                )  # The first dimension is the batch size.
         else:  # If the data is a single tensor, just print its type and shape.
             print(f"Data Type: {data.dtype}")
             print(f"Data Shape: {data.shape}")  # The first dimension is the batch size.
 
         # If labels are present, print their type and shape.
-        if 'labels' in locals():
+        if "labels" in locals():
             print(f"Label Type: {labels.dtype}")
-            print(f"Label Shape: {labels.shape}")  # The first dimension is the batch size.
+            print(
+                f"Label Shape: {labels.shape}"
+            )  # The first dimension is the batch size.

@@ -9,7 +9,6 @@ from src.deepnn.datasets import Datasets
 from src.deepnn.metrics import R_squared
 
 
-
 class NeuralNetwork:
     def __init__(
         self,
@@ -18,7 +17,6 @@ class NeuralNetwork:
         name: str,
         instance_folder,
     ):
-
         self.config = configuration
         self.name = name
         self.datasets = datasets
@@ -43,7 +41,6 @@ class NeuralNetwork:
         self.evaluation = None
         self.time_training = 0
         self.time_evaluation = 0
-
 
     def _build_model(self) -> tf.keras.Model:
         """
@@ -109,7 +106,7 @@ class NeuralNetwork:
         """
         Compile the neural network model based on the configuration.
         """
-        
+
         # Convert string metrics to actual TensorFlow objects and add the custom R-squared metric
         actual_metrics = []
         for metric in self.compile_config["metrics"]:
@@ -128,7 +125,6 @@ class NeuralNetwork:
             loss=self.compile_config["loss"],
             metrics=actual_metrics,  # This should be the instantiated metrics list
         )
-
 
     def train_model(self):
         """
@@ -157,7 +153,6 @@ class NeuralNetwork:
         end_time = time.time()
         # Calculate and format the elapsed time
         self.time_training = end_time - start_time
-        
 
     def evaluate_model(self, verbose=1):
         """
@@ -175,18 +170,19 @@ class NeuralNetwork:
 
         # Evaluate the model on all datasets
         train_evaluation = self.model.evaluate(self.train_dataset, verbose=verbose)
-        validation_evaluation = self.model.evaluate(self.validation_dataset, verbose=verbose)
+        validation_evaluation = self.model.evaluate(
+            self.validation_dataset, verbose=verbose
+        )
         test_evaluation = self.model.evaluate(self.test_dataset, verbose=verbose)
 
         # Prepare a dictionary to hold all evaluation results
         self.evaluation = {
-            'train': dict(zip(self.model.metrics_names, train_evaluation)),
-            'validation': dict(zip(self.model.metrics_names, validation_evaluation)),
-            'test': dict(zip(self.model.metrics_names, test_evaluation)),
+            "train": dict(zip(self.model.metrics_names, train_evaluation)),
+            "validation": dict(zip(self.model.metrics_names, validation_evaluation)),
+            "test": dict(zip(self.model.metrics_names, test_evaluation)),
         }
 
         print("Evaluation Completed")
-
 
     def save_model(self, filepath: Path):
         """
@@ -202,9 +198,6 @@ class NeuralNetwork:
         filepath = filepath / "trained_model.h5"
         self.model.save(filepath)
         print(f"Model saved successfully at {filepath}")
-
-
-
 
     def get_results(self):
         # Ensure that training has occurred
@@ -226,8 +219,7 @@ class NeuralNetwork:
             "training_history": {
                 "epochs": self.history.epoch,
                 "history": self.history.history,
-            }
+            },
         }
 
         return results_dict
-    

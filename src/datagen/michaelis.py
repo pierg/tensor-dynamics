@@ -205,7 +205,7 @@ def generate_datapoint(parameters) -> tuple[np.ndarray, np.ndarray]:
 
     # Assuming that the operations are numpy-based and "features" need an additional dimension
     features = datapoint["NN_eValue_Input"] * datapoint["NN_eVector_Input"]
-    
+
     # Check the current shape of your features and decide if you need to add an extra dimension.
     # This is typically necessary when preparing data for convolutional networks which expect data in a 3D format.
     if features.ndim == 2:
@@ -218,7 +218,6 @@ def generate_datapoint(parameters) -> tuple[np.ndarray, np.ndarray]:
     label = datapoint["NN_Prediction"].flatten()
 
     return features, label
-
 
 
 def collect_data_points(num_samples, param_config):

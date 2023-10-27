@@ -10,6 +10,7 @@ import json
 # ARGUMENT PARSING FUNCTIONS
 # -------------------------
 
+
 def parse_arguments():
     """Parses command-line arguments for the script."""
     parser = argparse.ArgumentParser(description="Process data and configurations.")
@@ -20,6 +21,7 @@ def parse_arguments():
 # -------------------------
 # DIRECTORY UTILS FUNCTIONS
 # -------------------------
+
 
 def validate_directory(path):
     """Validates if the provided path is a directory."""
@@ -35,7 +37,6 @@ def is_directory_empty(path):
     return len(os.listdir(path)) == 0
 
 
-
 def save_dict_to_json_file(data_dict: dict, file_path: Path) -> None:
     """
     Save a dictionary into a formatted JSON file.
@@ -48,7 +49,7 @@ def save_dict_to_json_file(data_dict: dict, file_path: Path) -> None:
     file_path.parent.mkdir(parents=True, exist_ok=True)
 
     try:
-        with file_path.open('w', encoding='utf-8') as file:
+        with file_path.open("w", encoding="utf-8") as file:
             json.dump(data_dict, file, ensure_ascii=False, indent=4)
         print(f"Data saved successfully to {file_path}")
     except IOError as e:
@@ -58,7 +59,6 @@ def save_dict_to_json_file(data_dict: dict, file_path: Path) -> None:
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
         raise  # Re-throw the exception after logging it
-
 
 
 def format_section(title, dict_data):
@@ -73,15 +73,17 @@ def format_section(title, dict_data):
         str: A string representation of the dictionary formatted as a section.
     """
     formatted = f"{title}:\n"
-    separator = '-' * len(title)
+    separator = "-" * len(title)
     formatted += f"{separator}\n"
 
     for key, value in dict_data.items():
-        if isinstance(value, dict):  # if value itself is a dictionary, format as a subsection
-            value = '\n' + format_section(f"  {key}", value)
+        if isinstance(
+            value, dict
+        ):  # if value itself is a dictionary, format as a subsection
+            value = "\n" + format_section(f"  {key}", value)
         formatted += f"{key.capitalize()}: {value}\n"
 
-    return formatted + '\n'  # Add a newline for separation between sections
+    return formatted + "\n"  # Add a newline for separation between sections
 
 
 def pretty_print_dict(data, indent=0):
@@ -94,21 +96,23 @@ def pretty_print_dict(data, indent=0):
     """
     for key, value in data.items():
         # Print the key with the current indentation
-        print('    ' * indent + str(key), end='')
+        print("    " * indent + str(key), end="")
 
         if isinstance(value, dict):
             # If the value is another dictionary, print a colon and continue the recursion
-            print(':')
-            pretty_print_dict(value, indent + 1)  # Increase the indentation level for nested dictionary
+            print(":")
+            pretty_print_dict(
+                value, indent + 1
+            )  # Increase the indentation level for nested dictionary
         else:
             # If the value is not a dictionary, print a colon and the value itself
-            print(f': {value}')
-
+            print(f": {value}")
 
 
 # -------------------------
 # GIT OPERATIONS FUNCTIONS
 # -------------------------
+
 
 def clone_private_repo(repo_url, local_path):
     """Clones a private repository to the local path."""
@@ -147,6 +151,7 @@ def clone_private_repo(repo_url, local_path):
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while cloning the repo: {e}")
         raise e
+
 
 def git_pull(folder=None, prefer_local=True):
     """Pulls the latest changes from a GitHub repository."""
@@ -202,9 +207,7 @@ def git_pull(folder=None, prefer_local=True):
         print(f"An error occurred while pulling from GitHub: {str(e)}")
         raise  # Rethrow the exception to handle it at a higher level of your application
     finally:
-        os.chdir(
-            original_cwd
-        )  
+        os.chdir(original_cwd)
 
 
 def git_push(folder=None, commit_message="Update files"):
@@ -287,11 +290,10 @@ def git_push(folder=None, commit_message="Update files"):
         )  # Ensure that you always return to the original directory
 
 
-
-
 # -------------------------
 # ENVIRONMENT SETUP FUNCTIONS
 # -------------------------
+
 
 def load_secrets(file_path):
     """Loads secrets from a file into environment variables."""
@@ -324,12 +326,14 @@ def load_secrets(file_path):
 # MAIN FUNCTION (if needed)
 # -------------------------
 
+
 def main():
     """Main function that could be used to execute the script."""
     args = parse_arguments()
     validate_directory(Path(args.data_dir))
-    
+
     # Other function calls based on script logic...
+
 
 if __name__ == "__main__":
     main()
