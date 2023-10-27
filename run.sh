@@ -38,9 +38,9 @@ else
         # If CONFIGS is provided, include it in the python command
         
         # Double-quote variables to prevent globbing and word splitting, in case of spaces or special characters in variables.
-        python src/main.py --data_dir="$DATA_DIR" $CONFIGS
+        python src/main.py $CONFIGS
     else
         # If CONFIGS is not provided, run the python command without it
-        python src/main.py --data_dir="$DATA_DIR"
+        python src/main.py
     fi
 fi
