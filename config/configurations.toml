@@ -1,23 +1,23 @@
 # Configuration Eli
-[E]
-[E.structure]
-layers = [
-  { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
-  { type = "Flatten" },
-  { type = "Dense", units = 128, activation = "relu" },
-  { type = "Dense", units = 128, activation = "relu" },
-  { type = "Dense", units = 64, activation = "relu" },
-  { type = "Dense", units = 32, activation = "linear" },
-  { type = "Dense", units = 12, activation = "linear" },
-]
-[E.compile]
-optimizer = "adam"
-loss = "mean_squared_error"
-metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[E.dataset]
-id = "d1"
-[E.training]
-epochs = 70
+# [E]
+# [E.structure]
+# layers = [
+#   { type = "Conv2D", filters = 32, kernel_size = [3, 1], activation = "relu" },
+#   { type = "Flatten" },
+#   { type = "Dense", units = 128, activation = "relu" },
+#   { type = "Dense", units = 128, activation = "relu" },
+#   { type = "Dense", units = 64, activation = "relu" },
+#   { type = "Dense", units = 32, activation = "linear" },
+#   { type = "Dense", units = 12, activation = "linear" },
+# ]
+# [E.compile]
+# optimizer = "adam"
+# loss = "mean_squared_error"
+# metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+# [E.dataset]
+# id = "d1"
+# [E.training]
+# epochs = 70
 
 
 
