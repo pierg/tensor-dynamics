@@ -10,10 +10,10 @@ from shared import (
     results_runs_folder,
 )
 from data import load_all_datasets, process_datasets
-from src.deepnn.datasets import Datasets
-from src.deepnn.model import NeuralNetwork
-from src.shared.utils import git_push, save_dict_to_json_file
-from src.utils import handle_training_exception, main_preamble
+from deepnn.datasets import Datasets
+from deepnn.model import NeuralNetwork
+from shared.utils import git_push, save_dict_to_json_file
+from utils import handle_training_exception, main_preamble
 
 
 def process_configuration(config_name, config, instance_config_folder):

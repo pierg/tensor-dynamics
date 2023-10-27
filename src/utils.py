@@ -6,7 +6,7 @@ import traceback
 from typing import List, Dict
 from pathlib import Path
 from shared import config_file, secrets_path, results_repo_folder
-from src.shared.utils import (
+from shared.utils import (
     clone_private_repo,
     is_directory_empty,
     load_secrets,

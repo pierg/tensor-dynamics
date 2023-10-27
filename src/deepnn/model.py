@@ -5,8 +5,8 @@ from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import TensorBoard
 
-from src.deepnn.datasets import Datasets
-from src.deepnn.metrics import R_squared
+from deepnn.datasets import Datasets
+from deepnn.metrics import R_squared
 
 
 class NeuralNetwork:

@@ -3,11 +3,11 @@ import toml
 from pathlib import Path
 from typing import Dict, Any
 import shutil
-from src.datagen.tf_dataset import (
+from datagen.tf_dataset import (
     create_datasets,
     load_datasets
 )
-from src.shared.utils import  pretty_print_dict, save_dict_to_json_file
+from shared.utils import  pretty_print_dict, save_dict_to_json_file
 from typing import Dict, Any
 from pathlib import Path
 import shutil
@@ -107,7 +107,7 @@ def process_datasets(dataset_config: Dict[str, Any],
 
 # The main execution can be wrapped in a main function and executed conditionally.
 def main():
-    from src.shared import data_config_file, datasets_folder  # assuming the import path is correct
+    from shared import data_config_file, datasets_folder  # assuming the import path is correct
 
     dataset_config = toml.load(data_config_file)["d1"]
     process_datasets(dataset_config, datasets_folder, overwrite=False)

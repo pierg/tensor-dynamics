@@ -1,8 +1,8 @@
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
-from src.datagen.runningstats import RunningStatsDatapoints
-from src.datagen.tf_dataset import load_tfrecord_dataset
+from datagen.runningstats import RunningStatsDatapoints
+from datagen.tf_dataset import load_tfrecord_dataset
 
 
 def print_data_info(data: np.ndarray, label: str) -> None:

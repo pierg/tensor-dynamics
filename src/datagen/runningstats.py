@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.shared.utils import format_section
+from shared.utils import format_section
 import tensorflow as tf
 import numpy as np
 from typing import Union

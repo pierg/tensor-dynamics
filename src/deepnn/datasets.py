@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import tensorflow as tf
-from src.datagen.runningstats import RunningStatsDatapoints
+from datagen.runningstats import RunningStatsDatapoints
 
 
 @dataclass
