@@ -1,64 +1,3 @@
-[Simple1]
-[Simple1.structure]
-layers = [
-  { type = "Conv2D", filters = 8, kernel_size = [3, 1], activation = "relu" },
-  { type = "MaxPooling2D", pool_size = [2, 1] },
-  { type = "Flatten" },
-  { type = "Dense", units = 8, activation = "relu" },
-  { type = "Dense", units = 12, activation = "linear" }
-]
-[Simple1.compile]
-optimizer = "sgd"  # Simpler optimizer
-loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[Simple1.dataset]
-shuffle_buffer_size = 512  # Reduced buffer size
-batch_size = 32  # Smaller batch size
-splits = [0.7, 0.15, 0.15]
-[Simple1.training]
-epochs = 40
-
-
-
-[Simple2]
-[Simple2.structure]
-layers = [
-  { type = "Conv2D", filters = 16, kernel_size = [3, 1], activation = "relu" },
-  { type = "Flatten" },
-  { type = "Dense", units = 12, activation = "linear" }
-]
-[Simple2.compile]
-optimizer = "sgd"
-loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[Simple2.dataset]
-shuffle_buffer_size = 512
-batch_size = 32
-splits = [0.7, 0.15, 0.15]
-[Simple2.training]
-epochs = 40
-
-
-[Simple3]
-[Simple3.structure]
-layers = [
-  { type = "Flatten" },
-  { type = "Dense", units = 32, activation = "relu" },
-  { type = "Dense", units = 12, activation = "linear" }
-]
-[Simple3.compile]
-optimizer = "sgd"
-loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
-[Simple3.dataset]
-shuffle_buffer_size = 512
-batch_size = 32
-splits = [0.7, 0.15, 0.15]
-[Simple3.training]
-epochs = 40
-
-
-
 # Configuration Eli
 [E]
 [E.structure]
@@ -74,11 +13,9 @@ layers = [
 [E.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [E.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+id = "d1"
 [E.training]
 epochs = 40
 
@@ -102,11 +39,9 @@ layers = [
 [A.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [A.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+id = "d1"
 [A.training]
 epochs = 40
 
@@ -129,11 +64,9 @@ layers = [
 [P.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [P.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing
+id = "d1"
 [P.training]
 epochs = 40
 
@@ -161,11 +94,9 @@ layers = [
 [P2.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [P2.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing. Kept as-is.
+id = "d1"
 [P2.training]
 epochs = 40
 
@@ -194,10 +125,8 @@ layers = [
 [PBN.compile]
 optimizer = "adam"
 loss = "mean_squared_error"
-metrics = ["MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
+metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [PBN.dataset]
-shuffle_buffer_size = 1024
-batch_size = 64
-splits = [0.7, 0.15, 0.15]  # Represents 70% training, 15% validation, and 15% testing.
+id = "d1"
 [PBN.training]
 epochs = 40

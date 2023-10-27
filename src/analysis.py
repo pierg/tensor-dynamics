@@ -1,17 +1,18 @@
 import os
 import json
 import matplotlib.pyplot as plt
-from pathlib import Path
-from shared import results_folder, comparisons_folder
+from results.analysis import extract_training_info, find_training_info_json
+from src.shared.utils import git_pull, git_push
 
+# Separate functions for better modularization and readability
 
-def create_summary_file(training_data, results_dir):
-    summary_lines = ["Training Summary:\n", "-----------------\n"]
-
+def find_best_configuration(training_data):
+    """
+    Identifies the configuration with the best performance based on MAPE.
+    """
     best_performance_index = None
     best_mape = float("inf")
 
-    # Search for the best performing configuration
     for i, data in enumerate(training_data):
         current_mape = data.get("evaluation_results", {}).get(
             "mean_absolute_percentage_error", float("inf")
@@ -21,36 +22,60 @@ def create_summary_file(training_data, results_dir):
             best_mape = current_mape
             best_performance_index = i
 
-    # Adding the best configuration info at the beginning of the summary
-    if best_performance_index is not None:
-        best_config = training_data[best_performance_index]
-        config_name = best_config.get("config_name", "N/A")
-        timestamp = best_config.get("timestamp", "N/A")
+    return best_performance_index, best_mape
 
-        summary_lines.append(f"Best Performing Configuration:\n")
-        summary_lines.append(f"Config Name: {config_name}\n")
-        summary_lines.append(f"Timestamp: {timestamp}\n")
-        summary_lines.append(f"Lowest MAPE: {best_mape}\n\n")
+def generate_summary_content(training_data):
+    """
+    Generates summary text content based on training data.
+    """
+    summary_lines = ["Training Summary:\n", "-----------------\n"]
 
-    # Add information for each configuration
+    best_index, best_mape = find_best_configuration(training_data)
+
+    # Handle the best configuration summary
+    if best_index is not None:
+        best_config = training_data[best_index]
+        summary_lines += format_best_config_summary(best_config, best_mape)
+
+    # Handle individual configuration summaries
     for data in training_data:
-        config_name = data.get("config_name", "N/A")
-        timestamp = data.get("timestamp", "N/A")
-        evaluation_results = data.get("evaluation_results", {})
+        summary_lines += format_config_summary(data)
 
-        summary_lines.append(f"Configuration: {config_name}\n")
-        summary_lines.append(f"Timestamp: {timestamp}\n\n")
+    return summary_lines
 
-        # Add model evaluation results
-        summary_lines.append("Evaluation Results:\n")
-        for metric, value in evaluation_results.items():
-            summary_lines.append(f"  - {metric}: {value}\n")
-        summary_lines.append("\n")
+def format_best_config_summary(config, best_mape):
+    """
+    Formats the summary for the best configuration.
+    """
+    lines = [
+        f"Best Performing Configuration:\n",
+        f"Config Name: {config.get('config_name', 'N/A')}\n",
+        f"Timestamp: {config.get('timestamp', 'N/A')}\n",
+        f"Lowest MAPE: {best_mape}\n\n"
+    ]
+    return lines
 
-    summary_file_path = os.path.join(results_dir, "summary.txt")
-    with open(summary_file_path, "w") as summary_file:
-        summary_file.writelines(summary_lines)
+def format_config_summary(config):
+    """
+    Formats the summary for an individual configuration.
+    """
+    lines = [
+        f"Configuration: {config.get('config_name', 'N/A')}\n",
+        f"Timestamp: {config.get('timestamp', 'N/A')}\n\n",
+        "Evaluation Results:\n"
+    ]
+    for metric, value in config.get("evaluation_results", {}).items():
+        lines.append(f"  - {metric}: {value}\n")
+    lines.append("\n")
+    return lines
 
+def save_summary_file(summary_content, directory):
+    """
+    Saves the summary file to the specified directory.
+    """
+    summary_file_path = os.path.join(directory, "summary.txt")
+    with open(summary_file_path, "w") as file:
+        file.writelines(summary_content)
 
 def plot_training_info(training_data, metric, results_dir):
     plt.figure(figsize=(10, 6))
@@ -102,40 +127,42 @@ def compare_plots(training_data, results_dir):
         plot_training_info(training_data, metric, results_dir)
 
 
-def find_training_info_json(root_directory):
+def compare_results(results_folder):
     """
-    This function searches for all 'training_info.json' files starting from the root directory.
-    :param root_directory: The starting directory to search through.
-    :return: A list of file paths that point to 'training_info.json' files.
+    Main function to handle the comparison of results and generation of summaries and plots.
     """
-    matches = []
-    for root, dirnames, filenames in os.walk(root_directory):
-        for filename in filenames:
-            if filename == "training_info.json":
-                matches.append(os.path.join(root, filename))
-    return matches
-
-
-def extract_training_info(file_paths):
-    training_data = []
-    for file_path in file_paths:
-        with open(file_path, "r") as file:
-            data = json.load(file)
-            training_data.append(data)
-    return training_data
-
-
-def compare_results():
     training_info_files = find_training_info_json(results_folder)
-
     training_data = extract_training_info(training_info_files)
+
+    comparisons_folder = results_folder / "comparisons"
 
     if not os.path.exists(comparisons_folder):
         os.makedirs(comparisons_folder)
 
-    create_summary_file(training_data, comparisons_folder)
+    summary_content = generate_summary_content(training_data)
+    save_summary_file(summary_content, comparisons_folder)
+
     compare_plots(training_data, comparisons_folder)
 
 
+def push_results(results_folder):
+    """
+    Main function for analysis and pushing the results to the repository.
+    """
+    git_pull(folder=results_folder, prefer_local=True)
+    git_push(folder=results_folder)
+
+
+def analyze_and_push(results_folder):
+    """
+    Main function for analysis and pushing the results to the repository.
+    """
+    git_pull(folder=results_folder, prefer_local=True)
+    print("Comparing results...")
+    compare_results(results_folder)
+    print("Pushing to GitHub, overwriting remote comparisons...")
+    git_push(folder=results_folder)
+
 if __name__ == "__main__":
-    compare_results()
+    from shared import results_folder
+    analyze_and_push(results_folder=results_folder)

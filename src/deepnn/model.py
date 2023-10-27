@@ -1,41 +1,32 @@
+from pathlib import Path
+import time
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import TensorBoard
-from .utils import compute_dataset_range, compute_mean_and_variance
-from shared import tb_log_dir
-from datetime import datetime
+
+from src.deepnn.datasets import Datasets
+from src.deepnn.metrics import R_squared
+
 
 
 class NeuralNetwork:
     def __init__(
         self,
-        train_dataset: tf.data.Dataset,
-        validation_dataset: tf.data.Dataset,
-        test_dataset: tf.data.Dataset,
+        datasets: Datasets,
         configuration: dict,
         name: str,
         instance_folder,
     ):
-        """
-        Initialize the NeuralNetwork class with training, validation, and test datasets,
-        and a specific configuration from a file.
 
-        Args:
-            train_dataset (tf.data.Dataset): Training dataset.
-            validation_dataset (tf.data.Dataset): Validation dataset.
-            test_dataset (tf.data.Dataset): Testing dataset.
-            configuration (dict): Configuration to use.
-            name (str): Name of the confirguration
-        """
         self.config = configuration
         self.name = name
+        self.datasets = datasets
 
         # Dataset attributes
-        self.train_dataset = train_dataset
-        self.validation_dataset = validation_dataset
-        self.test_dataset = test_dataset
-        self._analyze_datasets()
+        self.train_dataset = datasets.test_dataset
+        self.validation_dataset = datasets.validation_dataset
+        self.test_dataset = datasets.test_dataset
 
         # Extracting configuration components for easier access
         self.structure_config = self.config["structure"]
@@ -46,34 +37,13 @@ class NeuralNetwork:
         self.model = self._build_model()
         self._compile_model()
 
+        # Results
         self.instance_folder = instance_folder
+        self.history = None
+        self.evaluation = None
+        self.time_training = 0
+        self.time_evaluation = 0
 
-    def _analyze_datasets(self):
-        # Compute range of train_dataset val_dataset and test_dataset
-        # Compute and print the range for each dataset
-        self.train_range = compute_dataset_range(self.train_dataset)
-        print(f"Range of target values in training dataset: {self.train_range}")
-        self.mean_train, self.variance_train = compute_mean_and_variance(
-            self.train_dataset
-        )
-        print(f"Mean of target values in training dataset: {self.mean_train}")
-        print(f"Variance of target values in training dataset: {self.variance_train}")
-
-        self.val_range = compute_dataset_range(self.validation_dataset)
-        print(f"Range of target values in validation dataset: {self.val_range}")
-        self.mean_val, self.variance_val = compute_mean_and_variance(
-            self.validation_dataset
-        )
-        print(f"Mean of target values in validation dataset: {self.mean_val}")
-        print(f"Variance of target values in validation dataset: {self.variance_val}")
-
-        self.test_range = compute_dataset_range(self.test_dataset)
-        print(f"Range of target values in test dataset: {self.test_range}")
-        self.mean_test, self.variance_test = compute_mean_and_variance(
-            self.test_dataset
-        )
-        print(f"Mean of target values in test dataset: {self.mean_test}")
-        print(f"Variance of target values in test dataset: {self.variance_test}")
 
     def _build_model(self) -> tf.keras.Model:
         """
@@ -106,6 +76,7 @@ class NeuralNetwork:
 
             # For each type of layer, we handle the parameters appropriately.
             if layer_type == "Conv2D":
+                # Reshaping here...
                 prev_layer = tf.keras.layers.Conv2D(
                     filters=layer_conf["filters"],
                     kernel_size=tuple(layer_conf["kernel_size"]),
@@ -138,35 +109,34 @@ class NeuralNetwork:
         """
         Compile the neural network model based on the configuration.
         """
-        # TODO: Depending on the available optimizers and customization needed, you might want to extend this section
-        self.model.compile(
-            optimizer=self.compile_config["optimizer"],
-            loss=self.compile_config["loss"],
-            metrics=self.compile_config["metrics"],
-        )
-
-        # Assuming self.compile_config is already filled by reading the configuration file
-        metrics_list = self.compile_config["metrics"]
-
-        # Convert string metrics to actual TensorFlow objects. This is needed because the configuration file has strings
+        
+        # Convert string metrics to actual TensorFlow objects and add the custom R-squared metric
         actual_metrics = []
-        for metric in metrics_list:
+        for metric in self.compile_config["metrics"]:
             if hasattr(tf.keras.metrics, metric):
                 actual_metrics.append(getattr(tf.keras.metrics, metric)())
             else:
-                raise ValueError(f"Unknown metric: {metric}")
+                if metric == "R_squared":
+                    # Ensure that R_squared is a defined metric function in your program
+                    actual_metrics.append(R_squared())
+                else:
+                    raise ValueError(f"Unknown metric: {metric}")
 
+        # You should use actual_metrics here instead of self.compile_config["metrics"]
         self.model.compile(
             optimizer=self.compile_config["optimizer"],
             loss=self.compile_config["loss"],
-            metrics=actual_metrics,
+            metrics=actual_metrics,  # This should be the instantiated metrics list
         )
+
 
     def train_model(self):
         """
         Train the neural network model with provided datasets.
         """
-        log_dir = self.instance_folder / f"{self.name}"
+        start_time = time.time()
+
+        log_dir = self.instance_folder
 
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
 
@@ -176,82 +146,88 @@ class NeuralNetwork:
         epochs = self.training_config["epochs"]
 
         # Train the model
-        history = self.model.fit(
+        self.history = self.model.fit(
             self.train_dataset,
             epochs=epochs,
             validation_data=self.validation_dataset,
             callbacks=[tensorboard_callback],
         )
 
-        return history
+        # Record the end time
+        end_time = time.time()
+        # Calculate and format the elapsed time
+        self.time_training = end_time - start_time
+        
 
-    def evaluate_model(self, verbose=0, return_dict=True):
+    def evaluate_model(self, verbose=1):
         """
-        Evaluate the neural network model with the provided testing dataset.
+        Evaluate the neural network model on training, validation, and test datasets.
 
         Args:
-            verbose (int, optional): Verbosity mode. 0 = silent, 1 = progress bar, 2 = one line per epoch. Defaults to 0.
-            return_dict (bool, optional): If True, loss and metric results are returned as a dictionary.
+            verbose (int): Verbosity mode used during evaluation.
 
         Returns:
-            dict: A dictionary containing detailed loss and metric results along with additional statistics.
-
-        Raises:
-            ValueError: If the test dataset is empty.
+            dict: A dictionary containing the evaluation results for each dataset.
         """
-        # Check if the test dataset is empty. The cardinality method checks the number of elements in the dataset.
-        if self.test_dataset.cardinality().numpy() == 0:
-            raise ValueError("Test dataset is empty, evaluation cannot be performed.")
+        # Ensure the model has been trained before evaluation
+        if self.model is None:
+            raise ValueError("The model hasn't been built or trained yet.")
 
-        # Evaluating the model on different datasets helps in understanding the performance and robustness of the model.
+        # Evaluate the model on all datasets
+        train_evaluation = self.model.evaluate(self.train_dataset, verbose=verbose)
+        validation_evaluation = self.model.evaluate(self.validation_dataset, verbose=verbose)
+        test_evaluation = self.model.evaluate(self.test_dataset, verbose=verbose)
 
-        # The training data evaluation helps understand how well the model learned the patterns in the data it was trained on.
-        train_results = self.model.evaluate(
-            x=self.train_dataset, verbose=verbose, return_dict=return_dict
-        )
-
-        # Evaluating on validation data provides insights on how the model performs on unseen data, which is crucial for understanding its generalization.
-        val_results = self.model.evaluate(
-            x=self.val_dataset, verbose=verbose, return_dict=return_dict
-        )
-
-        # Finally, the test data evaluation gives the most unbiased estimate of the model's real-world performance on entirely new data.
-        test_results = self.model.evaluate(
-            x=self.test_dataset, verbose=verbose, return_dict=return_dict
-        )
-
-        # Calculate additional statistics, such as R-squared, which is a statistical measure that represents the proportion of the variance for the dependent variable that's explained by the independent variables in a regression model.
-
-        # The closer R-squared is to 1, the more the model explains the variation in the target variable. Conversely, a value closer to 0 indicates the model does not explain much of the variation, highlighting potential issues with the model's fit.
-        R_squared_train = 1 - (train_results["loss"] / self.variance_train)
-        R_squared_val = 1 - (val_results["loss"] / self.variance_val)
-        R_squared_test = 1 - (test_results["loss"] / self.variance_test)
-
-        # Organize everything in a dictionary to return. This includes both the results from .evaluate()
-        # as well as any additional statistics you've calculated.
-        # This comprehensive data helps in making informed decisions and evaluations about the model's performance and potential next steps.
-        evaluation_results = {
-            "train": {
-                "results": train_results,
-                "range": self.train_range,  # Range gives an idea of the spread of values, which can influence how we interpret the model's error rates.
-                "mean": self.mean_train,  # Knowing the mean helps put the model's prediction errors into context.
-                "variance": self.variance_train,  # Variance helps in understanding the distribution of data.
-                "R_squared": R_squared_train,  # Indicates how much of the target's variability is explained by the model.
-            },
-            "validation": {
-                "results": val_results,
-                "range": self.val_range,
-                "mean": self.mean_val,
-                "variance": self.variance_val,
-                "R_squared": R_squared_val,
-            },
-            "test": {
-                "results": test_results,
-                "range": self.test_range,
-                "mean": self.mean_test,
-                "variance": self.variance_test,
-                "R_squared": R_squared_test,
-            },
+        # Prepare a dictionary to hold all evaluation results
+        self.evaluation = {
+            'train': dict(zip(self.model.metrics_names, train_evaluation)),
+            'validation': dict(zip(self.model.metrics_names, validation_evaluation)),
+            'test': dict(zip(self.model.metrics_names, test_evaluation)),
         }
 
-        return evaluation_results
+        print("Evaluation Completed")
+
+
+    def save_model(self, filepath: Path):
+        """
+        Save the neural network model to the specified file path.
+
+        Args:
+            filepath (str): The path where the model will be saved.
+        """
+        if self.model is None:
+            raise ValueError("The model hasn't been built or trained yet.")
+
+        # Construct the complete filepath if only a directory is provided
+        filepath = filepath / "trained_model.h5"
+        self.model.save(filepath)
+        print(f"Model saved successfully at {filepath}")
+
+
+
+
+    def get_results(self):
+        # Ensure that training has occurred
+        if self.history is None or self.evaluation is None:
+            raise Exception("The model hasn't been trained/evaluated yet.")
+
+        # Creating a comprehensive results dictionary
+        results_dict = {
+            "config_name": self.name,
+            "evaluation": self.evaluation,
+            "dataset": self.datasets.to_dict(),
+            "training_time": self.time_training,
+            "evaluation_time": self.time_evaluation,
+            "model_config": {
+                "structure_config": self.structure_config,
+                "compile_config": self.compile_config,
+                "training_config": self.training_config,
+            },
+            "training_history": {
+                "epochs": self.history.epoch,
+                "history": self.history.history,
+            }
+        }
+
+        return results_dict
+    

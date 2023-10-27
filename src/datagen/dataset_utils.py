@@ -91,7 +91,7 @@ def pretty_print_sharded_dataset_elements(
     running_stats: RunningStatsDatapoints = None,
     compute_stats: bool = True,
     print_elements: bool = False,
-    n: int = None,
+    n: int = None
 ) -> None:
     """
     Pretty prints 'n' elements from a sharded dataset located at the provided directory.

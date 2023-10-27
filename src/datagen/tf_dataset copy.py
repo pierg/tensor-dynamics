@@ -274,70 +274,133 @@ def create_sharded_tfrecord(base_file_path: Path,
 
     return running_stats
 
-import tensorflow as tf
-from pathlib import Path
-import pickle
-from typing import Dict, Tuple
 
-def load_datasets(base_directory: Path, batch_size: int = 32) -> Tuple[Dict[str, tf.data.Dataset], Dict[str, Any]]:
-    """
-    Load datasets from TFRecord files and running statistics.
-
-    :param base_directory: Base directory where datasets are stored.
-    :param batch_size: Number of samples per batch.
-    :return: A tuple containing two dictionaries: datasets and running statistics for each dataset type.
-    """
+def load_datasets(base_directory: Path, 
+                  batch_size: int = 32):
     datasets = {}
     running_stats = {}
 
     for dataset_type in ['training', 'testing', 'validation']:
         dataset_directory = base_directory / dataset_type
-
-        # Check if the dataset directory exists
-        if not dataset_directory.exists():
-            raise FileNotFoundError(f"{dataset_directory} does not exist.")
-
         print(f"Loading {dataset_type} dataset...")
-
+        
         # Load the dataset
         datasets[dataset_type] = load_all_shards_tfrecord_dataset(dataset_directory, batch_size)
 
         # Load running stats
         stats_path = dataset_directory / "stats.pkl"
-        if not stats_path.exists():
-            raise FileNotFoundError(f"Stats file does not exist at {stats_path}.")
-
         with open(stats_path, "rb") as pkl_file:
             running_stats[dataset_type] = pickle.load(pkl_file)
 
     return datasets, running_stats
 
 
-def load_all_shards_tfrecord_dataset(base_file_path: Path, batch_size: int = 32) -> tf.data.Dataset:
+def create_sharded_tfrecord_old(base_file_path: Path, 
+                            gen_parameters: dict,
+                            num_shards, 
+                            num_samples):
     """
-    Load all shards from the directory and create a tf.data.Dataset.
+    Writes the dataset into multiple TFRecord files (shards).
+    """
+    running_stats = RunningStatsDatapoints()
+    samples_per_shard = math.ceil(num_samples / num_shards)
 
-    :param base_file_path: Path to the directory containing the TFRecord shards.
-    :param batch_size: Number of samples per batch.
-    :return: A tf.data.Dataset object.
+    for shard_id in range(num_shards):
+        shard_file_path = base_file_path / f"shard_{shard_id}.tfrecord"
+        with tf.io.TFRecordWriter(str(shard_file_path)) as writer:
+            for _ in range(samples_per_shard):
+                parameters = generate_parameters(gen_parameters)
+                feature, label = generate_datapoint(parameters)
+                running_stats.update(feature, label)
+                tf_example = serialize_example(feature, label)
+                writer.write(tf_example)
+                
+        print(f"Shard {shard_id} written at {shard_file_path}")
+    
+    save_dict_to_json_file(running_stats.to_dict(), base_file_path / "stats.json", )
+    # picke running_stats and save it in stats.pk
+
+    return running_stats
+    
+
+def load_all_shards_tfrecord_dataset(base_file_path: Path, 
+                                     batch_size: int = 32) -> tf.data.Dataset:
     """
+    Create a dataset by loading all shards without splitting and without loading the full dataset into memory.
+    """
+
+    # Ensure the base_file_path exists and is a directory.
     if not base_file_path.is_dir():
         raise ValueError(f"{base_file_path} is not a valid directory.")
 
+    # Collect all .tfrecord files within the directory.
     tfrecord_files = list(base_file_path.glob('*.tfrecord'))
+
+    # If there are no .tfrecord files, raise an error.
     if not tfrecord_files:
-        raise FileNotFoundError(f"No TFRecord files found in {base_file_path}.")
+        raise FileNotFoundError(f"No .tfrecord files found in {base_file_path}.")
 
-    # Create a dataset from the file paths
-    raw_dataset = tf.data.TFRecordDataset(filenames=[str(path) for path in tfrecord_files])
+    num_shards = len(tfrecord_files)
 
-    # Map the parsing function over the dataset
-    parsed_dataset = raw_dataset.map(parse_tfrecord_fn, num_parallel_calls=tf.data.AUTOTUNE)
+    # Generate file paths for all the shards.
+    all_files = [str(file_path) for file_path in tfrecord_files]
 
-    # Batch and prefetch the dataset
-    ready_dataset = parsed_dataset.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
+    # Utilize the 'interleave' function to read from multiple files in parallel, effectively shuffling the dataset records.
+    full_dataset = tf.data.TFRecordDataset(all_files).interleave(
+        lambda x: tf.data.TFRecordDataset(x),
+        cycle_length=num_shards,
+        num_parallel_calls=tf.data.AUTOTUNE
+    )
 
-    return ready_dataset
+    # Parse, batch, and prefetch the datasets.
+    full_dataset = full_dataset.map(
+        parse_tfrecord_fn,
+        num_parallel_calls=tf.data.experimental.AUTOTUNE
+    ).batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+
+    return full_dataset
+
+def load_sharded_tfrecord_dataset_and_split(base_file_path: Path, dataset_config: dict):
+    """
+    Create training, validation, and test datasets by selecting shards without loading the full dataset into memory.
+    """
+    num_shards = dataset_config["n_shards"]
+    split_ratios = dataset_config["splits"]
+    batch_size = dataset_config["batch_size"]
+
+    # Ensure there are enough shards.
+    if num_shards < 3:  # minimum for train, val, and test
+        raise ValueError("Not enough shards to create train/val/test split.")
+
+    # Shuffle the shards to randomize the dataset parts used for different splits (if required).
+    shard_ids = tf.random.shuffle(tf.range(num_shards))
+
+    # Calculate how many shards will be used for each dataset split, ensuring at least one shard per split.
+    train_shards = max(1, int(num_shards * split_ratios[0]))
+    val_shards = max(1, int(num_shards * split_ratios[1]))
+    # Remaining shards for testing (ensuring we use all shards).
+    test_shards = num_shards - train_shards - val_shards
+
+    # Guard against having zero shards for testing
+    if test_shards <= 0:
+        raise ValueError("Not enough shards to allocate for testing.")
+
+    # Generate file paths for the shards.
+    train_files = [str(base_file_path / f"shard_{shard_id}.tfrecord") for shard_id in shard_ids[:train_shards]]
+    val_files = [str(base_file_path / f"shard_{shard_id}.tfrecord") for shard_id in shard_ids[train_shards:train_shards+val_shards]]
+    test_files = [str(base_file_path / f"shard_{shard_id}.tfrecord") for shard_id in shard_ids[train_shards+val_shards:]]
+
+    # Utilize the 'interleave' function to read from multiple files in parallel, effectively shuffling the dataset records.
+    train_dataset = tf.data.TFRecordDataset(train_files).interleave(lambda x: tf.data.TFRecordDataset(x), cycle_length=train_shards, num_parallel_calls=tf.data.AUTOTUNE)
+    val_dataset = tf.data.TFRecordDataset(val_files).interleave(lambda x: tf.data.TFRecordDataset(x), cycle_length=val_shards, num_parallel_calls=tf.data.AUTOTUNE)
+    test_dataset = tf.data.TFRecordDataset(test_files).interleave(lambda x: tf.data.TFRecordDataset(x), cycle_length=test_shards, num_parallel_calls=tf.data.AUTOTUNE)
+
+    # Parse, batch, and prefetch the datasets.
+    train_dataset = train_dataset.map(parse_tfrecord_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE).batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+    val_dataset = val_dataset.map(parse_tfrecord_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE).batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+    test_dataset = test_dataset.map(parse_tfrecord_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE).batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+
+    return train_dataset, val_dataset, test_dataset
 
 
 

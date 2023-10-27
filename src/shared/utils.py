@@ -4,7 +4,7 @@ import subprocess
 from urllib.parse import urlparse, urlunparse
 from pathlib import Path
 import sys
-
+import json
 
 # -------------------------
 # ARGUMENT PARSING FUNCTIONS
@@ -33,6 +33,77 @@ def is_directory_empty(path):
     if not os.path.exists(path):
         return True
     return len(os.listdir(path)) == 0
+
+
+
+def save_dict_to_json_file(data_dict: dict, file_path: Path) -> None:
+    """
+    Save a dictionary into a formatted JSON file.
+
+    Args:
+    data_dict (Dict): The dictionary to save.
+    file_path (Path): The file path where the dictionary should be saved.
+    """
+    # Ensure the parent directory exists
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        with file_path.open('w', encoding='utf-8') as file:
+            json.dump(data_dict, file, ensure_ascii=False, indent=4)
+        print(f"Data saved successfully to {file_path}")
+    except IOError as e:
+        print(f"An error occurred while writing to the file: {e}")
+    except json.JSONDecodeError as e:
+        print(f"An error occurred with JSON encoding/decoding: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        raise  # Re-throw the exception after logging it
+
+
+
+def format_section(title, dict_data):
+    """
+    Formats a dictionary into a sectioned string with a title.
+
+    Args:
+        title (str): The title of the section.
+        dict_data (dict): The dictionary to format.
+
+    Returns:
+        str: A string representation of the dictionary formatted as a section.
+    """
+    formatted = f"{title}:\n"
+    separator = '-' * len(title)
+    formatted += f"{separator}\n"
+
+    for key, value in dict_data.items():
+        if isinstance(value, dict):  # if value itself is a dictionary, format as a subsection
+            value = '\n' + format_section(f"  {key}", value)
+        formatted += f"{key.capitalize()}: {value}\n"
+
+    return formatted + '\n'  # Add a newline for separation between sections
+
+
+def pretty_print_dict(data, indent=0):
+    """
+    Recursively prints nested dictionaries.
+
+    Args:
+        data (dict): The dictionary to print.
+        indent (int, optional): The current indentation level. Defaults to 0.
+    """
+    for key, value in data.items():
+        # Print the key with the current indentation
+        print('    ' * indent + str(key), end='')
+
+        if isinstance(value, dict):
+            # If the value is another dictionary, print a colon and continue the recursion
+            print(':')
+            pretty_print_dict(value, indent + 1)  # Increase the indentation level for nested dictionary
+        else:
+            # If the value is not a dictionary, print a colon and the value itself
+            print(f': {value}')
+
 
 
 # -------------------------
@@ -189,8 +260,10 @@ def git_push(folder=None, commit_message="Update files"):
             print("No local changes to commit.")
 
         print("Pushing to the remote repository...")
+        pull_command = ["git", "pull", repo_url_with_token, "main"]
         push_command = ["git", "push", repo_url_with_token, "main"]
         try:
+            subprocess.run(pull_command, check=True)  # Attempt to pull
             subprocess.run(push_command, check=True)  # Attempt to push
         except subprocess.CalledProcessError:
             # If push fails, pull with strategy to prefer local changes

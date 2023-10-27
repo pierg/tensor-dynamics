@@ -111,6 +111,7 @@ class RunningStatsDataset:
     def __init__(self):
         self.features = RunningStats()
         self.labels = RunningStats()
+        self.n = 0
         self.initialized = False
 
     def update(self, feature, label):
@@ -118,6 +119,7 @@ class RunningStatsDataset:
         # because our RunningStats objects now initialize themselves on the first push.
         self.features.push(feature)
         self.labels.push(label)
+        self.n += 1
 
     def get_feature_stats(self):
         return {

@@ -23,6 +23,39 @@ batch_size = 64  # Adjust based on your specific memory constraints
 shuffle_buffer_size = 1000  # Sufficient for shuffling data effectively in most cases
 splits = [0.7, 0.15, 0.15]  # 70% training, 15% validation, 15% test
 
+
+[dtest]
+[dtest.parameters]
+k1_min = 0.01
+k1_max = 0.05
+k2_min = 0.01
+k2_max = 0.05
+k3_min = 0.01
+k3_max = 0.05
+E0_min = 0.1
+E0_max = 0.3
+S0_min = 0.1
+S0_max = 0.3
+spectra_min = -1
+spectra_max = 1
+amplitude_min = 0.2
+amplitude_max = 0.8
+[dtest.dataset]
+# 'seed' is used for any kind of randomization, ensuring that the operations are deterministic.
+seed = 42
+# 'n_samples' is the total number of samples in your dataset.
+n_samples = 500
+# 'n_shards' indicates into how many parts the dataset is divided. 
+# Make sure that the number of shards appropriately divides the number of samples.
+n_shards = 10  # Each shard will have 50 samples if 'n_samples' is 500.
+# 'batch_size' is the number of samples that will be propagated through the network.
+batch_size = 50  # Adjusted so it divides evenly into n_samples. 
+                 # Note: This doesn't need to divide 'n_samples', but typically it makes training and evaluation more straightforward.
+# 'shuffle_buffer_size' is the number of elements from which to shuffle.
+shuffle_buffer_size = 100  # This is often set to a number larger than 'batch_size' and smaller than 'n_samples'.
+# 'splits' represents the ratio of data to be divided into training, validation, and test sets.
+splits = [0.7, 0.15, 0.15]  # This configuration divides 500 samples into 350 training, 75 validation, and 75 test samples.
+
 # [d1.dataset]
 # seed = 42
 # n_samples = 1000000  # e.g., 1 million samples
