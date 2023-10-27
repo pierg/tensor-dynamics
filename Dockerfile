@@ -33,6 +33,10 @@ EXPOSE 6006
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
+
+ENV PYTHONPATH "${PYTHONPATH}:/app/:/app/src/"
+
+
 # Use the entrypoint script to configure how the container will run
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 

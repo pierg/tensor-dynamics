@@ -9,7 +9,7 @@ from shared import (
     datasets_folder,
     results_runs_folder,
 )
-from src.data import load_all_datasets, process_datasets
+from data import load_all_datasets, process_datasets
 from src.deepnn.datasets import Datasets
 from src.deepnn.model import NeuralNetwork
 from src.shared.utils import git_push, save_dict_to_json_file
