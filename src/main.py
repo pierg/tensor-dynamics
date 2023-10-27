@@ -31,7 +31,7 @@ def process_configuration(config_name, config, instance_config_folder):
     dataset_config = toml.load(data_config_file).get(config["dataset"]["id"], {})
 
     # If you're testing with a specific dataset, uncomment the line below
-    dataset_config = toml.load(data_config_file)["dtest"]
+    # dataset_config = toml.load(data_config_file)["dtest"]
 
     # Create the dataset and obtain its folder path
     base_folder_path = process_datasets(dataset_config, datasets_folder, overwrite=False)
