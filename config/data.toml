@@ -17,8 +17,8 @@ amplitude_max = 0.8
 
 [d1.dataset]
 seed = 42
-n_samples = 50000  # e.g., 50,000 samples
-n_shards = 10      # The dataset is divided into 10 shards, each containing 5,000 samples
+n_samples = 500000  # e.g., 500,000 samples
+n_shards = 100      # The dataset is divided into 100 shards, each containing 50,000 samples
 batch_size = 64    # Adjust based on your specific memory constraints
 shuffle_buffer_size = 1000 
 splits = [0.7, 0.15, 0.15]  # 70% training, 15% validation, 15% test
