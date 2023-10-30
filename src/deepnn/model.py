@@ -189,6 +189,10 @@ class NeuralNetwork:
         }
 
         print("Evaluation Completed")
+        # Record the end time
+        end_time = time.time()
+        # Calculate and format the elapsed time
+        self.time_evaluation = end_time - start_time
 
     def save_model(self, filepath: Path):
         """
