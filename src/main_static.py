@@ -1,13 +1,15 @@
 import toml
 from datetime import datetime
+from pathlib import Path
 
 # Local module imports
 from shared import (
     results_repo_folder,
     data_config_file,
+    datasets_folder,
     results_runs_folder,
 )
-from src.data_dynamic import DatasetGenerator
+from .data_static import load_all_datasets, process_datasets
 from deepnn.datasets import Datasets
 from deepnn.model import NeuralNetwork
 from shared.utils import git_push, save_dict_to_json_file
@@ -28,21 +30,20 @@ def process_configuration(config_name, config, instance_config_folder):
     # Load the dataset configuration
     dataset_config = toml.load(data_config_file).get(config["dataset"]["id"], {})
 
-    dataset_generator = DatasetGenerator(dataset_config["dataset"], dataset_config["parameters"])
+    # If you're testing with a specific dataset, uncomment the line below
+    # dataset_config = toml.load(data_config_file)["dtest"]
 
-    train_dataset, val_dataset, test_dataset = dataset_generator.create_tf_datasets()
+    # Create the dataset and obtain its folder path
+    base_folder_path = process_datasets(dataset_config, datasets_folder, overwrite=False)
 
-    datasets=Datasets(
-        train_dataset=train_dataset,
-        validation_dataset=val_dataset,
-        test_dataset=test_dataset,
-        train_stats=dataset_generator.running_stats
+    datasets, running_stats = load_all_datasets(
+        dataset_config, base_folder_path, transformed=False
     )
 
     try:
         # Set up and train the neural network
         neural_network = NeuralNetwork(
-            datasets=datasets,
+            datasets=Datasets.from_dict(datasets, running_stats),
             configuration=config,
             name=config_name,
             instance_folder=instance_config_folder,
@@ -80,6 +81,9 @@ def main():
         process_configuration(config_name, config, instance_folder / config_name)
         # Saving results on GitHub
         git_push(folder=results_repo_folder)
+
+    # print("\nAnalysing and saving results...")
+    # analyze_and_push(results_folder)
 
 
 if __name__ == "__main__":

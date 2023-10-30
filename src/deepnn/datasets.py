@@ -2,28 +2,21 @@ from dataclasses import dataclass, field
 import tensorflow as tf
 from datagen.runningstats import RunningStatsDatapoints
 
+from dataclasses import dataclass, field
+import tensorflow as tf
+from typing import Optional
 
 @dataclass
 class Datasets:
     train_dataset: tf.data.Dataset
     validation_dataset: tf.data.Dataset
     test_dataset: tf.data.Dataset
-    train_stats: RunningStatsDatapoints
-    validation_stats: RunningStatsDatapoints
-    test_stats: RunningStatsDatapoints
+    train_stats: Optional[RunningStatsDatapoints] = None
+    validation_stats: Optional[RunningStatsDatapoints] = None
+    test_stats: Optional[RunningStatsDatapoints] = None
 
     @classmethod
     def from_dict(cls, datasets: dict, stats: dict) -> "Datasets":
-        """
-        Create a Datasets instance from provided dictionaries.
-
-        Args:
-            datasets (dict): A dictionary containing TensorFlow datasets for training, validation, and testing.
-            stats (dict): A dictionary containing statistics objects for training, validation, and testing datasets.
-
-        Returns:
-            Datasets: An instance of Datasets dataclass.
-        """
         # Ensure the input dictionaries have the correct keys
         if not all(key in datasets for key in ["training", "validation", "testing"]):
             raise ValueError(
@@ -46,16 +39,10 @@ class Datasets:
         )
 
     def to_dict(self) -> dict:
-        """
-        Convert the Datasets instance into a dictionary containing key statistics and dataset sizes.
-
-        Returns:
-            dict: A dictionary representation of the Datasets instance.
-        """
         datasets_dict = {
-            "train": {"stats": self.train_stats.to_dict(reduced=True)},
-            "validation": {"stats": self.validation_stats.to_dict(reduced=True)},
-            "test": {"stats": self.test_stats.to_dict(reduced=True)},
+            "train": {"stats": self.train_stats.to_dict(reduced=True) if self.train_stats else None},
+            "validation": {"stats": self.validation_stats.to_dict(reduced=True) if self.validation_stats else None},
+            "test": {"stats": self.test_stats.to_dict(reduced=True) if self.test_stats else None},
         }
 
         return datasets_dict

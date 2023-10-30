@@ -54,10 +54,6 @@ class NeuralNetwork:
         Returns:
             Model: Uncompiled Keras model.
         """
-        # We need to extract the input shape from the training dataset.
-        # Here, we'll take a single batch and infer the shape from it.
-        # We assume that the first dimension is the batch size and should be discarded for the model's input shape.
-
         for sample_batch in self.train_dataset.take(1):
             # sample_batch is a tuple of (input_batch, target_batch)
             # We only need the input_batch to determine the shape

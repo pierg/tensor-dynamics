@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from pathlib import Path
-from datagen.dataset import *
+from src.datagen.dataset import *
 
 import numpy as np
 import tensorflow as tf
