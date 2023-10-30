@@ -29,6 +29,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 
+ENV PYTHONPATH "${PYTHONPATH}:/app/:/app/src/"
+
+
 # Set the entrypoint script as the entrypoint for the Docker container
 ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 # The CMD should be an array of strings, which form the arguments you would 

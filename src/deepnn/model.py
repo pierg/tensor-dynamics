@@ -169,6 +169,7 @@ class NeuralNetwork:
         Returns:
             dict: A dictionary containing the evaluation results for each dataset.
         """
+        start_time = time.time()
         # Ensure the model has been trained before evaluation
         if self.model is None:
             raise ValueError("The model hasn't been built or trained yet.")
