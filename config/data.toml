@@ -43,11 +43,11 @@ amplitude_max = 0.8
 
 [dbig.dataset]
 seed = 42
-n_samples = 100000000  # e.g., 50,000,000 samples
-n_shards = 1000         # The dataset is divided into 10000 shards, each containing 500,000 samples
-batch_size = 64         # Adjust based on your specific memory constraints
+n_samples = 100000000 
+n_shards = 1000       
+batch_size = 64        
 shuffle_buffer_size = 1000 
-splits = [0.8, 0.10, 0.10]  # 70% training, 15% validation, 15% test
+splits = [0.8, 0.10, 0.10]  
 
 
 
