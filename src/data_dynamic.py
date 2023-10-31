@@ -183,4 +183,4 @@ def testing():
     print_first_n_elements(train_dataset2, 2)
 
 
-size_testing()
+# size_testing()
