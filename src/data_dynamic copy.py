@@ -2,8 +2,8 @@ from click import Path
 import numpy as np
 import tensorflow as tf
 import toml
-from src.datagen.michaelis import generate_datapoint, generate_parameters
-from src.datagen.runningstats import RunningStatsDatapoints
+from datagen.michaelis import generate_datapoint, generate_parameters
+from datagen.runningstats import RunningStatsDatapoints
 from shared import (
     data_config_file, data_statistics_folder
 )

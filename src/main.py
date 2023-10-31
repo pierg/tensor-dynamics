@@ -7,7 +7,7 @@ from shared import (
     data_config_file,
     results_runs_folder,
 )
-from src.data_dynamic import DatasetGenerator
+from data_dynamic import DatasetGenerator
 from deepnn.datasets import Datasets
 from deepnn.model import NeuralNetwork
 from shared.utils import git_push, save_dict_to_json_file
