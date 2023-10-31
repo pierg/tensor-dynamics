@@ -58,6 +58,7 @@ class DatasetGenerator:
         print("Calculating statistics...")
         for _ in self._data_generator():
             pass
+        os.makedirs(os.path.dirname(self.stats_file_path), exist_ok=True)
         with open(self.stats_file_path, 'wb') as file:
             pickle.dump(self.running_stats, file)
 
