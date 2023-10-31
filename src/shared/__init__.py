@@ -12,7 +12,6 @@ config_folder: Path = main_repo_folder / "config"
 # Path to configuration file
 config_file: Path = config_folder / "configurations.toml"
 data_config_file: Path = config_folder / "data.toml"
-data_statistics_folder: Path = config_folder / "statistics"
 
 # Path to results folder
 results_repo_folder: Path = main_repo_folder / "results"
@@ -24,3 +23,6 @@ secrets_path: Path = main_repo_folder / ".secrets"
 
 # Datasets folder path
 datasets_folder: Path = main_repo_folder / "data"
+
+
+data_statistics_folder: Path = results_repo_folder / "statistics"

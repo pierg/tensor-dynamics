@@ -43,11 +43,40 @@ amplitude_max = 0.8
 
 [dbig.dataset]
 seed = 42
-n_samples = 5000000  # e.g., 50,000,000 samples
+n_samples = 100000000  # e.g., 50,000,000 samples
 n_shards = 1000         # The dataset is divided into 10000 shards, each containing 500,000 samples
 batch_size = 64         # Adjust based on your specific memory constraints
 shuffle_buffer_size = 1000 
-splits = [0.7, 0.15, 0.15]  # 70% training, 15% validation, 15% test
+splits = [0.8, 0.10, 0.10]  # 70% training, 15% validation, 15% test
+
+
+
+[dsmall]
+[dsmall.parameters]
+k1_min = 0.01
+k1_max = 0.05
+k2_min = 0.01
+k2_max = 0.05
+k3_min = 0.01
+k3_max = 0.05
+E0_min = 0.1
+E0_max = 0.3
+S0_min = 0.1
+S0_max = 0.3
+spectra_min = -1
+spectra_max = 1
+amplitude_min = 0.2
+amplitude_max = 0.8
+
+[dsmall.dataset]
+seed = 42
+n_samples = 1000 
+batch_size = 4 
+splits = [0.8, 0.10, 0.10] 
+
+
+
+
 
 
 
@@ -71,7 +100,7 @@ amplitude_max = 0.8
 # 'seed' is used for any kind of randomization, ensuring that the operations are deterministic.
 seed = 42
 # 'n_samples' is the total number of samples in your dataset.
-n_samples = 500
+n_samples = 5000
 # 'n_shards' indicates into how many parts the dataset is divided. 
 # Make sure that the number of shards appropriately divides the number of samples.
 n_shards = 10  # Each shard will have 50 samples if 'n_samples' is 500.

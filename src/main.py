@@ -13,6 +13,19 @@ from deepnn.model import NeuralNetwork
 from shared.utils import git_push, save_dict_to_json_file
 from utils import handle_training_exception, main_preamble
 
+def print_dataset_statistics(datasets: Datasets):
+    """
+    Print statistics of the datasets.
+
+    Args:
+        datasets (Datasets): The datasets object containing train, validation, and test datasets.
+    """
+    print("\nDataset Statistics:")
+    print(f"Training samples: {len(list(datasets.train_dataset))}")
+    print(f"Validation samples: {len(list(datasets.validation_dataset))}")
+    print(f"Test samples: {len(list(datasets.test_dataset))}")
+    print(f"Training stats: {datasets.train_stats}\n")
+
 
 def process_configuration(config_name, config, instance_config_folder):
     """
@@ -32,12 +45,15 @@ def process_configuration(config_name, config, instance_config_folder):
 
     train_dataset, val_dataset, test_dataset = dataset_generator.create_tf_datasets()
 
-    datasets=Datasets(
+    datasets = Datasets(
         train_dataset=train_dataset,
         validation_dataset=val_dataset,
         test_dataset=test_dataset,
         train_stats=dataset_generator.running_stats
     )
+
+    # Print dataset statistics
+    print_dataset_statistics(datasets)
 
     try:
         # Set up and train the neural network

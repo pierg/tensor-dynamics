@@ -3,49 +3,42 @@ import time
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
+
 
 from deepnn.datasets import Datasets
 from deepnn.metrics import R_squared
 
 
 class NeuralNetwork:
-    def __init__(
-        self,
-        datasets: Datasets,
-        configuration: dict,
-        name: str,
-        instance_folder,
-    ):
+    def __init__(self, datasets: Datasets, configuration: dict, name: str, instance_folder):
         self.config = configuration
         self.name = name
-        self.datasets = datasets
+        self.instance_folder = instance_folder
 
-        # Dataset attributes
-        self.train_dataset = datasets.test_dataset
+        # Correctly assign the datasets
+        self.train_dataset = datasets.train_dataset
         self.validation_dataset = datasets.validation_dataset
         self.test_dataset = datasets.test_dataset
 
-        # Extracting configuration components for easier access
         self.structure_config = self.config["structure"]
         self.compile_config = self.config["compile"]
         self.training_config = self.config["training"]
 
-        # Building and compiling the neural network model
-        # Instantiate the MirroredStrategy
-        self.strategy = tf.distribute.MirroredStrategy()
-        
-        with self.strategy.scope():
-            # Building and compiling should be inside the strategy scope.
-            self.model = self._build_model()
-            self._compile_model()  
+        self.initialize_model()
 
-        # Results
-        self.instance_folder = instance_folder
-        self.history = None
-        self.evaluation = None
-        self.time_training = 0
-        self.time_evaluation = 0
+    def initialize_model(self):
+        self.strategy = tf.distribute.MirroredStrategy()
+        with self.strategy.scope():
+            self.model = self._build_model()
+            self._compile_model()
+
+        # Define the early stopping callback here
+        self.early_stopping = EarlyStopping(
+            monitor='val_loss', patience=10, verbose=1, restore_best_weights=True
+        )
+            
+            
 
     def _build_model(self) -> tf.keras.Model:
         """
@@ -125,6 +118,7 @@ class NeuralNetwork:
             optimizer=self.compile_config["optimizer"],
             loss=self.compile_config["loss"],
             metrics=actual_metrics,  # This should be the instantiated metrics list
+            run_eagerly=True
         )
 
     def train_model(self):
@@ -134,9 +128,7 @@ class NeuralNetwork:
         start_time = time.time()
 
         log_dir = self.instance_folder
-
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
-
         self.model.summary()  # Display model architecture
 
         # Extract training parameters from configuration
@@ -147,7 +139,7 @@ class NeuralNetwork:
             self.train_dataset,
             epochs=epochs,
             validation_data=self.validation_dataset,
-            callbacks=[tensorboard_callback],
+            callbacks=[tensorboard_callback, self.early_stopping],  # Use self.early_stopping here
         )
 
         # Record the end time
