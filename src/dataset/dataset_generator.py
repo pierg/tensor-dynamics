@@ -53,7 +53,7 @@ class DatasetGenerator:
                 self.running_stats = pickle.load(f)
         else:
             self.running_stats = RunningStatsDatapoints.from_generator(
-                self._data_generator, file_path=stats_file_path
+                self._data_generator, file_path=stats_file_path, max_points=use_stats_of
             )
 
     def calculate_stats_file_path(
@@ -75,7 +75,6 @@ class DatasetGenerator:
         """A generator that yields batches of data."""
         total_batches = self.n_samples // self.batch_size
         print_every_n_batches = 100
-        print()
         for batch_num in range(total_batches):
             x_batch = [
                 generate_datapoint(generate_parameters(self.parameters))[0]

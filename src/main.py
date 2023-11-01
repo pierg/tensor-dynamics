@@ -16,7 +16,7 @@ def process_configuration(
     config_name: str,
     training_config: Dict[str, Any],
     dataset_config: Dict[str, Any],
-    data_stats_size: int,
+    use_stats_of: int,
     instance_config_folder: Path,
 ) -> Dict[str, Any]:
     """
@@ -36,7 +36,7 @@ def process_configuration(
     dataset_generator = DatasetGenerator(
         dataset_config["shape"], 
         dataset_config["parameters"],
-        data_stats_size
+        use_stats_of
     )
     train_dataset, val_dataset, test_dataset = dataset_generator.create_tf_datasets()
 
@@ -81,13 +81,13 @@ def main() -> None:
 
     for config_name, training_config in training_configs.items():
         dataset_t_config = dataset_configs[training_config["dataset"]["training"]]
-        data_stats_size = training_config["dataset"].get("use_stats_of", dataset_t_config["shape"]["n_samples"])
+        use_stats_of = training_config["dataset"].get("use_stats_of", dataset_t_config["shape"]["n_samples"])
 
         process_configuration(
             config_name, 
             training_config, 
             dataset_t_config,
-            data_stats_size,
+            use_stats_of,
             instance_folder / config_name
         )
 

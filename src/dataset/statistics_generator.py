@@ -145,7 +145,8 @@ class RunningStatsDatapoints:
         cls,
         generator: Callable[[], Any],
         save_every: int = 1000,
-        file_path: Union[str, Path] = None
+        file_path: Union[str, Path] = None,
+        max_points: int | None = None
     ) -> "RunningStatsDatapoints":
         """
         Initialize and populate a RunningStatsDatapoints object using a generator.
@@ -159,16 +160,29 @@ class RunningStatsDatapoints:
         - RunningStatsDatapoints: The populated object.
         """
         print(f"Generating statistics {file_path}")
+        
+        # Ensure file_path is a Path object
+        if isinstance(file_path, str):
+            file_path = Path(file_path)
+        
         instance = cls()
         for i, (feature, label) in enumerate(generator()):
+            if i == max_points:
+                cls._save_instance(instance, file_path, i)
+                break
             instance.update(feature, label)
             if (i + 1) % save_every == 0 and file_path:
-                base_name = file_path.stem.rsplit("_", 1)[0]  # Gets the filename without the number
-                current_file_path = file_path.parent / f"{base_name}_{i+1}.pkl"  # Constructs the new filename with updated index
-                with open(current_file_path, 'wb') as f:
-                    print(f"Saving {current_file_path}")
-                    pickle.dump(instance, f)
+                cls._save_instance(instance, file_path, i)
         return instance
+
+    @staticmethod
+    def _save_instance(instance, base_path: Path, index: int) -> None:
+        """Save the instance to a file based on the base path and index."""
+        base_name = base_path.stem.rsplit("_", 1)[0]
+        current_file_path = base_path.parent / f"{base_name}_{index+1}.pkl"
+        with open(current_file_path, 'wb') as f:
+            print(f"Saving {current_file_path}")
+            pickle.dump(instance, f)
 
     
 
