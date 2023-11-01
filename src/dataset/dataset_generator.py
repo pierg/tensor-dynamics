@@ -50,6 +50,7 @@ class DatasetGenerator:
         # Check if stats file exists, if so load it, otherwise generate it
         if os.path.exists(stats_file_path):
             with open(stats_file_path, "rb") as f:
+                print("Statistics found, loading...")
                 self.running_stats = pickle.load(f)
         else:
             self.running_stats = RunningStatsDatapoints.from_generator(
