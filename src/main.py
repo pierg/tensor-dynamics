@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 # Local module imports
 from shared import results_repo_folder, data_config_file, results_runs_folder
-from src.dataset.dataset_generator import DatasetGenerator
+from dataset.dataset_generator import DatasetGenerator
 from deepnn.datasets import Datasets
 from deepnn.model import NeuralNetwork
 from shared.utils import git_push, save_dict_to_json_file

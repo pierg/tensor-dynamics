@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import toml
 from dataset.michaelis import generate_datapoint, generate_parameters
-from src.dataset.statistics_generator import RunningStatsDatapoints
+from dataset.statistics_generator import RunningStatsDatapoints
 from shared import data_statistics_folder
 import hashlib
 import pickle
