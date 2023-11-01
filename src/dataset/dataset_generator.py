@@ -29,7 +29,6 @@ class DatasetGenerator:
         )
         np.random.seed(self.seed)
         tf.random.set_seed(self.seed)
-        self.ensure_statistics_available()
 
     def set_initial_attributes(
         self, dataset_config, dataset_parameters, use_stats_of, data_statistics_folder: Path
@@ -44,8 +43,10 @@ class DatasetGenerator:
         
         # Calculate stats file path
         stats_file_path = self.calculate_stats_file_path(
-            dataset_config, dataset_parameters, data_statistics_folder, use_stats_of
+            dataset_parameters, data_statistics_folder, use_stats_of
         )
+        print(stats_file_path)
+        exit
 
         # Check if stats file exists, if so load it, otherwise generate it
         if os.path.exists(stats_file_path):
@@ -59,16 +60,12 @@ class DatasetGenerator:
 
     def calculate_stats_file_path(
         self,
-        dataset_config,
         dataset_parameters,
         data_statistics_folder: Path,
         use_stats_of: int,
     ) -> Path:
         """Calculate the statistics file path using MD5 hashing."""
-        combined_data = (
-            str(dataset_config) + str(dataset_parameters) + "_" + str(use_stats_of)
-        )
-        hash_value = hashlib.md5(combined_data.encode()).hexdigest()[:HASH_LENGTH]
+        hash_value = hashlib.md5(str(dataset_parameters).encode()).hexdigest()[:HASH_LENGTH]
         return data_statistics_folder / f"running_stats_{hash_value}_{use_stats_of}.pkl"
 
 
