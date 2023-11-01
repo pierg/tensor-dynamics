@@ -1,6 +1,9 @@
 import numpy as np
 import tensorflow as tf
 from typing import Union
+import pickle
+from typing import Any, Callable, Union
+from pathlib import Path
 
 
 class RunningStats:
@@ -136,6 +139,38 @@ class RunningStatsDatapoints:
         self.features = RunningStats()
         self.labels = RunningStats()
         self.n = 0
+
+    @classmethod
+    def from_generator(
+        cls,
+        generator: Callable[[], Any],
+        save_every: int = 500,
+        file_path: Union[str, Path] = None
+    ) -> "RunningStatsDatapoints":
+        """
+        Initialize and populate a RunningStatsDatapoints object using a generator.
+
+        Args:
+        - generator (Callable): A function that yields data points.
+        - save_every (int): The number of data points processed before saving the object.
+        - file_path (Union[str, Path]): The base path to save the object (with a placeholder number).
+
+        Returns:
+        - RunningStatsDatapoints: The populated object.
+        """
+        print(f"Generating statistics {file_path}")
+        instance = cls()
+        for i, (feature, label) in enumerate(generator()):
+            instance.update(feature, label)
+            if (i + 1) % save_every == 0 and file_path:
+                base_name = file_path.stem.rsplit("_", 1)[0]  # Gets the filename without the number
+                current_file_path = file_path.parent / f"{base_name}_{i+1}.pkl"  # Constructs the new filename with updated index
+                with open(current_file_path, 'wb') as f:
+                    print(f"Saving {current_file_path}")
+                    pickle.dump(instance, f)
+        return instance
+
+    
 
     def update(self, feature: np.ndarray, label: np.ndarray):
         """

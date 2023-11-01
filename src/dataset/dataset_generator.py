@@ -18,17 +18,21 @@ class DatasetGenerator:
         self,
         dataset_config,
         dataset_parameters,
+        use_stats_of: int | None,
         data_statistics_folder: Path = data_statistics_folder,
     ):
+        if use_stats_of is None:
+            use_stats_of = dataset_config["n_samples"]
+
         self.set_initial_attributes(
-            dataset_config, dataset_parameters, data_statistics_folder
+            dataset_config, dataset_parameters, use_stats_of, data_statistics_folder
         )
         np.random.seed(self.seed)
         tf.random.set_seed(self.seed)
         self.ensure_statistics_available()
 
     def set_initial_attributes(
-        self, dataset_config, dataset_parameters, data_statistics_folder: Path
+        self, dataset_config, dataset_parameters, use_stats_of, data_statistics_folder: Path
     ):
         """Initialize class attributes using provided arguments."""
         self.seed = dataset_config["seed"]
@@ -37,54 +41,40 @@ class DatasetGenerator:
         self.shuffle_buffer_size = dataset_config.get("shuffle_buffer_size", 0)
         self.splits = dataset_config["splits"]
         self.parameters = dataset_parameters
-        self.running_stats = RunningStatsDatapoints()
-        self.stats_file_path = self.calculate_stats_file_path(
-            dataset_config,
-            dataset_parameters,
-            data_statistics_folder,
-            dataset_config["n_samples"],
+        
+        # Calculate stats file path
+        stats_file_path = self.calculate_stats_file_path(
+            dataset_config, dataset_parameters, data_statistics_folder, use_stats_of
         )
+
+        # Check if stats file exists, if so load it, otherwise generate it
+        if os.path.exists(stats_file_path):
+            with open(stats_file_path, "rb") as f:
+                self.running_stats = pickle.load(f)
+        else:
+            self.running_stats = RunningStatsDatapoints.from_generator(
+                self._data_generator, file_path=stats_file_path
+            )
 
     def calculate_stats_file_path(
         self,
         dataset_config,
         dataset_parameters,
         data_statistics_folder: Path,
-        n_samples: int,
+        use_stats_of: int,
     ) -> Path:
         """Calculate the statistics file path using MD5 hashing."""
         combined_data = (
-            str(dataset_config) + str(dataset_parameters) + "_" + str(n_samples)
+            str(dataset_config) + str(dataset_parameters) + "_" + str(use_stats_of)
         )
         hash_value = hashlib.md5(combined_data.encode()).hexdigest()[:HASH_LENGTH]
-        return data_statistics_folder / f"running_stats_{hash_value}.pkl"
+        return data_statistics_folder / f"running_stats_{hash_value}_{use_stats_of}.pkl"
 
-    def ensure_statistics_available(self):
-        """Ensure that statistics are either loaded or calculated."""
-        if os.path.exists(self.stats_file_path):
-            self.load_statistics()
-        else:
-            self.calculate_and_save_statistics()
-
-    def load_statistics(self):
-        """Load running statistics from file."""
-        print("Loading statistics...")
-        with open(self.stats_file_path, "rb") as file:
-            self.running_stats = pickle.load(file)
-
-    def calculate_and_save_statistics(self):
-        """Calculate and save running statistics to file."""
-        print("Calculating statistics...")
-        for _ in self._data_generator():
-            pass
-        os.makedirs(os.path.dirname(self.stats_file_path), exist_ok=True)
-        with open(self.stats_file_path, "wb") as file:
-            pickle.dump(self.running_stats, file)
 
     def _data_generator(self):
         """A generator that yields batches of data."""
         total_batches = self.n_samples // self.batch_size
-        print_every_n_batches = 10
+        print_every_n_batches = 100
         print()
         for batch_num in range(total_batches):
             x_batch = [
@@ -97,7 +87,6 @@ class DatasetGenerator:
             ]
             x_batch = np.stack(x_batch)
             y_batch = np.stack(y_batch)
-            self.running_stats.update(x_batch, y_batch)
 
             # Print a message every n batches
             if (batch_num + 1) % print_every_n_batches == 0:

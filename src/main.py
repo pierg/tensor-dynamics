@@ -16,6 +16,7 @@ def process_configuration(
     config_name: str,
     training_config: Dict[str, Any],
     dataset_config: Dict[str, Any],
+    data_stats_size: int,
     instance_config_folder: Path,
 ) -> Dict[str, Any]:
     """
@@ -33,7 +34,9 @@ def process_configuration(
     print(f"\nProcessing {config_name}...")
 
     dataset_generator = DatasetGenerator(
-        dataset_config["shape"], dataset_config["parameters"]
+        dataset_config["shape"], 
+        dataset_config["parameters"],
+        data_stats_size
     )
     train_dataset, val_dataset, test_dataset = dataset_generator.create_tf_datasets()
 
@@ -77,10 +80,15 @@ def main() -> None:
     dataset_configs = toml.load(data_config_file)
 
     for config_name, training_config in training_configs.items():
-        dataset_config = dataset_configs[training_config["dataset"]["id"]]
+        dataset_t_config = dataset_configs[training_config["dataset"]["training"]]
+        data_stats_size = training_config["dataset"].get("use_stats_of", dataset_t_config["shape"]["n_samples"])
 
         process_configuration(
-            config_name, training_config, dataset_config, instance_folder / config_name
+            config_name, 
+            training_config, 
+            dataset_t_config,
+            data_stats_size,
+            instance_folder / config_name
         )
 
         git_push(folder=results_repo_folder)

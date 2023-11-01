@@ -15,7 +15,8 @@ optimizer = "adam"
 loss = "mean_squared_error"
 metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [E.dataset]
-id = "dsmall"
+training = "dbig"
+use_stats_of = 10000
 [E.training]
 epochs = 200
 
@@ -41,7 +42,8 @@ optimizer = "adam"
 loss = "mean_squared_error"
 metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [A.dataset]
-id = "dsmall"
+training = "dbig"
+use_stats_of = 10000
 [A.training]
 epochs = 200
 
@@ -66,7 +68,8 @@ optimizer = "adam"
 loss = "mean_squared_error"
 metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [P.dataset]
-id = "dsmall"
+training = "dbig"
+use_stats_of = 10000
 [P.training]
 epochs = 200
 
@@ -96,7 +99,8 @@ optimizer = "adam"
 loss = "mean_squared_error"
 metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 [P2.dataset]
-id = "dsmall"
+training = "dbig"
+use_stats_of = 10000
 [P2.training]
 epochs = 200
 
@@ -127,6 +131,7 @@ epochs = 200
 # loss = "mean_squared_error"
 # metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 # [PBN.dataset]
-# id = "dsmall"
+# training = "dbig"
+use_stats_of = 10000
 # [PBN.training]
 # epochs = 200
