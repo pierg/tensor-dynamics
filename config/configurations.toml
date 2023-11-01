@@ -132,6 +132,6 @@ epochs = 200
 # metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePercentageError", "RootMeanSquaredError"]
 # [PBN.dataset]
 # training = "dbig"
-use_stats_of = 10000
+# use_stats_of = 10000
 # [PBN.training]
 # epochs = 200
