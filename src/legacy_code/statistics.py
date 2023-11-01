@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 import toml
 import matplotlib.pyplot as plt
-from datagen.michaelis import generate_datapoint, generate_parameters
+from dataset.michaelis import generate_datapoint, generate_parameters
 
 
 def plot_and_save_statistics(cumulative_means, title, file_name):

@@ -1,13 +1,15 @@
-from dataclasses import dataclass, field
-import tensorflow as tf
-from datagen.runningstats import RunningStatsDatapoints
-
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 import tensorflow as tf
 from typing import Optional
+from src.dataset.statistics_generator import RunningStatsDatapoints
+
 
 @dataclass
 class Datasets:
+    """
+    Data class to represent datasets and their corresponding statistics.
+    """
+
     train_dataset: tf.data.Dataset
     validation_dataset: tf.data.Dataset
     test_dataset: tf.data.Dataset
@@ -17,18 +19,29 @@ class Datasets:
 
     @classmethod
     def from_dict(cls, datasets: dict, stats: dict) -> "Datasets":
+        """
+        Create a Datasets instance using provided dictionaries.
+
+        Args:
+        - datasets (dict): Dictionary containing train, validation, and test datasets.
+        - stats (dict): Dictionary containing train, validation, and test statistics.
+
+        Returns:
+        - Datasets: An instance of the Datasets class.
+        """
         # Ensure the input dictionaries have the correct keys
-        if not all(key in datasets for key in ["training", "validation", "testing"]):
+        required_keys = ["training", "validation", "testing"]
+
+        if not all(key in datasets for key in required_keys):
             raise ValueError(
                 "The 'datasets' dictionary must contain 'training', 'validation', and 'testing' keys."
             )
 
-        if not all(key in stats for key in ["training", "validation", "testing"]):
+        if not all(key in stats for key in required_keys):
             raise ValueError(
                 "The 'stats' dictionary must contain 'training', 'validation', and 'testing' keys."
             )
 
-        # Create the Datasets instance using the provided dictionaries
         return cls(
             train_dataset=datasets["training"],
             validation_dataset=datasets["validation"],
@@ -39,12 +52,40 @@ class Datasets:
         )
 
     def to_dict(self) -> dict:
-        datasets_dict = {
-            "train": {"stats": self.train_stats.to_dict(reduced=True) if self.train_stats else None},
-            "validation": {"stats": self.validation_stats.to_dict(reduced=True) if self.validation_stats else None},
-            "test": {"stats": self.test_stats.to_dict(reduced=True) if self.test_stats else None},
+        """
+        Convert the Datasets instance to a dictionary format.
+
+        Returns:
+        - dict: A dictionary representation of the Datasets instance.
+        """
+        return {
+            "train": {
+                "stats": self.train_stats.to_dict(reduced=True)
+                if self.train_stats
+                else None
+            },
+            "validation": {
+                "stats": self.validation_stats.to_dict(reduced=True)
+                if self.validation_stats
+                else None
+            },
+            "test": {
+                "stats": self.test_stats.to_dict(reduced=True)
+                if self.test_stats
+                else None
+            },
         }
 
-        return datasets_dict
 
+def print_dataset_statistics(datasets: Datasets) -> None:
+    """
+    Print statistics of the datasets.
 
+    Args:
+        datasets (Datasets): The datasets object containing train, validation, and test datasets.
+    """
+    print("\nDataset Statistics:")
+    print(f"Training samples: {len(list(datasets.train_dataset))}")
+    print(f"Validation samples: {len(list(datasets.validation_dataset))}")
+    print(f"Test samples: {len(list(datasets.test_dataset))}")
+    print(f"Training stats: {datasets.train_stats}\n")

@@ -231,7 +231,9 @@ def git_push(folder=None, commit_message="Update files"):
     if not repo_url.startswith("https://"):
         raise ValueError("The repository URL must start with 'https://'")
 
-    repo_url_with_token = repo_url.replace("https://", f"https://{github_token}:x-oauth-basic@")
+    repo_url_with_token = repo_url.replace(
+        "https://", f"https://{github_token}:x-oauth-basic@"
+    )
 
     # Validate and set the working directory
     if folder is None:
@@ -247,7 +249,9 @@ def git_push(folder=None, commit_message="Update files"):
 
         # Stage any changes and commit them
         subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(["git", "commit", "-m", commit_message], check=False)  # It's okay if nothing to commit
+        subprocess.run(
+            ["git", "commit", "-m", commit_message], check=False
+        )  # It's okay if nothing to commit
 
         print("Pulling changes from remote repository...")
         subprocess.run(["git", "fetch", repo_url_with_token], check=True)

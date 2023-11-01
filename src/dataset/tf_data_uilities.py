@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 import math
-from datagen.michaelis import generate_datapoint, generate_parameters
-from datagen.runningstats import RunningStatsDatapoints
+from dataset.michaelis import generate_datapoint, generate_parameters
+from src.dataset.statistics_generator import RunningStatsDatapoints
 from shared.utils import save_dict_to_json_file
 import pickle
 from typing import Dict, Any

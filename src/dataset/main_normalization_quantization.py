@@ -1,8 +1,8 @@
 from pathlib import Path
 import toml
-from datagen.dataset_utils import pretty_print_dataset_elements
-from datagen.runningstats import RunningStatsDatapoints
-from datagen.tf_dataset import transform_and_save_dataset, write_tfrecord
+from generators.dataset_utils import pretty_print_dataset_elements
+from src.dataset.statistics_generator import RunningStatsDatapoints
+from src.dataset.tf_data_uilities import transform_and_save_dataset, write_tfrecord
 
 
 def main() -> None:

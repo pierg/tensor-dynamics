@@ -22,33 +22,32 @@ def load_configurations(file_path: str) -> Dict:
     """
     Load the configurations from the specified TOML file.
 
-    :param file_path: The path to the configuration file.
-    :return: A dictionary containing the configurations.
+    Args:
+    - file_path: The path to the configuration file.
+
+    Returns:
+    - A dictionary containing the configurations.
     """
     try:
         with open(file_path, "r") as file:
-            config = toml.load(file)
-            return config
+            return toml.load(file)
     except Exception as e:
         logging.error(f"Failed to load configurations: {e}", exc_info=True)
         return {}
 
 
-def check_tf():
+def check_tf_availability() -> None:
+    """
+    Check TensorFlow version and GPU availability.
+    """
     print("Checking Tensorflow...")
-
-    # Check TensorFlow version
     print("TensorFlow version: ", tf.__version__)
 
-    # List all available GPUs
     gpus = tf.config.list_physical_devices("GPU")
-
     if gpus:
-        # If GPU list is not empty, TensorFlow has access to GPU
         print(f"Num GPUs Available: {len(gpus)}")
         print("GPU(s) available for TensorFlow:", gpus)
     else:
-        # If GPU list is empty, no GPU is accessible to TensorFlow
         print("No GPU available for TensorFlow")
 
 
@@ -57,7 +56,7 @@ def prepare_environment() -> None:
     Prepare the necessary environment, including checking TensorFlow,
     loading secrets, and setting up the results directory.
     """
-    check_tf()
+    check_tf_availability()
 
     if not secrets_path.exists():
         logging.warning(f"Secrets file not found at {secrets_path}")
@@ -78,9 +77,12 @@ def filter_configurations(all_configs: Dict, specified_configs: List[str]) -> Di
     Filter the configurations based on the specified list. If the list is empty,
     all configurations will be used.
 
-    :param all_configs: All available configurations.
-    :param specified_configs: The list of specified configuration names.
-    :return: A dictionary containing the configurations to be processed.
+    Args:
+    - all_configs: All available configurations.
+    - specified_configs: The list of specified configuration names.
+
+    Returns:
+    - A dictionary containing the configurations to be processed.
     """
     if not specified_configs:
         logging.info(
@@ -105,7 +107,8 @@ def main_preamble() -> Dict:
     """
     Set up the environment and determine the configurations to process.
 
-    :return: A dictionary containing configurations to be processed.
+    Returns:
+    - A dictionary containing configurations to be processed.
     """
     all_configs = load_configurations(config_file)
 
@@ -127,17 +130,16 @@ def handle_training_exception(
     """
     Handle exceptions that occur during the training process.
 
-    :param e: The exception object.
-    :param config_name: The name of the neural network configuration.
-    :param results_folder: The directory path to save error logs.
+    Args:
+    - e: The exception object.
+    - config_name: The name of the neural network configuration.
+    - results_folder: The directory path to save error logs.
     """
     logging.error(
         f"Error during processing configuration {config_name}: {e}", exc_info=True
     )
 
-    # Record the traceback information along with the error message
     error_log = {"error_message": str(e), "traceback": traceback.format_exc()}
-
     error_file_path = results_folder / f"{config_name}_error_log.json"
 
     try:

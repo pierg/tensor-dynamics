@@ -11,7 +11,9 @@ from deepnn.metrics import R_squared
 
 
 class NeuralNetwork:
-    def __init__(self, datasets: Datasets, configuration: dict, name: str, instance_folder):
+    def __init__(
+        self, datasets: Datasets, configuration: dict, name: str, instance_folder
+    ):
         self.config = configuration
         self.name = name
         self.instance_folder = instance_folder
@@ -35,10 +37,8 @@ class NeuralNetwork:
 
         # Define the early stopping callback here
         self.early_stopping = EarlyStopping(
-            monitor='val_loss', patience=10, verbose=1, restore_best_weights=True
+            monitor="val_loss", patience=10, verbose=1, restore_best_weights=True
         )
-            
-            
 
     def _build_model(self) -> tf.keras.Model:
         """
@@ -118,7 +118,7 @@ class NeuralNetwork:
             optimizer=self.compile_config["optimizer"],
             loss=self.compile_config["loss"],
             metrics=actual_metrics,  # This should be the instantiated metrics list
-            run_eagerly=True
+            run_eagerly=True,
         )
 
     def train_model(self):
@@ -139,7 +139,10 @@ class NeuralNetwork:
             self.train_dataset,
             epochs=epochs,
             validation_data=self.validation_dataset,
-            callbacks=[tensorboard_callback, self.early_stopping],  # Use self.early_stopping here
+            callbacks=[
+                tensorboard_callback,
+                self.early_stopping,
+            ],  # Use self.early_stopping here
         )
 
         # Record the end time
