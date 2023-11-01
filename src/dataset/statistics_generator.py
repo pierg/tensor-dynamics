@@ -144,7 +144,7 @@ class RunningStatsDatapoints:
     def from_generator(
         cls,
         generator: Callable[[], Any],
-        save_every: int = 500,
+        save_every: int = 1000,
         file_path: Union[str, Path] = None
     ) -> "RunningStatsDatapoints":
         """
