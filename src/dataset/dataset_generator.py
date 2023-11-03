@@ -74,14 +74,9 @@ class DatasetGenerator:
         total_batches = self.n_samples // self.batch_size
         print_every_n_batches = 100
         for batch_num in range(total_batches):
-            x_batch = [
-                generate_datapoint(generate_parameters(self.parameters))[0]
-                for _ in range(self.batch_size)
-            ]
-            y_batch = [
-                generate_datapoint(generate_parameters(self.parameters))[1]
-                for _ in range(self.batch_size)
-            ]
+            # Generate data points and separate them into x and y batches
+            datapoints = [generate_datapoint(generate_parameters(self.parameters)) for _ in range(self.batch_size)]
+            x_batch, y_batch = zip(*datapoints)  # This separates the tuple into x and y
             x_batch = np.stack(x_batch)
             y_batch = np.stack(y_batch)
 
@@ -90,6 +85,7 @@ class DatasetGenerator:
                 print(f"Generated {batch_num + 1} batches out of {total_batches}")
 
             yield x_batch, y_batch
+
 
     def create_tf_datasets(self):
         """Create TensorFlow datasets for training, validation, and testing."""
@@ -100,8 +96,8 @@ class DatasetGenerator:
                 normalized_x = (
                     x - self.running_stats.features.get_mean()
                 ) / self.running_stats.features.get_standard_deviation()
-                features = normalized_x.astype(np.float32)
-                labels = y.astype(np.float32)
+                features = normalized_x.astype(np.float16)  # Use half precision
+                labels = y.astype(np.float16)  # Use half precision
                 features = np.round(features, 3)
                 yield features, labels
 
@@ -113,10 +109,10 @@ class DatasetGenerator:
             generator,
             output_signature=(
                 tf.TensorSpec(
-                    shape=(self.batch_size, *first_batch_x.shape[1:]), dtype=tf.float32
+                    shape=(self.batch_size, *first_batch_x.shape[1:]), dtype=tf.float16  # Use half precision
                 ),
                 tf.TensorSpec(
-                    shape=(self.batch_size, *first_batch_y.shape[1:]), dtype=tf.float32
+                    shape=(self.batch_size, *first_batch_y.shape[1:]), dtype=tf.float16  # Use half precision
                 ),
             ),
         ).prefetch(tf.data.AUTOTUNE)
@@ -129,6 +125,7 @@ class DatasetGenerator:
         test_dataset = full_dataset.skip(train_size + val_size)
 
         return train_dataset, val_dataset, test_dataset
+
 
     def print_statistics(self):
         feature_stats = self.running_stats.get_feature_stats()

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#SBATCH -A pc_nnkinetics -p es1 -q es_normal -t 0-42:0:0 -N 1
-#SBATCH --gres=gpu:1 --ntasks 1 --cpus-per-task=2
+#SBATCH -A pc_nnkinetics -p es1 -q es_normal -t 0-72:0:0 -N 1
+#SBATCH --gres=gpu:1 --ntasks 1 --cpus-per-task=8
 #SBATCH --job-name=nn_gpu
 
 # Ensure any error stops the script execution

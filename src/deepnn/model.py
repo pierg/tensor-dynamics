@@ -8,6 +8,7 @@ from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
 
 from deepnn.datasets import Datasets
 from deepnn.metrics import R_squared
+from src.deepnn.callback import CustomSaveCallback
 
 
 class NeuralNetwork:
@@ -121,20 +122,22 @@ class NeuralNetwork:
             run_eagerly=True,
         )
 
+
     def train_model(self):
-        """
-        Train the neural network model with provided datasets.
-        """
         start_time = time.time()
 
         log_dir = self.instance_folder
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
-        self.model.summary()  # Display model architecture
+        self.model.summary()
 
-        # Extract training parameters from configuration
         epochs = self.training_config["epochs"]
 
-        # Train the model
+        # Initialize the custom callback
+        save_callback = CustomSaveCallback(
+            neural_network=self,  # Pass the entire NeuralNetwork instance
+            interval=self.training_config.get("save_interval", 5)  # Get the interval from config or default to 5
+        )
+
         self.history = self.model.fit(
             self.train_dataset,
             epochs=epochs,
@@ -142,13 +145,13 @@ class NeuralNetwork:
             callbacks=[
                 tensorboard_callback,
                 self.early_stopping,
-            ],  # Use self.early_stopping here
+                save_callback
+            ],
         )
 
-        # Record the end time
         end_time = time.time()
-        # Calculate and format the elapsed time
         self.time_training = end_time - start_time
+        
 
     def evaluate_model(self, verbose=1):
         """
