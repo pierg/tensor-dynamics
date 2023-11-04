@@ -20,6 +20,7 @@ class NeuralNetwork:
         self.instance_folder = instance_folder
 
         # Correctly assign the datasets
+        self.datasets = datasets
         self.train_dataset = datasets.train_dataset
         self.validation_dataset = datasets.validation_dataset
         self.test_dataset = datasets.test_dataset
@@ -27,6 +28,10 @@ class NeuralNetwork:
         self.structure_config = self.config["structure"]
         self.compile_config = self.config["compile"]
         self.training_config = self.config["training"]
+
+        self.training_start_time = None
+        self.time_evaluation = None
+        self.time_training = None
 
         self.initialize_model()
 
@@ -124,7 +129,7 @@ class NeuralNetwork:
 
 
     def train_model(self):
-        start_time = time.time()
+        self.training_start_time = time.time()
 
         log_dir = self.instance_folder
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
@@ -150,7 +155,7 @@ class NeuralNetwork:
         )
 
         end_time = time.time()
-        self.time_training = end_time - start_time
+        self.time_training = end_time - self.training_start_time
         
 
     def evaluate_model(self, verbose=1):
@@ -163,6 +168,9 @@ class NeuralNetwork:
         Returns:
             dict: A dictionary containing the evaluation results for each dataset.
         """
+        if self.time_training is None:
+            self.time_training = time.time() - self.training_start_time
+
         start_time = time.time()
         # Ensure the model has been trained before evaluation
         if self.model is None:
@@ -203,10 +211,13 @@ class NeuralNetwork:
         self.model.save(filepath)
         print(f"Model saved successfully at {filepath}")
 
-    def get_results(self):
-        # Ensure that training has occurred
-        if self.history is None or self.evaluation is None:
+    def get_results(self, interim_results=None):
+        # If interim results are provided (e.g., from a callback), use them
+        history = interim_results if interim_results is not None else self.history
+
+        if history is None:
             raise Exception("The model hasn't been trained/evaluated yet.")
+        
 
         # Creating a comprehensive results dictionary
         results_dict = {
@@ -220,10 +231,7 @@ class NeuralNetwork:
                 "compile_config": self.compile_config,
                 "training_config": self.training_config,
             },
-            "training_history": {
-                "epochs": self.history.epoch,
-                "history": self.history.history,
-            },
+            "training_history": history,
         }
 
         return results_dict
