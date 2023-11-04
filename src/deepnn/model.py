@@ -8,7 +8,7 @@ from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
 
 from deepnn.datasets import Datasets
 from deepnn.metrics import R_squared
-from src.deepnn.callback import CustomSaveCallback
+from deepnn.callback import CustomSaveCallback
 
 
 class NeuralNetwork:
