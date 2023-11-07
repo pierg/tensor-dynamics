@@ -19,7 +19,7 @@ training = "dbig"
 use_stats_of = 300000
 [E.training]
 epochs = 200
-
+save_interval = 1
 
 
 # Configuration A: Original CNN configuration
@@ -46,6 +46,7 @@ training = "dbig"
 use_stats_of = 300000
 [A.training]
 epochs = 200
+save_interval = 1
 
 
 
@@ -72,6 +73,7 @@ training = "dbig"
 use_stats_of = 300000
 [P.training]
 epochs = 200
+save_interval = 1
 
 
 # Configuration P2
@@ -103,6 +105,7 @@ training = "dbig"
 use_stats_of = 300000
 [P2.training]
 epochs = 200
+save_interval = 1
 
 
 

@@ -5,6 +5,7 @@ import os
 class CustomSaveCallback(Callback):
     def __init__(self, neural_network, interval=5):
         super().__init__()
+        print(f"Setting saving callback every {interval} epochs")
         self.neural_network = neural_network
         self.interval = interval
         # Initialize the interim history with the model's metric names

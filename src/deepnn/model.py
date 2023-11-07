@@ -124,7 +124,7 @@ class NeuralNetwork:
             optimizer=self.compile_config["optimizer"],
             loss=self.compile_config["loss"],
             metrics=actual_metrics,  # This should be the instantiated metrics list
-            run_eagerly=True,
+            run_eagerly=False,
         )
 
 
@@ -142,6 +142,7 @@ class NeuralNetwork:
             neural_network=self,  # Pass the entire NeuralNetwork instance
             interval=self.training_config.get("save_interval", 5)  # Get the interval from config or default to 5
         )
+        
 
         self.history = self.model.fit(
             self.train_dataset,
@@ -152,6 +153,7 @@ class NeuralNetwork:
                 self.early_stopping,
                 save_callback
             ],
+            verbose=1,  # This will print one line per epoch
         )
 
         end_time = time.time()

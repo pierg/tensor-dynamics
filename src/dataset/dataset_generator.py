@@ -72,7 +72,7 @@ class DatasetGenerator:
     def _data_generator(self):
         """A generator that yields batches of data."""
         total_batches = self.n_samples // self.batch_size
-        print_every_n_batches = 100
+        print_every_n_batches = 1000
         for batch_num in range(total_batches):
             # Generate data points and separate them into x and y batches
             datapoints = [generate_datapoint(generate_parameters(self.parameters)) for _ in range(self.batch_size)]
@@ -82,7 +82,7 @@ class DatasetGenerator:
 
             # Print a message every n batches
             if (batch_num + 1) % print_every_n_batches == 0:
-                print(f"Generated {batch_num + 1} batches out of {total_batches}")
+                print(f"\nGenerated {batch_num + 1} batches out of {total_batches}")
 
             yield x_batch, y_batch
 
