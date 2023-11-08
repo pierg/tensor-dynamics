@@ -3,7 +3,7 @@ import time
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import TensorBoard, EarlyStopping
+from tensorflow.keras.callbacks import TensorBoard, EarlyStopping, TerminateOnNaN
 
 
 from deepnn.datasets import Datasets
@@ -118,46 +118,73 @@ class NeuralNetwork:
                     actual_metrics.append(R_squared())
                 else:
                     raise ValueError(f"Unknown metric: {metric}")
+        
+        # Set a default clipvalue if it's not provided
+        default_clipvalue = 1.0
+        clipvalue = self.compile_config.get("clipvalue", default_clipvalue)
 
-        # You should use actual_metrics here instead of self.compile_config["metrics"]
+        # Get the optimizer class name from the compile configuration
+        optimizer_class_name = self.compile_config["optimizer"]
+        
+        # Create the optimizer configuration dictionary, including gradient clipping
+        optimizer_config = {
+            "class_name": optimizer_class_name,
+            "config": {"clipvalue": clipvalue}  # Set gradient clipping by value
+        }
+
+        # Retrieve the optimizer object with the specified configuration
+        optimizer = tf.keras.optimizers.get(optimizer_config)
+
+        # Compile the model with the specified loss, metrics, and optimizer including gradient clipping
         self.model.compile(
-            optimizer=self.compile_config["optimizer"],
+            optimizer=optimizer,
             loss=self.compile_config["loss"],
-            metrics=actual_metrics,  # This should be the instantiated metrics list
-            run_eagerly=False,
+            metrics=actual_metrics,  # Use the instantiated metrics list
+            run_eagerly=self.compile_config.get("run_eagerly", False),  # Set run_eagerly to False by default, can be overridden
         )
 
 
     def train_model(self):
         self.training_start_time = time.time()
 
+        # Define the directory where TensorBoard logs will be stored
         log_dir = self.instance_folder
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
+        
+        # Print the model summary to understand the layer architecture and parameters
         self.model.summary()
 
+        # Retrieve the number of epochs from the training configuration
         epochs = self.training_config["epochs"]
 
-        # Initialize the custom callback
+        # Initialize the custom callback for saving the model
         save_callback = CustomSaveCallback(
             neural_network=self,  # Pass the entire NeuralNetwork instance
             interval=self.training_config.get("save_interval", 5)  # Get the interval from config or default to 5
         )
         
+        # Define callbacks including TensorBoard, EarlyStopping, custom saving, and TerminateOnNaN
+        callbacks_list = [
+            tensorboard_callback,
+            self.early_stopping,
+            save_callback,
+            TerminateOnNaN()  # Callback to terminate training if NaN loss is encountered
+        ]
 
+        # Train the model using the provided datasets and callbacks
         self.history = self.model.fit(
             self.train_dataset,
             epochs=epochs,
             validation_data=self.validation_dataset,
-            callbacks=[
-                tensorboard_callback,
-                self.early_stopping,
-                save_callback
-            ],
+            callbacks=callbacks_list,
             verbose=1,  # This will print one line per epoch
         )
 
+        # Record the end time of training
         end_time = time.time()
+        # Calculate the total training time
         self.time_training = end_time - self.training_start_time
+
         
 
     def evaluate_model(self, verbose=1):

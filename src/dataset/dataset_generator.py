@@ -11,7 +11,8 @@ import os
 
 # Constants
 HASH_LENGTH = 5
-
+DTYPE = np.float32
+TF_DTYPE = tf.float32
 
 class DatasetGenerator:
     def __init__(
@@ -45,8 +46,6 @@ class DatasetGenerator:
         stats_file_path = self.calculate_stats_file_path(
             dataset_parameters, data_statistics_folder, use_stats_of
         )
-        print(stats_file_path)
-        exit
 
         # Check if stats file exists, if so load it, otherwise generate it
         if os.path.exists(stats_file_path):
@@ -89,15 +88,15 @@ class DatasetGenerator:
 
     def create_tf_datasets(self):
         """Create TensorFlow datasets for training, validation, and testing."""
+        epsilon = 1e-7  # A small constant value to prevent division by zero
 
         def generator():
             """A generator that yields normalized batches of data."""
             for x, y in self._data_generator():
-                normalized_x = (
-                    x - self.running_stats.features.get_mean()
-                ) / self.running_stats.features.get_standard_deviation()
-                features = normalized_x.astype(np.float16)  # Use half precision
-                labels = y.astype(np.float16)  # Use half precision
+                std_dev = self.running_stats.features.get_standard_deviation()
+                normalized_x = (x - self.running_stats.features.get_mean()) / (std_dev + epsilon)
+                features = normalized_x.astype(DTYPE)  # Convert to single precision
+                labels = y.astype(DTYPE)  # Convert to single precision
                 features = np.round(features, 3)
                 yield features, labels
 
@@ -105,17 +104,15 @@ class DatasetGenerator:
         shape_generator = self._data_generator()
         first_batch_x, first_batch_y = next(shape_generator)
 
+        # Update the output_signature to match the single precision
         full_dataset = tf.data.Dataset.from_generator(
             generator,
             output_signature=(
-                tf.TensorSpec(
-                    shape=(self.batch_size, *first_batch_x.shape[1:]), dtype=tf.float16  # Use half precision
-                ),
-                tf.TensorSpec(
-                    shape=(self.batch_size, *first_batch_y.shape[1:]), dtype=tf.float16  # Use half precision
-                ),
+                tf.TensorSpec(shape=(self.batch_size, *first_batch_x.shape[1:]), dtype=TF_DTYPE),
+                tf.TensorSpec(shape=(self.batch_size, *first_batch_y.shape[1:]), dtype=TF_DTYPE),
             ),
         ).prefetch(tf.data.AUTOTUNE)
+        
 
         train_size = int(self.splits[0] * self.n_samples / self.batch_size)
         val_size = int(self.splits[1] * self.n_samples / self.batch_size)
