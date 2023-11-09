@@ -10,6 +10,7 @@ from deepnn.datasets import Datasets
 from deepnn.model import NeuralNetwork
 from shared.utils import git_push
 from utils import handle_training_exception, main_preamble
+import json
 
 
 def process_configuration(
