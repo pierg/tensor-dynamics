@@ -65,7 +65,7 @@ def process_configuration(
         # Save final results to JSON file
         results_path = instance_config_folder / "final_results.json"
         with open(results_path, 'w') as f:
-            json.dump(results, f)
+            json.dump(results, f, indent=4)
         print(f"Final results saved to {results_path}")
 
         return results

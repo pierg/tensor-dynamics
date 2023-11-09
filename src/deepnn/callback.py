@@ -34,7 +34,7 @@ class CustomSaveCallback(Callback):
             # Save results to JSON file
             results_path = os.path.join(self.neural_network.instance_folder, f'results_epoch_{epoch + 1}.json')
             with open(results_path, 'w') as f:
-                json.dump(results, f)
+                json.dump(results, f, indent=4)
             print(f"Results saved to {results_path}")
 
     def on_train_end(self, logs=None):
