@@ -118,18 +118,18 @@ class NeuralNetwork:
                     actual_metrics.append(R_squared())
                 else:
                     raise ValueError(f"Unknown metric: {metric}")
-        
+
         # Set a default clipvalue if it's not provided
         default_clipvalue = 1.0
         clipvalue = self.compile_config.get("clipvalue", default_clipvalue)
 
         # Get the optimizer class name from the compile configuration
         optimizer_class_name = self.compile_config["optimizer"]
-        
+
         # Create the optimizer configuration dictionary, including gradient clipping
         optimizer_config = {
             "class_name": optimizer_class_name,
-            "config": {"clipvalue": clipvalue}  # Set gradient clipping by value
+            "config": {"clipvalue": clipvalue},  # Set gradient clipping by value
         }
 
         # Retrieve the optimizer object with the specified configuration
@@ -140,9 +140,10 @@ class NeuralNetwork:
             optimizer=optimizer,
             loss=self.compile_config["loss"],
             metrics=actual_metrics,  # Use the instantiated metrics list
-            run_eagerly=self.compile_config.get("run_eagerly", False),  # Set run_eagerly to False by default, can be overridden
+            run_eagerly=self.compile_config.get(
+                "run_eagerly", False
+            ),  # Set run_eagerly to False by default, can be overridden
         )
-
 
     def train_model(self):
         self.training_start_time = time.time()
@@ -150,7 +151,7 @@ class NeuralNetwork:
         # Define the directory where TensorBoard logs will be stored
         log_dir = self.instance_folder
         tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1)
-        
+
         # Print the model summary to understand the layer architecture and parameters
         self.model.summary()
 
@@ -160,15 +161,17 @@ class NeuralNetwork:
         # Initialize the custom callback for saving the model
         save_callback = CustomSaveCallback(
             neural_network=self,  # Pass the entire NeuralNetwork instance
-            interval=self.training_config.get("save_interval", 5)  # Get the interval from config or default to 5
+            interval=self.training_config.get(
+                "save_interval", 5
+            ),  # Get the interval from config or default to 5
         )
-        
+
         # Define callbacks including TensorBoard, EarlyStopping, custom saving, and TerminateOnNaN
         callbacks_list = [
             tensorboard_callback,
             self.early_stopping,
             save_callback,
-            TerminateOnNaN()  # Callback to terminate training if NaN loss is encountered
+            TerminateOnNaN(),  # Callback to terminate training if NaN loss is encountered
         ]
 
         # Train the model using the provided datasets and callbacks
@@ -184,8 +187,6 @@ class NeuralNetwork:
         end_time = time.time()
         # Calculate the total training time
         self.time_training = end_time - self.training_start_time
-
-        
 
     def evaluate_model(self, verbose=1):
         """
@@ -240,7 +241,6 @@ class NeuralNetwork:
         self.model.save(filepath)
         print(f"Model saved successfully at {filepath}")
 
-
     def get_info(self):
         return {
             "config_name": self.name,
@@ -249,7 +249,7 @@ class NeuralNetwork:
                 "structure_config": self.structure_config,
                 "compile_config": self.compile_config,
                 "training_config": self.training_config,
-            }
+            },
         }
 
     def get_results(self, interim=False):
@@ -266,4 +266,3 @@ class NeuralNetwork:
             results["training_history"] = self.history.history
 
         return results
-

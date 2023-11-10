@@ -146,7 +146,7 @@ class RunningStatsDatapoints:
         generator: Callable[[], Any],
         save_every: int = 1000,
         file_path: Union[str, Path] = None,
-        max_points: int | None = None
+        max_points: int | None = None,
     ) -> "RunningStatsDatapoints":
         """
         Initialize and populate a RunningStatsDatapoints object using a generator.
@@ -160,11 +160,11 @@ class RunningStatsDatapoints:
         - RunningStatsDatapoints: The populated object.
         """
         print(f"Generating statistics {file_path}")
-        
+
         # Ensure file_path is a Path object
         if isinstance(file_path, str):
             file_path = Path(file_path)
-        
+
         instance = cls()
         for i, (feature, label) in enumerate(generator()):
             if i == max_points:
@@ -180,11 +180,9 @@ class RunningStatsDatapoints:
         """Save the instance to a file based on the base path and index."""
         base_name = base_path.stem.rsplit("_", 1)[0]
         current_file_path = base_path.parent / f"{base_name}_{index+1}.pkl"
-        with open(current_file_path, 'wb') as f:
+        with open(current_file_path, "wb") as f:
             print(f"Saving {current_file_path}")
             pickle.dump(instance, f)
-
-    
 
     def update(self, feature: np.ndarray, label: np.ndarray):
         """

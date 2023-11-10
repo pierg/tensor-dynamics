@@ -35,9 +35,7 @@ def process_configuration(
     print(f"\nProcessing {config_name}...")
 
     dataset_generator = DatasetGenerator(
-        dataset_config["shape"], 
-        dataset_config["parameters"],
-        use_stats_of
+        dataset_config["shape"], dataset_config["parameters"], use_stats_of
     )
     train_dataset, val_dataset, test_dataset = dataset_generator.create_tf_datasets()
 
@@ -75,8 +73,6 @@ def process_configuration(
         raise e
 
 
-
-
 def main() -> None:
     """
     Main execution function.
@@ -89,14 +85,16 @@ def main() -> None:
 
     for config_name, training_config in training_configs.items():
         dataset_t_config = dataset_configs[training_config["dataset"]["training"]]
-        use_stats_of = training_config["dataset"].get("use_stats_of", dataset_t_config["shape"]["n_samples"])
+        use_stats_of = training_config["dataset"].get(
+            "use_stats_of", dataset_t_config["shape"]["n_samples"]
+        )
 
         process_configuration(
-            config_name, 
-            training_config, 
+            config_name,
+            training_config,
             dataset_t_config,
             use_stats_of,
-            instance_folder / config_name
+            instance_folder / config_name,
         )
 
         git_push(folder=results_repo_folder)
