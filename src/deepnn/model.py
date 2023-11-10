@@ -240,27 +240,30 @@ class NeuralNetwork:
         self.model.save(filepath)
         print(f"Model saved successfully at {filepath}")
 
-    def get_results(self, interim_results=None):
-        # If interim results are provided (e.g., from a callback), use them
-        history = interim_results if interim_results is not None else self.history
 
-        if history is None:
-            raise Exception("The model hasn't been trained/evaluated yet.")
-        
-
-        # Creating a comprehensive results dictionary
-        results_dict = {
+    def get_info(self):
+        return {
             "config_name": self.name,
-            "evaluation": self.evaluation,
             "dataset": self.datasets.to_dict(),
-            "training_time": self.time_training,
-            "evaluation_time": self.time_evaluation,
             "model_config": {
                 "structure_config": self.structure_config,
                 "compile_config": self.compile_config,
                 "training_config": self.training_config,
-            },
-            "training_history": history,
+            }
         }
 
-        return results_dict
+    def get_results(self, interim=False):
+        # Define common data
+        results = {
+            "config_name": self.name,
+            "evaluation": self.evaluation,
+            "training_time": self.time_training,
+            "evaluation_time": self.time_evaluation,
+        }
+
+        # Add training history
+        if not interim:
+            results["training_history"] = self.history.history
+
+        return results
+

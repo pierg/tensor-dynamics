@@ -8,7 +8,7 @@ from shared import results_repo_folder, data_config_file, results_runs_folder
 from dataset.dataset_generator import DatasetGenerator
 from deepnn.datasets import Datasets
 from deepnn.model import NeuralNetwork
-from shared.utils import git_push
+from shared.utils import git_push, save_dict_to_json_file
 from utils import handle_training_exception, main_preamble
 import json
 
@@ -56,17 +56,17 @@ def process_configuration(
             instance_folder=instance_config_folder,
         )
 
+        info = neural_network.get_info()
+
+        save_dict_to_json_file(info, instance_config_folder / "info.json")
+
         neural_network.train_model()  # Training now includes the save callback
 
         # After training is complete, save the final model and results
         neural_network.save_model(instance_config_folder)
         results = neural_network.get_results()
 
-        # Save final results to JSON file
-        results_path = instance_config_folder / "final_results.json"
-        with open(results_path, 'w') as f:
-            json.dump(results, f, indent=4)
-        print(f"Final results saved to {results_path}")
+        save_dict_to_json_file(results, instance_config_folder / "final_results.json")
 
         return results
 

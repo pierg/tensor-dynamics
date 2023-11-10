@@ -4,6 +4,19 @@ from typing import Optional
 from dataset.statistics_generator import RunningStatsDatapoints
 
 
+
+def dataset_size(dataset: tf.data.Dataset) -> int:
+    """
+    Calculate the number of samples in a given dataset.
+
+    Args:
+    - dataset (tf.data.Dataset): The dataset to calculate the size for.
+
+    Returns:
+    - int: The size of the dataset.
+    """
+    return sum(1 for _ in dataset)
+
 @dataclass
 class Datasets:
     """
@@ -58,6 +71,15 @@ class Datasets:
         Returns:
         - dict: A dictionary representation of the Datasets instance.
         """
+        if self.validation_stats is None and self.test_stats is None:
+            return {
+            "samples": {
+                "training": dataset_size(self.train_dataset),
+                "validation": dataset_size(self.validation_dataset),
+                "test": dataset_size(self.test_dataset),
+            },
+                "training_stats":self.train_stats.to_dict(reduced=True)
+            }
         return {
             "train": {
                 "stats": self.train_stats.to_dict(reduced=True)
