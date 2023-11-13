@@ -1,3 +1,9 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+Description: Custom TensorFlow metrics implementation, including the R_squared metric class for model performance evaluation.
+'''
+
 import tensorflow as tf
 
 class R_squared(tf.keras.metrics.Metric):

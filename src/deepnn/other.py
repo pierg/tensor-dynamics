@@ -1,3 +1,8 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+'''
+
 import json
 import os
 import pickle

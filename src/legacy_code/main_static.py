@@ -1,3 +1,8 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+'''
+
 from datetime import datetime
 from pathlib import Path
 

@@ -1,3 +1,8 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+'''
+
 import argparse
 import json
 import os

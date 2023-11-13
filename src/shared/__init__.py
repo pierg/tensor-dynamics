@@ -1,3 +1,9 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+Description: Initialization for shared module, defining key directory paths for configuration, results, and datasets.
+'''
+
 from pathlib import Path
 
 # Path to the current file (__init__.py)

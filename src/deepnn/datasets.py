@@ -1,3 +1,9 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+Description: Dataclass Datasets for organizing and managing training, validation, and test datasets, including their statistics.
+'''
+
 from dataclasses import dataclass
 from typing import Optional
 

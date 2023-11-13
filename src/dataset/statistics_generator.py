@@ -1,3 +1,9 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+Description: Defines RunningStats and RunningStatsDatapoints classes for calculating and maintaining running statistics of datasets.
+'''
+
 import pickle
 from pathlib import Path
 from typing import Any, Callable, Union

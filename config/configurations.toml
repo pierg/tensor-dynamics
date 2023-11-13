@@ -1,4 +1,4 @@
-# Configuration E: ....
+# Configuration E: Extended Convolutional Neural Network
 [E]
 [E.structure]
 layers = [
@@ -20,7 +20,6 @@ use_stats_of = 300000
 [E.training]
 epochs = 3
 save_interval = 1
-
 
 # Configuration A: Original CNN configuration
 [A]
@@ -48,9 +47,7 @@ use_stats_of = 300000
 epochs = 3
 save_interval = 1
 
-
-
-# Configuration P
+# Configuration P: Simplified CNN configuration
 [P]
 [P.structure]
 layers = [
@@ -75,8 +72,7 @@ use_stats_of = 300000
 epochs = 3
 save_interval = 1
 
-
-# Configuration P2
+# Configuration P2: Enhanced CNN with additional Conv2D and Dropout layers
 [P2]
 [P2.structure]
 layers = [
@@ -106,4 +102,3 @@ use_stats_of = 300000
 [P2.training]
 epochs = 3
 save_interval = 1
-

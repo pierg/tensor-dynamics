@@ -1,3 +1,9 @@
+'''
+Author: Piergiuseppe Mallozzi
+Date: November 2023
+Description: Defines the NeuralNetwork class, encompassing model initialization, training, evaluation, and saving functionalities.
+'''
+
 import time
 from pathlib import Path
 
