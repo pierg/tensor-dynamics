@@ -2,7 +2,7 @@ from tensorflow.keras.callbacks import Callback
 import json
 import os
 
-from src.shared.utils import save_dict_to_json_file
+from shared.utils import save_dict_to_json_file
 
 
 class CustomSaveCallback(Callback):
