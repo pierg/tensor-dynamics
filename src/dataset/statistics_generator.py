@@ -5,11 +5,10 @@ from typing import Any, Callable, Union
 import numpy as np
 import tensorflow as tf
 
-
 class RunningStats:
     """
-    Maintains running statistics including mean, variance, min, max,
-    shape, data type, and an example of the data points.
+    Class to maintain running statistics including mean, variance, min, max, 
+    and other data properties like shape, data type, and an example of the data points.
     """
 
     def __init__(self):
@@ -17,7 +16,7 @@ class RunningStats:
 
     def clear(self):
         """
-        Reset all statistical data.
+        Reset all statistical data to initial state.
         """
         self.n = 0
         self.mean = None
@@ -33,28 +32,33 @@ class RunningStats:
         Update the statistics with a new data point.
 
         Args:
-        - x (np.ndarray): A new data point.
+            x (np.ndarray): A new data point to be included in the statistics.
         """
-        # Store the shape, data type, and example of the first data point
         if self.n == 0:
-            self.shape = x.shape
-            self.dtype = str(x.dtype)
-            self.example = x
-
-            self.mean = np.zeros_like(x)
-            self.M2 = np.zeros_like(x)
-            self.min = np.full_like(x, np.inf)
-            self.max = np.full_like(x, -np.inf)
+            self._initialize_first_datapoint(x)
 
         self.n += 1
-
-        # Update mean, M2 for variance, min, and max
         delta = x - self.mean
         self.mean += delta / self.n
         delta2 = x - self.mean
         self.M2 += delta * delta2
         self.min = np.minimum(self.min, x)
         self.max = np.maximum(self.max, x)
+
+    def _initialize_first_datapoint(self, x: np.ndarray):
+        """
+        Initialize statistics for the first data point.
+
+        Args:
+            x (np.ndarray): The first data point.
+        """
+        self.shape = x.shape
+        self.dtype = str(x.dtype)
+        self.example = x
+        self.mean = np.zeros_like(x)
+        self.M2 = np.zeros_like(x)
+        self.min = np.full_like(x, np.inf)
+        self.max = np.full_like(x, -np.inf)
 
     def _get_safe_value(self, value, default=0):
         """
@@ -128,11 +132,11 @@ class RunningStats:
                 "example": serialize_array(self.example),
             },
         }
-
+    
 
 class RunningStatsDatapoints:
     """
-    Maintains running statistics for a dataset, including features and labels.
+    Class to maintain running statistics for a dataset, including statistics for both features and labels.
     """
 
     def __init__(self):
@@ -142,11 +146,8 @@ class RunningStatsDatapoints:
 
     @classmethod
     def from_generator(
-        cls,
-        generator: Callable[[], Any],
-        save_every: int = 1000,
-        file_path: Union[str, Path] = None,
-        max_points: int | None = None,
+        cls, generator: Callable[[], Any], save_every: int = 1000,
+        file_path: Union[str, Path] = None, max_points: int | None = None
     ) -> "RunningStatsDatapoints":
         """
         Initialize and populate a RunningStatsDatapoints object using a generator.
@@ -244,28 +245,25 @@ class RunningStatsDatapoints:
             "labels": self.get_label_stats(),
         }
 
-
 def calculate_dataset_running_stats(
-    dataset: tf.data.Dataset,
-    feature_dims: Union[int, tuple] = None,
-    label_dims: Union[int, tuple] = None,
+    dataset: tf.data.Dataset, feature_dims: Union[int, tuple] = None,
+    label_dims: Union[int, tuple] = None
 ) -> RunningStatsDatapoints:
     """
     Calculate running statistics for a TensorFlow dataset.
 
     Args:
-    - dataset (tf.data.Dataset): A TensorFlow dataset.
-    - feature_dims (Union[int, tuple]): Dimensions of a feature.
-    - label_dims (Union[int, tuple]): Dimensions of a label.
+        dataset (tf.data.Dataset): A TensorFlow dataset to analyze.
+        feature_dims (Union[int, tuple], optional): Dimensions to reshape features to.
+        label_dims (Union[int, tuple], optional): Dimensions to reshape labels to.
 
     Returns:
-    - RunningStatsDatapoints: An object containing the statistics.
+        RunningStatsDatapoints: An object containing running statistics for the dataset.
     """
     stats = RunningStatsDatapoints()
 
     for features, labels in dataset:
         features_numpy, labels_numpy = features.numpy(), labels.numpy()
-
         if feature_dims and label_dims:
             for feature, label in zip(features_numpy, labels_numpy):
                 stats.update(feature.reshape(feature_dims), label.reshape(label_dims))
@@ -273,3 +271,4 @@ def calculate_dataset_running_stats(
             stats.update(features_numpy, labels_numpy)
 
     return stats
+

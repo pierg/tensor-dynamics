@@ -3,7 +3,6 @@ from pathlib import Path
 
 import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, TerminateOnNaN
-from tensorflow.keras.layers import Conv2D, Dense, Flatten, Input, MaxPooling2D
 from tensorflow.keras.models import Model
 
 from deepnn.callback import CustomSaveCallback
@@ -12,46 +11,59 @@ from deepnn.metrics import R_squared
 
 
 class NeuralNetwork:
-    def __init__(
-        self, datasets: Datasets, configuration: dict, name: str, instance_folder
-    ):
+    def __init__(self, datasets: Datasets, configuration: dict, name: str, instance_folder: Path):
+        """
+        Initializes a neural network instance with the given datasets, configuration, name, and instance folder.
+
+        Args:
+            datasets (Datasets): Datasets for training, validation, and testing.
+            configuration (dict): Configuration dictionary for the neural network.
+            name (str): Name of the neural network configuration.
+            instance_folder (Path): Folder path for saving model instances and logs.
+        """
         self.config = configuration
         self.name = name
         self.instance_folder = instance_folder
 
-        # Correctly assign the datasets
+        # Assign datasets
         self.datasets = datasets
         self.train_dataset = datasets.train_dataset
         self.validation_dataset = datasets.validation_dataset
         self.test_dataset = datasets.test_dataset
 
+        # Extract specific configuration sections
         self.structure_config = self.config["structure"]
         self.compile_config = self.config["compile"]
         self.training_config = self.config["training"]
 
+        # Timing attributes
         self.training_start_time = None
         self.time_evaluation = None
         self.time_training = None
 
+        # Initialize the neural network model
         self.initialize_model()
 
     def initialize_model(self):
+        """
+        Initializes the neural network model with the defined architecture and compilation settings.
+        """
+        # Set up a distribution strategy for multi-GPU training, if available
         self.strategy = tf.distribute.MirroredStrategy()
         with self.strategy.scope():
+            # Build and compile the model
             self.model = self._build_model()
             self._compile_model()
 
-        # Define the early stopping callback here
-        self.early_stopping = EarlyStopping(
-            monitor="val_loss", patience=10, verbose=1, restore_best_weights=True
-        )
+        # Early stopping callback to prevent overfitting
+        self.early_stopping = EarlyStopping(monitor="val_loss", patience=10, verbose=1, restore_best_weights=True)
 
-    def _build_model(self) -> tf.keras.Model:
+    def _build_model(self) -> Model:
         """
-        Build the neural network model architecture based on the configuration and input data shape.
+        Builds the neural network model based on the structure configuration.
 
         Returns:
-            Model: Uncompiled Keras model.
+            Model: The built but uncompiled Keras model.
         """
         for sample_batch in self.train_dataset.take(1):
             # sample_batch is a tuple of (input_batch, target_batch)
@@ -104,6 +116,9 @@ class NeuralNetwork:
 
     def _compile_model(self):
         """
+        Compiles the neural network model with the defined optimizer, loss function, and metrics.
+        """
+        """
         Compile the neural network model based on the configuration.
         """
 
@@ -146,6 +161,9 @@ class NeuralNetwork:
         )
 
     def train_model(self):
+        """
+        Trains the neural network model using the training dataset and validates using the validation dataset.
+        """
         self.training_start_time = time.time()
 
         # Define the directory where TensorBoard logs will be stored
@@ -188,12 +206,12 @@ class NeuralNetwork:
         # Calculate the total training time
         self.time_training = end_time - self.training_start_time
 
-    def evaluate_model(self, verbose=1):
+    def evaluate_model(self, verbose=1) -> dict:
         """
-        Evaluate the neural network model on training, validation, and test datasets.
+        Evaluates the neural network model on the training, validation, and test datasets.
 
         Args:
-            verbose (int): Verbosity mode used during evaluation.
+            verbose (int): Verbosity mode for evaluation.
 
         Returns:
             dict: A dictionary containing the evaluation results for each dataset.
@@ -228,20 +246,23 @@ class NeuralNetwork:
 
     def save_model(self, filepath: Path):
         """
-        Save the neural network model to the specified file path.
+        Saves the trained neural network model to the specified file path.
 
         Args:
-            filepath (str): The path where the model will be saved.
+            filepath (Path): The file path where the model should be saved.
         """
-        if self.model is None:
-            raise ValueError("The model hasn't been built or trained yet.")
-
         # Construct the complete filepath if only a directory is provided
         filepath = filepath / "trained_model.h5"
         self.model.save(filepath)
         print(f"Model saved successfully at {filepath}")
 
-    def get_info(self):
+    def get_info(self) -> dict:
+        """
+        Retrieves information about the neural network configuration and dataset.
+
+        Returns:
+            dict: Information about the neural network configuration and dataset.
+        """
         return {
             "config_name": self.name,
             "dataset": self.datasets.to_dict(),
@@ -252,7 +273,16 @@ class NeuralNetwork:
             },
         }
 
-    def get_results(self, interim=False):
+    def get_results(self, interim=False) -> dict:
+        """
+        Retrieves the training and evaluation results of the neural network.
+
+        Args:
+            interim (bool): If True, returns interim results without training history.
+
+        Returns:
+            dict: Results including evaluation metrics and training history.
+        """
         # Define common data
         results = {
             "config_name": self.name,
@@ -266,3 +296,4 @@ class NeuralNetwork:
             results["training_history"] = self.history.history
 
         return results
+
