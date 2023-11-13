@@ -1,13 +1,15 @@
-from click import Path
+import hashlib
+import os
+import pickle
+
 import numpy as np
 import tensorflow as tf
 import toml
+from click import Path
+
 from dataset.michaelis import generate_datapoint, generate_parameters
 from dataset.statistics_generator import RunningStatsDatapoints
 from shared import data_statistics_folder
-import hashlib
-import pickle
-import os
 
 # Constants
 HASH_LENGTH = 5

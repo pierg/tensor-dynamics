@@ -1,13 +1,14 @@
+import math
+import pickle
+from pathlib import Path
+from typing import Any, Dict
+
 import numpy as np
 import tensorflow as tf
-from pathlib import Path
-import math
+
 from dataset.michaelis import generate_datapoint, generate_parameters
 from dataset.statistics_generator import RunningStatsDatapoints
 from shared.utils import save_dict_to_json_file
-import pickle
-from typing import Dict, Any
-
 
 # ----------------------
 # Utility Functions
@@ -301,10 +302,11 @@ def create_sharded_tfrecord(
     return running_stats
 
 
-import tensorflow as tf
-from pathlib import Path
 import pickle
+from pathlib import Path
 from typing import Dict, Tuple
+
+import tensorflow as tf
 
 
 def load_datasets(

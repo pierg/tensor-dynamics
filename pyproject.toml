@@ -1,3 +1,4 @@
+# Poetry configuration for the 'neural_networks' project
 [tool.poetry]
 name = "neural_networks"
 version = "0.1.0"
@@ -6,27 +7,35 @@ authors = ["pier <piergiuseppe.mallozzi@gmail.com>"]
 readme = "README.md"
 packages = [{include = "src"}]
 
+# Project dependencies
 [tool.poetry.dependencies]
-python = ">=3.11,<3.12"
+python = ">=3.11,<3.12"  # Specifies Python version compatibility
 numpy = "*"
 matplotlib = "*"
 toml = "^0.10.2"
 scipy = "^1.11.3"
 
+# Development dependencies with tools for linting, formatting, and testing
 [tool.poetry.group.dev.dependencies]
 black = "*"
 flake8 = "*"
 mypy = "*"
 pytest = "*"
+isort = "*"
+pylint = "*"
+flake8-pyproject = "^1.2.3"
+autoflake = "^2.2.1"
 
+# Build system configuration
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+# Black configuration for code formatting
 [tool.black]
 line-length = 88
 target-version = ['py38']
-include = '\.pyi?$'
+include = '\\.pyi?$'
 exclude = '''
 /(
     \.git
@@ -39,3 +48,30 @@ exclude = '''
   | dist
 )/
 '''
+
+# Flake8 configuration for code linting
+[tool.flake8]
+max-line-length = 88
+exclude = [".venv", ".git", ".tox", "dist", "doc", "*lib/python*", "*egg", "build"]
+ignore = ["E203", "E266", "W503"]
+max-complexity = 18
+select = ["B", "C", "E", "F", "W", "T4", "B9"]
+
+# Mypy configuration for static type checking
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+# Pytest configuration for unit testing
+[tool.pytest]
+addopts = "-ra -q"
+
+# Isort configuration for import sorting
+[tool.isort]
+profile = "black"
+
+# Placeholder for [tool.pylint] configuration
+# [tool.pylint]
+# (Add pylint configurations here)

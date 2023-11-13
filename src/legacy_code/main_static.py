@@ -1,19 +1,22 @@
-import toml
 from datetime import datetime
 from pathlib import Path
 
-# Local module imports
-from shared import (
-    results_repo_folder,
-    data_config_file,
-    datasets_folder,
-    results_runs_folder,
-)
-from .data_static import load_all_datasets, process_datasets
+import toml
+
 from deepnn.datasets import Datasets
 from deepnn.model import NeuralNetwork
+
+# Local module imports
+from shared import (
+    data_config_file,
+    datasets_folder,
+    results_repo_folder,
+    results_runs_folder,
+)
 from shared.utils import git_push, save_dict_to_json_file
 from utils import handle_training_exception, main_preamble
+
+from .data_static import load_all_datasets, process_datasets
 
 
 def process_configuration(config_name, config, instance_config_folder):

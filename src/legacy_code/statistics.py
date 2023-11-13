@@ -1,7 +1,9 @@
-import numpy as np
 from pathlib import Path
-import toml
+
 import matplotlib.pyplot as plt
+import numpy as np
+import toml
+
 from dataset.michaelis import generate_datapoint, generate_parameters
 
 

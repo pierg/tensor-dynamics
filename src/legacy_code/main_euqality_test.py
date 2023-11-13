@@ -1,10 +1,8 @@
-import numpy as np
-import tensorflow as tf
 from pathlib import Path
-from datagen.dataset import *
 
 import numpy as np
 import tensorflow as tf
+from datagen.dataset import *
 
 
 def are_datasets_equal(dataset1: tf.data.Dataset, dataset2: tf.data.Dataset) -> bool:

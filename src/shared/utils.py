@@ -1,10 +1,10 @@
 import argparse
+import json
 import os
 import subprocess
-from urllib.parse import urlparse, urlunparse
-from pathlib import Path
 import sys
-import json
+from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
 # -------------------------
 # ARGUMENT PARSING FUNCTIONS

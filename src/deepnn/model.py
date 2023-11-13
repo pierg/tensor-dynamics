@@ -1,14 +1,14 @@
-from pathlib import Path
 import time
+from pathlib import Path
+
 import tensorflow as tf
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, TerminateOnNaN
+from tensorflow.keras.layers import Conv2D, Dense, Flatten, Input, MaxPooling2D
 from tensorflow.keras.models import Model
-from tensorflow.keras.callbacks import TensorBoard, EarlyStopping, TerminateOnNaN
 
-
+from deepnn.callback import CustomSaveCallback
 from deepnn.datasets import Datasets
 from deepnn.metrics import R_squared
-from deepnn.callback import CustomSaveCallback
 
 
 class NeuralNetwork:

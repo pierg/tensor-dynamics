@@ -1,13 +1,12 @@
 import hashlib
-import toml
-from pathlib import Path
-from typing import Dict, Any
 import shutil
+from pathlib import Path
+from typing import Any, Dict
+
+import toml
+
 from dataset.tf_data_uilities import create_datasets, load_datasets
 from shared.utils import pretty_print_dict, save_dict_to_json_file
-from typing import Dict, Any
-from pathlib import Path
-import shutil
 
 
 def generate_dataset_id(seed: int, n_samples: int, n_shards: int) -> str:
@@ -110,10 +109,10 @@ def process_datasets(
 
 # The main execution can be wrapped in a main function and executed conditionally.
 def main():
-    from shared import (
+    from shared import (  # assuming the import path is correct
         data_config_file,
         datasets_folder,
-    )  # assuming the import path is correct
+    )
 
     dataset_config = toml.load(data_config_file)["d1"]
     process_datasets(dataset_config, datasets_folder, overwrite=False)

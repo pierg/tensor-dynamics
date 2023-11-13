@@ -1,14 +1,14 @@
-from pathlib import Path
-import pickle
-from typing import List, Tuple
-import numpy as np
 import json
 import os
-from datetime import datetime
-import matplotlib.pyplot as plt
-import os
+import pickle
 import subprocess
+from datetime import datetime
+from pathlib import Path
+from typing import List, Tuple
 from urllib.parse import urlparse, urlunparse
+
+import matplotlib.pyplot as plt
+import numpy as np
 import tensorflow as tf
 
 

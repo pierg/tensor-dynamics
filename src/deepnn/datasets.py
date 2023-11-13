@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-import tensorflow as tf
 from typing import Optional
+
+import tensorflow as tf
+
 from dataset.statistics_generator import RunningStatsDatapoints
 
 

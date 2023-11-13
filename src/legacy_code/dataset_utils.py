@@ -1,6 +1,8 @@
+from pathlib import Path
+
 import numpy as np
 import tensorflow as tf
-from pathlib import Path
+
 from dataset.statistics_generator import RunningStatsDatapoints
 from dataset.tf_data_uilities import load_tfrecord_dataset
 

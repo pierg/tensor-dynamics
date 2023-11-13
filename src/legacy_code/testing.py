@@ -1,9 +1,11 @@
+import hashlib
+import os
+import pickle
+
 import numpy as np
 import tensorflow as tf
 import toml
-import hashlib
-import pickle
-import os
+
 from dataset.michaelis import generate_datapoint, generate_parameters
 from dataset.statistics_generator import RunningStatsDatapoints
 from shared import data_config_file, data_statistics_folder

@@ -1,9 +1,9 @@
+import pickle
+from pathlib import Path
+from typing import Any, Callable, Union
+
 import numpy as np
 import tensorflow as tf
-from typing import Union
-import pickle
-from typing import Any, Callable, Union
-from pathlib import Path
 
 
 class RunningStats:

@@ -1,32 +1,34 @@
-import os
 import json
-import toml
 import logging
+import os
 import traceback
-from typing import List, Dict
 from pathlib import Path
-from shared import config_file, secrets_path, results_repo_folder
+from typing import Dict, List
+
+import tensorflow as tf
+import toml
+
+from shared import config_file, results_repo_folder, secrets_path
 from shared.utils import (
     clone_private_repo,
     is_directory_empty,
     load_secrets,
     parse_arguments,
 )
-import tensorflow as tf
 
-# Configure logging
+# Configure logging for better monitoring and debugging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
 def load_configurations(file_path: str) -> Dict:
     """
-    Load the configurations from the specified TOML file.
+    Load the configurations from a TOML file.
 
     Args:
-    - file_path: The path to the configuration file.
+        file_path (str): Path to the configuration file.
 
     Returns:
-    - A dictionary containing the configurations.
+        Dict: A dictionary of configurations loaded from the file.
     """
     try:
         with open(file_path, "r") as file:
@@ -38,11 +40,10 @@ def load_configurations(file_path: str) -> Dict:
 
 def check_tf_availability() -> None:
     """
-    Check TensorFlow version and GPU availability.
+    Check TensorFlow version and GPU availability. This function is useful for
+    validating the TensorFlow installation and available hardware.
     """
-    print("Checking Tensorflow...")
-    print("TensorFlow version: ", tf.__version__)
-
+    print(f"TensorFlow version: {tf.__version__}")
     gpus = tf.config.list_physical_devices("GPU")
     if gpus:
         print(f"Num GPUs Available: {len(gpus)}")
@@ -53,8 +54,8 @@ def check_tf_availability() -> None:
 
 def prepare_environment() -> None:
     """
-    Prepare the necessary environment, including checking TensorFlow,
-    loading secrets, and setting up the results directory.
+    Prepare the execution environment by checking TensorFlow, loading secrets,
+    and setting up the results directory.
     """
     check_tf_availability()
 
@@ -64,7 +65,7 @@ def prepare_environment() -> None:
         load_secrets(secrets_path)
 
     if is_directory_empty(results_repo_folder):
-        logging.info("Directory is empty. Cloning the private repository...")
+        logging.info("Cloning the private repository as directory is empty...")
         repo_url = os.getenv("GITHUB_RESULTS_REPO")
         if repo_url:
             clone_private_repo(repo_url, results_repo_folder)
@@ -74,53 +75,46 @@ def prepare_environment() -> None:
 
 def filter_configurations(all_configs: Dict, specified_configs: List[str]) -> Dict:
     """
-    Filter the configurations based on the specified list. If the list is empty,
-    all configurations will be used.
+    Filter configurations based on a specified list. If no configurations are specified,
+    all available configurations are returned.
 
     Args:
-    - all_configs: All available configurations.
-    - specified_configs: The list of specified configuration names.
+        all_configs (Dict): All available configurations.
+        specified_configs (List[str]): List of configuration names to filter.
 
     Returns:
-    - A dictionary containing the configurations to be processed.
+        Dict: Filtered configurations.
     """
     if not specified_configs:
-        logging.info(
-            "No specific configuration names provided. Processing all configurations."
-        )
+        logging.info("Processing all configurations.")
         return all_configs
 
     selected_configs = {
         name: all_configs[name] for name in specified_configs if name in all_configs
     }
     non_existent_configs = set(specified_configs) - set(selected_configs.keys())
-
     if non_existent_configs:
-        logging.warning(
-            f'Non-existent configurations ignored: {", ".join(non_existent_configs)}'
-        )
+        logging.warning(f'Ignored non-existent configurations: {", ".join(non_existent_configs)}')
 
     return selected_configs
 
 
 def main_preamble() -> Dict:
     """
-    Set up the environment and determine the configurations to process.
+    Execute initial setup steps before main processing begins. This includes
+    environment preparation and determining configurations to process.
 
     Returns:
-    - A dictionary containing configurations to be processed.
+        Dict: Configurations to be processed.
     """
     all_configs = load_configurations(config_file)
-
     if not all_configs:
-        logging.warning("No configurations loaded, ending process.")
+        logging.warning("No configurations loaded. Ending process.")
         return {}
 
     prepare_environment()
-
     args = parse_arguments()
     specified_config_names = args.configs if "configs" in args else []
-
     return filter_configurations(all_configs, specified_config_names)
 
 
@@ -128,17 +122,15 @@ def handle_training_exception(
     e: Exception, config_name: str, results_folder: Path
 ) -> None:
     """
-    Handle exceptions that occur during the training process.
+    Handle exceptions during the training process, logging error details
+    and saving them to a file in the results folder.
 
     Args:
-    - e: The exception object.
-    - config_name: The name of the neural network configuration.
-    - results_folder: The directory path to save error logs.
+        e (Exception): The exception encountered during training.
+        config_name (str): Name of the configuration being processed.
+        results_folder (Path): Path to the folder for saving error logs.
     """
-    logging.error(
-        f"Error during processing configuration {config_name}: {e}", exc_info=True
-    )
-
+    logging.error(f"Error in configuration {config_name}: {e}", exc_info=True)
     error_log = {"error_message": str(e), "traceback": traceback.format_exc()}
     error_file_path = results_folder / f"{config_name}_error_log.json"
 

@@ -1,6 +1,7 @@
-from tensorflow.keras.callbacks import Callback
 import json
 import os
+
+from tensorflow.keras.callbacks import Callback
 
 from shared.utils import save_dict_to_json_file
 
