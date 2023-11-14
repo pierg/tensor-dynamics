@@ -1,6 +1,35 @@
-# Neural Networks Repository
+# Biochemically-Informed Neural Networks
+**Configurable Neural Networks with Biochemically-Informed Data Generation**
 
-This repository provides an extensive framework for building, training, and evaluating neural networks using TensorFlow. It is designed for flexibility and ease of use, allowing users to configure various aspects of neural networks and data processing through TOML files. The project is ideal for both educational purposes and practical applications in machine learning and deep learning.
+
+# Biochemically-Informed Neural Networks
+**Configurable Neural Networks with Biochemically-Informed Data Generation**
+
+<p align="center">
+  <img src="image.png" alt="Project Image">
+</p>
+
+This repository presents a flexible platform for building and training neural networks using TensorFlow. It uses physics models as foundation for generating synthetic datasets. Key features of the project include:
+
+- **TOML-Based Configuration**: Easy customization of neural networks and data generation settings through TOML files.
+- **TensorFlow Integration**: Utilizes TensorFlow for robust model building and training.
+- **Dynamic Data Generation**: Features a data generation module capable of simulating complex biochemical reactions, including *Michaelis-Menten kinetics*, for creating synthetic datasets. 
+- **Efficient Data Management**: Employs TensorFlow's Dataset API for optimized data handling and preprocessing.
+- **High-Performance Computing (HPC) Support**: Includes scripts for HPC integration, compatible with Slurm-managed systems, leveraging TensorFlow's `MirroredStrategy` for distributed training.
+
+This project is designed to harness the power of modern computational tools, offering a comprehensive solution for exploring neural networks in various scientific and research contexts.
+
+
+
+This repository presents a flexible platform for building and training neural networks using TensorFlow. It uses physics models as foundation for generating synthetic datasets. Key features of the project include:
+
+- **TOML-Based Configuration**: Easy customization of neural networks and data generation settings through TOML files.
+- **TensorFlow Integration**: Utilizes TensorFlow for robust model building and training.
+- **Dynamic Data Generation**: Features a data generation module capable of simulating complex biochemical reactions, including *Michaelis-Menten kinetics*, for creating synthetic datasets. 
+- **Efficient Data Management**: Employs TensorFlow's Dataset API for optimized data handling and preprocessing.
+- **High-Performance Computing (HPC) Support**: Includes scripts for HPC integration, compatible with Slurm-managed systems, leveraging TensorFlow's `MirroredStrategy` for distributed training.
+
+This project is designed to harness the power of modern computational tools, offering a comprehensive solution for exploring neural networks in various scientific and research contexts.
 
 
 ## Prerequisites
