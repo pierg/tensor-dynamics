@@ -215,13 +215,16 @@ def git_pull(folder=None, prefer_local=True):
         os.chdir(original_cwd)
 
 
-def git_push(folder=None, commit_message="Update files"):
+def git_push(folder=None, commit_message="Update files", max_retries=5, wait_interval=5):
     """
-    Pushes changes to a GitHub repository using token-based authentication, resolving conflicts by favoring local changes.
+    Pushes changes to a GitHub repository using token-based authentication. 
+    If other git processes are running, it waits and retries a few times before giving up.
 
     Args:
-    folder (Path, optional): Path object representing the folder to push. If not provided, the current directory is used.
-    commit_message (str, optional): The commit message. Defaults to "Update files".
+        folder (Path, optional): Path object representing the folder to push. If not provided, the current directory is used.
+        commit_message (str, optional): The commit message. Defaults to "Update files".
+        max_retries (int, optional): Maximum number of retries if other Git processes are detected. Defaults to 5.
+        wait_interval (int, optional): Time in seconds to wait between retries. Defaults to 5 seconds.
     """
     # Check for necessary environment variables
     github_token = os.getenv("GITHUB_TOKEN")
@@ -232,49 +235,48 @@ def git_push(folder=None, commit_message="Update files"):
     if repo_url is None:
         raise ValueError("GITHUB_RESULTS_REPO is not set in the environment variables.")
 
-    # Ensure the repository URL is correctly formatted
     if not repo_url.startswith("https://"):
         raise ValueError("The repository URL must start with 'https://'")
 
-    repo_url_with_token = repo_url.replace(
-        "https://", f"https://{github_token}:x-oauth-basic@"
-    )
+    repo_url_with_token = repo_url.replace("https://", f"https://{github_token}:x-oauth-basic@")
 
-    # Validate and set the working directory
     if folder is None:
         folder = Path.cwd()
     elif not folder.is_dir():
         raise ValueError(f"{folder} does not exist or is not a directory.")
 
-    original_cwd = Path.cwd()  # Store the original working directory
+    original_cwd = Path.cwd()
+    os.chdir(folder)
+    print(f"Changed directory to: {folder}")
 
     try:
-        os.chdir(folder)
-        print(f"Changed directory to: {folder}")
+        for attempt in range(max_retries):
+            try:
+                # Check if the lock file exists, which indicates an ongoing Git operation
+                if (folder / ".git/index.lock").exists():
+                    print(f"Git lock file detected. Waiting for other git processes. Attempt {attempt + 1} of {max_retries}")
+                    time.sleep(wait_interval)
+                    continue
 
-        # Stage any changes and commit them
-        subprocess.run(["git", "add", "."], check=True)
-        subprocess.run(
-            ["git", "commit", "-m", commit_message], check=False
-        )  # It's okay if nothing to commit
+                # Stage any changes and commit them
+                subprocess.run(["git", "add", "."], check=True)
+                subprocess.run(["git", "commit", "-m", commit_message], check=False)
 
-        print("Pulling changes from remote repository...")
-        subprocess.run(["git", "fetch", repo_url_with_token], check=True)
+                # Pull, merge, and push changes
+                subprocess.run(["git", "fetch", repo_url_with_token], check=True)
+                subprocess.run(["git", "merge", "-Xours", "FETCH_HEAD"], check=True)
+                subprocess.run(["git", "push", repo_url_with_token, "main"], check=True)
+                print("Operation completed successfully.")
+                break
 
-        print("Merging changes with strategy favoring local changes...")
-        # Using -Xours keeps local changes in case of conflict
-        subprocess.run(["git", "merge", "-Xours", "FETCH_HEAD"], check=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Attempt {attempt + 1} failed: {str(e)}")
+                if attempt == max_retries - 1:
+                    raise
 
-        print("Pushing local changes to the remote repository...")
-        subprocess.run(["git", "push", repo_url_with_token, "main"], check=True)
-
-        print("Operation completed successfully.")
-
-    except subprocess.CalledProcessError as e:
-        print(f"An error occurred while pushing to GitHub: {str(e)}")
-        raise
     finally:
-        os.chdir(original_cwd)  # Always return to the original directory
+        os.chdir(original_cwd)
+
 
 
 # -------------------------
