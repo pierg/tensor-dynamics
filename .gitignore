@@ -10,7 +10,7 @@ data
 
 .secrets
 
-results/
+results
 
 # logs/
 legacy/

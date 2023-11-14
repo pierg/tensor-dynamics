@@ -51,8 +51,8 @@ amplitude_max = 0.8
 [dbig.shape]
 seed = 42
 # n_samples = 100000000  # 100 million
-# n_samples = 1000000  # 1 million
-n_samples = 100000 # 100.000
+n_samples = 1000000  # 1 million
+# n_samples = 100000 # 100.000
 n_shards = 1000       
 batch_size = 64        
 shuffle_buffer_size = 10 
