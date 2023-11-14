@@ -18,7 +18,7 @@ metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePe
 training = "dbig"
 use_stats_of = 300000
 [E.training]
-epochs = 3
+epochs = 200
 save_interval = 1
 
 # Configuration A: Original CNN configuration
@@ -44,7 +44,7 @@ metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePe
 training = "dbig"
 use_stats_of = 300000
 [A.training]
-epochs = 3
+epochs = 200
 save_interval = 1
 
 # Configuration P: Simplified CNN configuration
@@ -69,7 +69,7 @@ metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePe
 training = "dbig"
 use_stats_of = 300000
 [P.training]
-epochs = 3
+epochs = 200
 save_interval = 1
 
 # Configuration P2: Enhanced CNN with additional Conv2D and Dropout layers
@@ -100,5 +100,5 @@ metrics = ["R_squared", "MeanSquaredError", "MeanAbsoluteError", "MeanAbsolutePe
 training = "dbig"
 use_stats_of = 300000
 [P2.training]
-epochs = 3
+epochs = 200
 save_interval = 1
