@@ -1,10 +1,6 @@
 # Biochemically-Informed Neural Networks
 **Configurable Neural Networks with Biochemically-Informed Data Generation**
 
-
-# Biochemically-Informed Neural Networks
-**Configurable Neural Networks with Biochemically-Informed Data Generation**
-
 <p align="center">
   <img src="image.png" alt="Project Image">
 </p>
