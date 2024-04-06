@@ -1,8 +1,8 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
 Description: Defines RunningStats and RunningStatsDatapoints classes for calculating and maintaining running statistics of datasets.
-'''
+"""
 
 import pickle
 from pathlib import Path
@@ -11,9 +11,10 @@ from typing import Any, Callable, Union
 import numpy as np
 import tensorflow as tf
 
+
 class RunningStats:
     """
-    Class to maintain running statistics including mean, variance, min, max, 
+    Class to maintain running statistics including mean, variance, min, max,
     and other data properties like shape, data type, and an example of the data points.
     """
 
@@ -120,7 +121,10 @@ class RunningStats:
         Returns:
         - A dictionary containing the statistics.
         """
-        serialize_array = lambda x: x.tolist() if isinstance(x, np.ndarray) else x
+
+        def serialize_array(x):
+            return x.tolist() if isinstance(x, np.ndarray) else x
+
         averages = self.get_averages()
 
         return {
@@ -138,7 +142,7 @@ class RunningStats:
                 "example": serialize_array(self.example),
             },
         }
-    
+
 
 class RunningStatsDatapoints:
     """
@@ -152,8 +156,11 @@ class RunningStatsDatapoints:
 
     @classmethod
     def from_generator(
-        cls, generator: Callable[[], Any], save_every: int = 1000,
-        file_path: Union[str, Path] = None, max_points: int | None = None
+        cls,
+        generator: Callable[[], Any],
+        save_every: int = 1000,
+        file_path: Union[str, Path] = None,
+        max_points: int | None = None,
     ) -> "RunningStatsDatapoints":
         """
         Initialize and populate a RunningStatsDatapoints object using a generator.
@@ -251,9 +258,11 @@ class RunningStatsDatapoints:
             "labels": self.get_label_stats(),
         }
 
+
 def calculate_dataset_running_stats(
-    dataset: tf.data.Dataset, feature_dims: Union[int, tuple] = None,
-    label_dims: Union[int, tuple] = None
+    dataset: tf.data.Dataset,
+    feature_dims: Union[int, tuple] = None,
+    label_dims: Union[int, tuple] = None,
 ) -> RunningStatsDatapoints:
     """
     Calculate running statistics for a TensorFlow dataset.
@@ -277,4 +286,3 @@ def calculate_dataset_running_stats(
             stats.update(features_numpy, labels_numpy)
 
     return stats
-

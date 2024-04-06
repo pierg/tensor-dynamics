@@ -1,8 +1,8 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
 Description: Dataclass Datasets for organizing and managing training, validation, and test datasets, including their statistics.
-'''
+"""
 
 from dataclasses import dataclass
 from typing import Optional
@@ -10,6 +10,7 @@ from typing import Optional
 import tensorflow as tf
 
 from dataset.statistics_generator import RunningStatsDatapoints
+
 
 def dataset_size(dataset: tf.data.Dataset) -> int:
     """
@@ -22,6 +23,7 @@ def dataset_size(dataset: tf.data.Dataset) -> int:
         int: The number of samples in the dataset.
     """
     return sum(1 for _ in dataset)
+
 
 @dataclass
 class Datasets:
@@ -60,7 +62,9 @@ class Datasets:
         required_keys = ["training", "validation", "testing"]
         for key in required_keys:
             if key not in datasets or key not in stats:
-                raise ValueError(f"The '{key}' key is missing in the provided dictionaries.")
+                raise ValueError(
+                    f"The '{key}' key is missing in the provided dictionaries."
+                )
 
         # Construct and return the Datasets instance
         return cls(
@@ -90,11 +94,14 @@ class Datasets:
         if self.train_stats:
             datasets_dict["training_stats"] = self.train_stats.to_dict(reduced=True)
         if self.validation_stats:
-            datasets_dict["validation_stats"] = self.validation_stats.to_dict(reduced=True)
+            datasets_dict["validation_stats"] = self.validation_stats.to_dict(
+                reduced=True
+            )
         if self.test_stats:
             datasets_dict["test_stats"] = self.test_stats.to_dict(reduced=True)
 
         return datasets_dict
+
 
 def print_dataset_statistics(datasets: Datasets) -> None:
     """

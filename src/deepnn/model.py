@@ -1,8 +1,8 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
 Description: Defines the NeuralNetwork class, encompassing model initialization, training, evaluation, and saving functionalities.
-'''
+"""
 
 import time
 from pathlib import Path
@@ -17,7 +17,9 @@ from deepnn.metrics import R_squared
 
 
 class NeuralNetwork:
-    def __init__(self, datasets: Datasets, configuration: dict, name: str, instance_folder: Path):
+    def __init__(
+        self, datasets: Datasets, configuration: dict, name: str, instance_folder: Path
+    ):
         """
         Initializes a neural network instance with the given datasets, configuration, name, and instance folder.
 
@@ -62,7 +64,9 @@ class NeuralNetwork:
             self._compile_model()
 
         # Early stopping callback to prevent overfitting
-        self.early_stopping = EarlyStopping(monitor="val_loss", patience=10, verbose=1, restore_best_weights=True)
+        self.early_stopping = EarlyStopping(
+            monitor="val_loss", patience=10, verbose=1, restore_best_weights=True
+        )
 
     def _build_model(self) -> Model:
         """
@@ -302,4 +306,3 @@ class NeuralNetwork:
             results["training_history"] = self.history.history
 
         return results
-

@@ -1,8 +1,8 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
 Description: Description for this file
-'''
+"""
 
 import json
 import logging
@@ -100,7 +100,9 @@ def filter_configurations(all_configs: Dict, specified_configs: List[str]) -> Di
     }
     non_existent_configs = set(specified_configs) - set(selected_configs.keys())
     if non_existent_configs:
-        logging.warning(f'Ignored non-existent configurations: {", ".join(non_existent_configs)}')
+        logging.warning(
+            f'Ignored non-existent configurations: {", ".join(non_existent_configs)}'
+        )
 
     return selected_configs
 

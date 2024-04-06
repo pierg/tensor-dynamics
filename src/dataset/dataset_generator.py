@@ -1,7 +1,7 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
-'''
+"""
 
 import hashlib
 import os
@@ -19,6 +19,7 @@ from shared import data_statistics_folder
 HASH_LENGTH = 5
 DTYPE = np.float32
 TF_DTYPE = tf.float32
+
 
 class DatasetGenerator:
     def __init__(
@@ -99,7 +100,9 @@ class DatasetGenerator:
         Returns:
             Path: Calculated file path for statistics.
         """
-        hash_value = hashlib.md5(str(dataset_parameters).encode()).hexdigest()[:HASH_LENGTH]
+        hash_value = hashlib.md5(str(dataset_parameters).encode()).hexdigest()[
+            :HASH_LENGTH
+        ]
         return data_statistics_folder / f"running_stats_{hash_value}_{use_stats_of}.pkl"
 
     def _data_generator(self):
@@ -138,7 +141,9 @@ class DatasetGenerator:
             """Generator yielding normalized batches of data."""
             for x, y in self._data_generator():
                 std_dev = self.running_stats.features.get_standard_deviation()
-                normalized_x = (x - self.running_stats.features.get_mean()) / (std_dev + epsilon)
+                normalized_x = (x - self.running_stats.features.get_mean()) / (
+                    std_dev + epsilon
+                )
                 features = normalized_x.astype(DTYPE)  # Convert to single precision
                 labels = y.astype(DTYPE)  # Convert to single precision
                 features = np.round(features, 3)
@@ -151,8 +156,12 @@ class DatasetGenerator:
         full_dataset = tf.data.Dataset.from_generator(
             generator,
             output_signature=(
-                tf.TensorSpec(shape=(self.batch_size, *first_batch_x.shape[1:]), dtype=TF_DTYPE),
-                tf.TensorSpec(shape=(self.batch_size, *first_batch_y.shape[1:]), dtype=TF_DTYPE),
+                tf.TensorSpec(
+                    shape=(self.batch_size, *first_batch_x.shape[1:]), dtype=TF_DTYPE
+                ),
+                tf.TensorSpec(
+                    shape=(self.batch_size, *first_batch_y.shape[1:]), dtype=TF_DTYPE
+                ),
             ),
         ).prefetch(tf.data.AUTOTUNE)
 

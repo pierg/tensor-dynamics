@@ -5,6 +5,7 @@ from pathlib import Path
 AUTHOR = "Piergiuseppe Mallozzi"
 DATE = "November 2023"
 
+
 def header_exists(file_path, author_name):
     """
     Checks if the header already exists in the file.
@@ -17,12 +18,13 @@ def header_exists(file_path, author_name):
         bool: True if the header exists, False otherwise.
     """
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             # Read the first few lines of the file
-            first_lines = ''.join([next(file) for _ in range(3)])
+            first_lines = "".join([next(file) for _ in range(3)])
             return author_name in first_lines
     except (IOError, StopIteration):
         return False
+
 
 def add_header_to_file(file_path, author_name, date, description=None):
     """
@@ -40,11 +42,12 @@ def add_header_to_file(file_path, author_name, date, description=None):
         header += f"Description: {description}\n"
     header += "'''\n\n"
 
-    with open(file_path, 'r+') as file:
+    with open(file_path, "r+") as file:
         original_content = file.read()
         file.seek(0, 0)
         file.write(header + original_content)
         print(f"Header added to {file_path}")
+
 
 def add_headers_to_files(directory_path, file_descriptions):
     """
@@ -56,7 +59,7 @@ def add_headers_to_files(directory_path, file_descriptions):
     """
     for root, _, files in os.walk(directory_path):
         for filename in files:
-            if filename.endswith('.py'):
+            if filename.endswith(".py"):
                 file_path = Path(root) / filename
                 relative_path = str(file_path.relative_to(directory_path))
 
@@ -66,6 +69,7 @@ def add_headers_to_files(directory_path, file_descriptions):
                 # Add header if it does not already exist
                 if not header_exists(file_path, AUTHOR):
                     add_header_to_file(file_path, AUTHOR, DATE, description)
+
 
 # Dictionary mapping file paths to their descriptions
 file_descriptions = {

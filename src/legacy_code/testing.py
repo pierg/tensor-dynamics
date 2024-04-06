@@ -1,7 +1,7 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
-'''
+"""
 
 import hashlib
 import os

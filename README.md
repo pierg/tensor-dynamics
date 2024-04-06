@@ -34,8 +34,8 @@ To utilize this repository, ensure you have:
    
    Get a local copy of the repository:
    ```bash
-   git clone https://github.com/pierg/neural_networks.git
-   cd neural_networks
+   git clone https://github.com/pierg/tensor-dynamics.git
+   cd tensor-dynamics
    ```
 
 2. **Install Dependencies**
@@ -70,14 +70,14 @@ For streamlined deployment, use Docker. Run predefined configurations or specify
   ```bash
   docker run -it \
       -v <LOCAL_RESULTS_PATH>:/app/results \
-      pmallozzi/neural_networks:latest
+      pmallozzi/tensor-dynamics:latest
   ```
 
 - **Specific Configuration**:
   ```bash
   docker run -it \
       -v <LOCAL_RESULTS_PATH>:/app/results \
-      pmallozzi/neural_networks:latest CONFIGS='E'
+      pmallozzi/tensor-dynamics:latest CONFIGS='E'
   ```
 
 - **Multiple Configurations**:
@@ -85,7 +85,7 @@ For streamlined deployment, use Docker. Run predefined configurations or specify
   docker run -it \
       -v <LOCAL_RESULTS_PATH>:/app/results \
       -v <LOCAL_CONFIG_PATH>:/app/config \
-      pmallozzi/neural_networks:latest CONFIGS='E A'
+      pmallozzi/tensor-dynamics:latest CONFIGS='E A'
   ```
 
 

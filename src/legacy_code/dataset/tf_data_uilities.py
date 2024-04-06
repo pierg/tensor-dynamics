@@ -1,12 +1,12 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
-'''
+"""
 
 import math
 import pickle
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 import numpy as np
 import tensorflow as tf
@@ -187,9 +187,6 @@ def transform_and_save_dataset(
 # Main Dataset Sharded Functions
 # ----------------------
 
-from pathlib import Path
-from typing import Dict, Tuple
-
 
 def create_datasets(
     base_directory: Path,
@@ -263,12 +260,12 @@ def create_datasets(
             transformed_directory = base_transformed_path / dataset_type
             transformed_directory.mkdir(parents=True, exist_ok=True)
 
-            running_stats_transformed[
-                dataset_type
-            ] = transform_and_save_sharded_dataset(
-                input_shards_directory=origin_directory,
-                output_shards_directory=transformed_directory,
-                original_running_stats=running_stats_original[dataset_type],
+            running_stats_transformed[dataset_type] = (
+                transform_and_save_sharded_dataset(
+                    input_shards_directory=origin_directory,
+                    output_shards_directory=transformed_directory,
+                    original_running_stats=running_stats_original[dataset_type],
+                )
             )
 
     print("All datasets have been created.")
@@ -305,13 +302,6 @@ def create_sharded_tfrecord(
         pickle.dump(running_stats, pkl_file)
 
     return running_stats
-
-
-import pickle
-from pathlib import Path
-from typing import Dict, Tuple
-
-import tensorflow as tf
 
 
 def load_datasets(

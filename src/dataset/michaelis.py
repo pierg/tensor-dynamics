@@ -1,7 +1,7 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
-'''
+"""
 
 import sys
 
@@ -92,7 +92,9 @@ def generate_spectral_data(size, spectra_range, amplitude_range):
         if np.linalg.cond(spectra) < 1 / sys.float_info.epsilon:
             break
 
-    amplitudes = generate_random_parameters(amplitude_range[0], amplitude_range[1], (size, 1))
+    amplitudes = generate_random_parameters(
+        amplitude_range[0], amplitude_range[1], (size, 1)
+    )
     return spectral_vectors, amplitudes
 
 
@@ -159,15 +161,27 @@ def generate_parameters(param_config):
     kinetic_keys = ["k1", "k2", "k3"]
     concentration_keys = ["E0", "S0"]
     kinetic_coeff_range = generate_range_config(param_config, kinetic_keys)
-    initial_concentration_range = generate_range_config(param_config, concentration_keys)
+    initial_concentration_range = generate_range_config(
+        param_config, concentration_keys
+    )
 
     spectra_config = (param_config["spectra_min"], param_config["spectra_max"])
     amplitude_config = (param_config["amplitude_min"], param_config["amplitude_max"])
 
-    spectral_vectors, amplitudes = generate_spectral_data(4, spectra_config, amplitude_config)
+    spectral_vectors, amplitudes = generate_spectral_data(
+        4, spectra_config, amplitude_config
+    )
 
-    parameters = {key: generate_random_parameters(*kinetic_coeff_range[key]) for key in kinetic_keys}
-    parameters.update({key: generate_random_parameters(*initial_concentration_range[key]) for key in concentration_keys})
+    parameters = {
+        key: generate_random_parameters(*kinetic_coeff_range[key])
+        for key in kinetic_keys
+    }
+    parameters.update(
+        {
+            key: generate_random_parameters(*initial_concentration_range[key])
+            for key in concentration_keys
+        }
+    )
     parameters["spectral_vectors"] = spectral_vectors
     parameters["amplitudes"] = amplitudes
 
@@ -186,13 +200,18 @@ def generate_datapoint_dictionary(parameters):
     """
     k1, k2, k3 = parameters["k1"], parameters["k2"], parameters["k3"]
     E0, S0 = parameters["E0"], parameters["S0"]
-    spectral_vectors, amplitudes = parameters["spectral_vectors"], parameters["amplitudes"]
+    spectral_vectors, amplitudes = (
+        parameters["spectral_vectors"],
+        parameters["amplitudes"],
+    )
     initial_conditions = [E0, S0, 0.0, 0.0]  # E0, S0, ES0, P0
 
     simulator = MichaelisMentenSimulation()
     conc_simulation = simulator.run_simulation((k1, k2, k3), initial_conditions)
 
-    U_svd, sigma_svd, Vt_svd = simulate_svd(spectral_vectors, conc_simulation, amplitudes)
+    U_svd, sigma_svd, Vt_svd = simulate_svd(
+        spectral_vectors, conc_simulation, amplitudes
+    )
     R_matrix = calculate_r_matrix(U_svd[:, :3], conc_simulation).T
 
     datapoint = {

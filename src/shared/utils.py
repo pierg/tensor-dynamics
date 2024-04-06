@@ -1,7 +1,7 @@
-'''
+"""
 Author: Piergiuseppe Mallozzi
 Date: November 2023
-'''
+"""
 
 import argparse
 import json
@@ -215,9 +215,11 @@ def git_pull(folder=None, prefer_local=True):
         os.chdir(original_cwd)
 
 
-def git_push(folder=None, commit_message="Update files", max_retries=5, wait_interval=5):
+def git_push(
+    folder=None, commit_message="Update files", max_retries=5, wait_interval=5
+):
     """
-    Pushes changes to a GitHub repository using token-based authentication. 
+    Pushes changes to a GitHub repository using token-based authentication.
     If other git processes are running, it waits and retries a few times before giving up.
 
     Args:
@@ -238,7 +240,9 @@ def git_push(folder=None, commit_message="Update files", max_retries=5, wait_int
     if not repo_url.startswith("https://"):
         raise ValueError("The repository URL must start with 'https://'")
 
-    repo_url_with_token = repo_url.replace("https://", f"https://{github_token}:x-oauth-basic@")
+    repo_url_with_token = repo_url.replace(
+        "https://", f"https://{github_token}:x-oauth-basic@"
+    )
 
     if folder is None:
         folder = Path.cwd()
@@ -254,7 +258,9 @@ def git_push(folder=None, commit_message="Update files", max_retries=5, wait_int
             try:
                 # Check if the lock file exists, which indicates an ongoing Git operation
                 if (folder / ".git/index.lock").exists():
-                    print(f"Git lock file detected. Waiting for other git processes. Attempt {attempt + 1} of {max_retries}")
+                    print(
+                        f"Git lock file detected. Waiting for other git processes. Attempt {attempt + 1} of {max_retries}"
+                    )
                     time.sleep(wait_interval)
                     continue
 
@@ -276,7 +282,6 @@ def git_push(folder=None, commit_message="Update files", max_retries=5, wait_int
 
     finally:
         os.chdir(original_cwd)
-
 
 
 # -------------------------
